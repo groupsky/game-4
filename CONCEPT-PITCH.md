@@ -1,15 +1,17 @@
 # Circuit Quest: From Potatoes to Processors
 
-**Game Design Document - Concept Pitch**
+**Game Design Document - Complete Pitch v2.0**
 
 ---
 
 ## Executive Summary
 
 **Genre**: Educational Sandbox / Progression Crafting  
-**Platform**: PC/Web (potential mobile)  
+**Platform**: PC/Web/Mobile  
 **Target Audience**: Ages 12+, makers, engineers, puzzle enthusiasts  
 **Tagline**: *"Build a computer using everything in your house... then invent the future"*
+
+**Core Innovation**: 2D hand-drawn sketch aesthetic with personality-driven components and robust user-generated challenge system.
 
 ---
 
@@ -17,33 +19,147 @@
 
 Players **literally build the history of computing** - starting with a potato battery powering an LED, ending with designing their own CPU architecture. Every component is crafted from household items or unlocked historical parts.
 
+The game uses a **charming 2D sketch aesthetic** (like an inventor's notebook) where components have personality - batteries yawn when low, LEDs smile when lit, relays wink when they click. Players can create and share circuit challenges with the community.
+
 ### Why This Works
 - **Educational**: Learn real electrical engineering through play
 - **Tangible**: "I could actually build this at home!"
 - **Progressive**: Start simple, get infinitely complex
-- **Creative**: Sandbox mode for experimentation
+- **Creative**: Sandbox mode + user-generated challenges
 - **Historical**: Understand *why* technology evolved
+- **Accessible**: 2D sketch style reduces intimidation
+- **Endless Content**: Community creates challenges forever
 
 ---
 
 ## Gameplay Loop
 
 ```
-Scavenge → Craft → Test → Learn → Unlock → Repeat
+Scavenge → Craft → Test → Learn → Unlock → Share/Challenge → Repeat
 ```
 
 ### Example Player Session (First 10 Minutes)
 
 1. **Tutorial**: "Find items in your kitchen"
 2. **Scavenge**: Player clicks on potato, nails, copper wire
-3. **Craft**: Drag-and-drop to build battery
-4. **Test**: Connect to LED - see voltage readout: 0.9V!
-5. **Challenge**: Try to power calculator - fails! Not enough current
-6. **Learn**: Game explains series circuits with visual diagram
+3. **Craft**: Drag-and-drop to build battery (components animate with personality)
+4. **Test**: Connect to LED - see voltage readout: 0.9V! LED smiles! ⚡😊
+5. **Challenge**: Try to power calculator - fails! LED frowns 😞
+6. **Learn**: Game explains series circuits with animated sketch
 7. **Experiment**: Build 5 potato batteries in series → 4.5V
-8. **Success**: Calculator powers on! Achievement unlocked
+8. **Success**: Calculator powers on! Achievement unlocked, confetti animation!
 9. **Unlock**: "Battery Tech Tree" opens, new components available
-10. **Hook**: "Want to power something bigger? Try building a radio..."
+10. **Share**: "Turn this into a challenge for friends?"
+11. **Hook**: "Want to power something bigger? Try building a radio..."
+
+---
+
+## Art Direction: "Inventor's Sketchbook"
+
+### Visual Style
+**Core Aesthetic**: 2D hand-drawn cartoonish sketch style, as if everything is drawn in an inventor's notebook
+
+#### Style Pillars
+
+**1. Sketchbook Foundation**
+- Graph paper background (faint grid lines)
+- Hand-drawn component illustrations
+- Pencil sketch annotations and labels
+- Coffee stains and eraser marks for character
+- Doodles in margins (failed experiments, ideas)
+- Post-it notes for tutorials
+
+**2. Component Personalities**
+```
+Components have expressions and reactions:
+
+⚡ Battery               💡 LED                🔧 Relay
+┌─────────┐            ┌─────┐              ┌───────┐
+│  ^  ^  │ (Full)     │ ★★★ │ (Bright)     │ •   • │ (Active)
+│  ◡    ◡  │            │ ◡◡◡ │              │   ◡   │
+│  (==)  │            │ ╰○╯ │              │ | ⚡ | │
+└─────────┘            └─────┘ *sparkle*    └───────┘ *CLACK!*
+
+┌─────────┐            ┌─────┐              ┌───────┐
+│  -  -  │ (Low)      │     │ (Off)        │ o   o │ (Open)
+│   ︶   │            │  ◡  │              │   ◡   │
+│  zzz  │            │     │              │ |   | │
+└─────────┘            └─────┘              └───────┘ *click*
+```
+
+**3. Hand-Drawn Aesthetic**
+- Wobbly lines (not perfect CAD)
+- Hatching/cross-hatching for shading
+- Colored pencil style for highlights
+- Sketch construction lines visible
+- Imperfect circles and curves (human touch)
+- Notebook margin notes in cursive
+
+**4. Visual Feedback**
+- **Electricity Flow**: Cartoon lightning bolts ⚡ and sparks ✨
+- **Current**: Animated dotted arrows ──→⚡──→
+- **Voltage**: Glowing intensity (brighter = higher voltage)
+- **Smoke**: Puffy cartoon clouds when overcurrent 💨
+- **Success**: Stars, sparkles, happy component faces
+- **Failure**: Sad faces, question marks, X marks
+
+#### Color Palette
+```
+Primary Notebook Colors:
+- Paper White: #F5F5DC (aged paper)
+- Pencil Gray: #4A4A4A (sketch lines)
+- Pen Blue: #1E3A8A (circuit traces)
+- Copper: #B87333 (wire highlights)
+
+Accent Colors:
+- Warning Red: #DC2626 (too much current!)
+- Success Green: #16A34A (working circuit!)
+- Power Yellow: #FBBF24 (electricity flow)
+- Highlight Orange: #F97316 (selected)
+```
+
+#### Animation Style
+Based on 12 principles of animation:
+- **Bouncy physics**: Components wiggle when placed
+- **Squash and stretch**: Wires flex, components compress
+- **Anticipation**: Components "wind up" before activating
+- **Follow-through**: Sparks linger, smoke drifts slowly
+- **Personality**: Each component type has unique movement style
+
+### Audio Design
+- **Satisfying clicks**: Relay switches (mechanical clack!)
+- **Electrical hum**: Transformers, power supplies (bzzzz)
+- **Cartoonish sounds**: Boings, zaps, pops, whooshes
+- **Era music**: 1920s jazz → 1950s rock → 1980s synth
+- **Voice-over**: Friendly inventor character (optional)
+- **Component voices**: Subtle personality sounds (happy beep, sad buzz)
+
+### UI/UX: "Inventor's Desk"
+```
+┌──────────────────────────────────────────┐
+│  📔 Circuit Quest - Inventor's Notebook  │
+├──────────────────────────────────────────┤
+│  ┌────────────────────────────┐          │
+│  │ [Graph Paper Workspace]    │  [📦]   │
+│  │                            │  Parts   │
+│  │      ⚡───●───💡          │  Drawer  │
+│  │     /              \        │          │
+│  │   🔋──────────────●        │  [📋]   │
+│  │                            │  Goals   │
+│  │   V: 4.5V  I: 15mA        │          │
+│  └────────────────────────────┘  [🏆]   │
+│                                   Score   │
+│  💬 "Great! The LED is happy!"           │
+│     [Next Challenge →]                   │
+└──────────────────────────────────────────┘
+```
+
+- **Notebook interface**: Pages flip between menus
+- **Post-it notes**: Tutorials appear as sticky notes
+- **Pencil cursor**: Changes to eraser, ruler, wire tool
+- **Component drawer**: Pull-out sketchbook pages
+- **Margin notes**: Tips in cursive handwriting
+- **Speech bubbles**: Components give hints and reactions
 
 ---
 
@@ -54,23 +170,37 @@ Scavenge → Craft → Test → Learn → Unlock → Repeat
 **Duration**: 2-4 hours gameplay
 
 #### Available Components
-- **Power Sources**: Potato/lemon batteries, saltwater cells
-- **Passive Components**: Pencil resistors, foil capacitors, wire coils
-- **Output Devices**: LEDs, light bulbs, buzzers, motors
-- **Special**: Crystal radio (no power source needed!)
+- **Power**: Potato/lemon batteries, saltwater cells
+- **Passive**: Pencil resistors, foil capacitors, wire coils
+- **Output**: LEDs, light bulbs, buzzers, motors
+- **Special**: Crystal radio (no power needed!)
 
 #### Key Milestones
-1. Light an LED with potato battery
-2. Build a working electromagnet
-3. Create a simple motor
-4. Receive AM radio signal (crystal radio)
-5. **Final Challenge**: Power a light bulb for 1 minute
+1. Light an LED with potato battery (first "aha!")
+2. Build working electromagnet (pick up paperclips)
+3. Create simple motor (watch it spin!)
+4. Receive AM radio signal (hear real stations!)
+5. **Final Boss**: Power a light bulb for 1 minute
 
-#### Learning Goals
-- Voltage, current, resistance (Ohm's Law)
-- Series vs. parallel circuits
-- Electromagnetic induction
-- Resonance and tuning
+#### Example Circuit (Sketch Style)
+```
+    📔 My First Circuit! ⚡
+    ════════════════════════
+    
+    ╭─────╮                 ┌─────┐
+    │ 🥔  │~~~~~~~~~~~~~~~~~│ 💡  │
+    │😊9V │  copper wire    │ 🤩  │
+    ╰─────╯                 └─────┘
+    Potato                  LED
+    Battery                 (SO BRIGHT!)
+    
+    ✏️ Notes: 
+    - Used nail from garage
+    - Copper from old lamp
+    - IT ACTUALLY WORKS!!!
+    
+    Next idea: Can I power a calculator? 🤔
+```
 
 ---
 
@@ -79,31 +209,45 @@ Scavenge → Craft → Test → Learn → Unlock → Repeat
 **Duration**: 8-15 hours gameplay
 
 #### Available Components
-- **Logic Elements**: Electromagnetic relays, vacuum tubes
+- **Logic**: Electromagnetic relays, vacuum tubes
 - **Memory**: Ferrite core memory, punch cards
-- **Input/Output**: Switches, indicator lights, card readers
+- **I/O**: Switches, indicator lights, card readers
 - **Power**: Wall outlets, battery arrays
 
 #### Key Milestones
-1. Build a relay (from coil + switch)
-2. Create logic gates (AND, OR, NOT)
-3. Build a 1-bit adder
-4. Build a 4-bit adder
-5. Create a simple calculator
-6. Build core memory (8 bytes!)
-7. **Final Challenge**: Create a programmable calculator
-
-#### Learning Goals
-- Boolean logic
-- Binary arithmetic
-- State machines
-- Memory addressing
-- How computers actually work (mechanically)
+1. Build a relay from scratch (coil + contacts)
+2. Create logic gates (AND, OR, NOT with relays)
+3. Build 1-bit adder (hear the relay symphony!)
+4. Build 4-bit adder (calculator taking shape!)
+5. Create simple calculator (multiplication works!)
+6. Build core memory - 8 whole bytes! 
+7. **Final Boss**: Programmable calculator
 
 #### Special Challenges
-- **"Colossus Challenge"**: Break an encrypted code using relay logic
-- **"ENIAC Recreation"**: Build computer within size/weight limits
-- **"Efficiency Mode"**: Minimize relay count in design
+- **"Colossus Challenge"**: Break encrypted code
+- **"ENIAC Recreation"**: Build within weight limit
+- **"Efficiency Mode"**: Minimize relay count
+
+#### Relay Logic Example
+```
+    📔 AND Gate Design
+    ══════════════════════
+    
+    Input A ──┐
+              │  ┌───────┐
+              ├──┤ 🔧😊  │──→ Output
+              │  │Relay 1│
+    Input B ──┘  └───────┘
+    
+    Truth Table:
+    A | B | Out
+    0 | 0 | 0  ✓
+    0 | 1 | 0  ✓
+    1 | 0 | 0  ✓
+    1 | 1 | 1  ✓
+    
+    *click* *clack* Music! 🎵
+```
 
 ---
 
@@ -113,67 +257,173 @@ Scavenge → Craft → Test → Learn → Unlock → Repeat
 
 #### Available Components
 - **Transistors**: NPN, PNP, MOSFET
-- **Integrated Circuits**: Gates, flip-flops, counters, ALUs
+- **ICs**: Gates, flip-flops, counters, ALUs
 - **Memory**: RAM, ROM chips
-- **Interfaces**: 7-segment displays, keyboards, screens
+- **I/O**: 7-segment displays, keyboards, screens
 
 #### Key Milestones
-1. Build transistor logic gates
-2. Create a D flip-flop (memory cell)
-3. Design an ALU (Arithmetic Logic Unit)
-4. Build a simple CPU (4-bit)
-5. Design instruction set architecture
-6. Create a complete computer system
+1. Build transistor logic gates (so tiny!)
+2. Create D flip-flop (memory cell!)
+3. Design ALU (arithmetic unit)
+4. Build simple CPU (4-bit to start)
+5. Design instruction set
+6. Create complete computer system
 7. Write assembly code for your computer
-8. **Final Challenge**: Run Pong on your homemade computer
-
-#### Learning Goals
-- Transistor operation
-- Sequential vs. combinational logic
-- CPU architecture
-- Assembly programming
-- Computer organization
+8. **Final Boss**: Run Pong on your creation!
 
 #### Advanced Features
-- **Visual Circuit Editor**: Design custom ICs
-- **Timing Diagrams**: See signal propagation
-- **Optimization**: Minimize gate count, power, or delay
-- **Programming**: Write programs for your creation
+- Visual IC editor (design custom chips)
+- Timing diagrams (see signals propagate)
+- Optimization challenges (speed/power/size)
+- Assembly programming mini-game
 
 ---
 
-## Unique Features
+## User-Generated Challenge System
 
-### 1. Real Physics, Gamified
-- **Visual Current Flow**: Particles flowing through wires
-- **Real Measurements**: Oscilloscope, multimeter tools
-- **Failure States**: Smoke effects if wired wrong (but forgiving)
-- **"Why?" System**: Click any failure → tutorial explanation
+### "The Challenge Workshop" - Core Community Feature
 
-### 2. Historical Context
-- **Era-Specific Challenges**: Solve problems engineers actually faced
-- **Historical Photos**: Unlock as you progress
-- **Famous Quotes**: Edison, Tesla, Turing, etc.
-- **Timeline**: See your progress on computing history timeline
+Players can create three types of challenges:
 
-### 3. Creative Sandbox Mode
-- All components unlocked
-- No resource constraints
-- Export/import designs as "blueprints"
-- Community sharing system
-- Weekly design challenges
+#### A) Design Challenges
+**"Build something that meets specs"**
 
-### 4. Multiplayer Options (Future)
-- **Co-op**: One player designs power system, other designs logic
-- **Trading Post**: Exchange rare components
-- **Async Challenges**: "Improve my design" competitions
-- **Leaderboards**: Most efficient designs
+Example challenges:
+- "Build 4-bit adder using max 20 relays"
+- "Power this motor using only household items"
+- "Create radio tuner for exactly 550 kHz"
+
+**Creator tools:**
+- Set constraints (max components, power, time)
+- Define success criteria (voltage range, timing)
+- Add test cases (input → expected output)
+- Tag difficulty (⚡⚡⚡○○ = medium)
+
+#### B) Puzzle Challenges
+**"Figure out how this works"**
+
+Black Box Mode:
+- Show behavior, hide circuit
+- "Replicate this mystery circuit"
+- "Given outputs, recreate inputs"
+- Reverse engineering puzzles
+
+Debug Mode:
+- "Find the 3 errors in this circuit"
+- "Why doesn't this calculator work?"
+- Teaching through troubleshooting
+
+#### C) Creative Showcases
+**"Check out what I built!"**
+
+Open-ended sharing:
+- "My 8-bit CPU design"
+- "Working music synthesizer"
+- "Animated LED matrix display"
+- Remixable (others can improve it)
+
+### Challenge Editor Interface
+```
+┌────────────────────────────────────────┐
+│ 📋 Challenge Builder                   │
+├────────────────────────────────────────┤
+│  Title: ________________________       │
+│  Your Amazing Circuit Name Here        │
+│                                        │
+│  ┌──────────────────────────┐         │
+│  │  [Draw Circuit Here]     │         │
+│  │                          │   [📦]  │
+│  │    🔋───●───🔧───💡     │   Add   │
+│  │        /                 │   Parts │
+│  └──────────────────────────┘         │
+│                                        │
+│  ⚙️ Constraints:                       │
+│  ☑ Max 15 components                  │
+│  ☑ Under 10 Watts                     │
+│  ☐ Time limit: [60] seconds           │
+│  ☐ Required parts: [Select...]        │
+│                                        │
+│  ✅ Test Cases: [Add +]                │
+│  1. Input: [A=1, B=1] → Out: [1] ✓    │
+│  2. Input: [A=0, B=1] → Out: [0] ✓    │
+│                                        │
+│  🎯 Difficulty: ⚡⚡⚡○○ (Medium)        │
+│  🏷️ Tags: #logic #beginner #relay     │
+│                                        │
+│  Description:                          │
+│  ┌────────────────────────────┐       │
+│  │ Build an AND gate using... │       │
+│  └────────────────────────────┘       │
+│                                        │
+│  [🧪 Test Challenge] [📤 Publish]     │
+└────────────────────────────────────────┘
+```
+
+### Challenge Discovery: "Inventor's Bulletin Board"
+```
+┌────────────────────────────────────────┐
+│ 📌 Community Challenges                │
+├────────────────────────────────────────┤
+│  🌟 Featured Today:                    │
+│  "Mystery Calculator" by @TeslaFan     │
+│  ⚡⚡⚡⚡○ | 847 attempts | 234 solved  │
+│  "Can you figure out how it works?"    │
+│  [Try It →]                            │
+│                                        │
+│  🔥 Trending This Week:                │
+│  1. "Potato Power Challenge" ⚡○○○○   │
+│     2.4K attempts | 89% complete       │
+│  2. "Relay Logic Puzzle" ⚡⚡⚡○○      │
+│     1.8K attempts | 45% complete       │
+│  3. "Build a Radio" ⚡⚡⚡⚡○          │
+│     956 attempts | 23% complete        │
+│                                        │
+│  🔍 Search: [_________] 🔎             │
+│  Filter: [Difficulty ▼] [Era ▼]       │
+│          [#Tags ▼]                     │
+│                                        │
+│  Sort: [🔥 Hot] [⭐ Top] [🆕 New]      │
+└────────────────────────────────────────┘
+```
+
+### Reward System
+**Inventor Points & Badges**
+
+Points earned:
+- Create challenge: +10
+- Solve challenge: +5 to +50 (by difficulty)
+- First solver bonus: +25
+- Challenge gets upvote: +1 to creator
+- Featured challenge: +100
+
+Badges (sketch-style icons):
+- 🏆 "Edison's Apprentice" - 10 solved
+- ⚡ "Tesla's Prodigy" - 50 solved
+- 🔧 "Challenge Architect" - 5 created
+- 🎓 "Master Engineer" - 100 solved
+- 💡 "Lightbulb Moment" - First on hard challenge
+- 🔥 "Viral Creator" - Challenge hits 1000 attempts
+
+### Social Features
+- **Follow creators**: See their new challenges
+- **Comment system**: Tips in sketch-style bubbles
+- **Screenshot sharing**: Export as notebook page image
+- **Video replays**: Timelapse of solution (sketch animation)
+- **Leaderboards**: Fastest solves, most efficient designs
+- **Teams**: Collaborative challenge creation
+
+### Moderation & Quality
+- Auto-validation (must be solvable)
+- Community rating (thumbs up/down)
+- Report system (impossible/broken)
+- Dev curation (weekly featured picks)
+- Tutorial highlighting (best beginner content)
 
 ---
 
 ## Crafting System
 
-### Material Types
+### Material Progression
 ```
 Basic Materials → Components → Circuits → Systems
 ```
@@ -181,126 +431,136 @@ Basic Materials → Components → Circuits → Systems
 #### Tier 1: Household Items
 - Potato, lemon, salt, water
 - Aluminum foil, copper wire, nails
-- Paper, cardboard, pencil (graphite)
+- Paper, cardboard, pencil graphite
 - Mason jars, plastic wrap
 
 #### Tier 2: Hardware Store
 - Wire coils, magnets
 - Switches, terminals
 - Light bulbs, buzzers
-- Basic electronic components
+- Basic electronics
 
 #### Tier 3: Electronic Parts
 - Diodes, transistors
-- Capacitors, resistors (standardized)
+- Resistors, capacitors (standard values)
 - ICs, microcontrollers
 - Displays, interfaces
 
 ### Example Recipes
 
-**Potato Battery**
+**Potato Battery** 🥔
+```
+Recipe:
 - 1 Potato
-- 1 Zinc nail (galvanized)
-- 1 Copper wire/coin
-- Output: 0.9V, 1mA max
+- 1 Zinc nail
+- 1 Copper wire
+= Battery (0.9V, 1mA)
 
-**Crystal Radio**
-- 1 Wire coil (tuning inductor)
+Personality: 😊 when fresh, 😴 when old
+Degrades: 1% per game-hour
+```
+
+**Crystal Radio** 📻
+```
+Recipe:
+- 1 Wire coil (100 turns)
 - 1 Variable capacitor
 - 1 Diode (detector)
 - 1 Earphone
-- No power source needed!
+= Radio (no power needed!)
 
-**Electromagnetic Relay**
-- 1 Wire coil (100 turns)
+Special: Receives real AM frequencies!
+Tuning: f = 1/(2π√LC)
+```
+
+**Electromagnetic Relay** 🔧
+```
+Recipe:
+- 1 Wire coil (electromagnet)
 - 1 Iron nail (core)
+- 1 Spring contact
 - 1 Switch mechanism
-- 1 Spring
-- Output: Logic gate building block
+= Logic gate building block
+
+Personality: Winks when it clicks! 😉
+Sound: *click-CLACK!*
+```
 
 ---
 
 ## Educational Philosophy
 
 ### Learning by Doing
-- **No lectures**: Learn through experimentation
+- **No lectures**: Discover through experimentation
 - **Immediate feedback**: See results instantly
-- **Scaffolded complexity**: Each step builds on last
+- **Scaffolded complexity**: Each step builds naturally
 - **Multiple paths**: Different ways to solve challenges
+- **Fail forward**: Mistakes are learning opportunities
 
 ### Intuition First, Math Second
-- Show current flow visually
+- Show current flow visually (animated particles)
 - Explain concepts through analogy
 - Math equations available but optional
-- "Feel" how circuits work before calculating
+- "Feel" circuits before calculating
 
 ### Historical Context = Motivation
 Players understand:
 - Why vacuum tubes were revolutionary
 - Why transistors changed everything
-- Why integrated circuits enabled computers
-- How we got from room-sized to pocket-sized
-
----
-
-## Art Direction
-
-### Visual Style
-**Theme**: Cozy workshop/inventor's lab aesthetic
-
-- **Hand-drawn schematic look**: Circuits that come alive
-- **Blueprint UI**: Notebook/graph paper backgrounds
-- **Particle effects**: Electricity as flowing particles
-- **Material textures**: Wood, metal, paper feel tactile
-- **Historical photos**: Black & white archival images
-
-### Audio Design
-- **Satisfying clicks**: Relay switches, button presses
-- **Electrical hum**: Transformers, power supplies
-- **Era-appropriate music**: 1920s → 1950s → 1980s styles
-- **Voice-over tutorials**: Friendly inventor character
-
-### UI/UX
-- **Minimal HUD**: Focus on the workshop
-- **Context menus**: Right-click for component info
-- **Visual feedback**: Voltage/current as glowing intensity
-- **Tooltips**: Always available, never intrusive
+- Why ICs enabled modern computing
+- How room-sized became pocket-sized
 
 ---
 
 ## Technical Requirements
 
 ### Simulation Engine
-**95% Analytical Formulas** (instant calculations)
-- Ohm's Law: V = IR
-- Power: P = VI
-- RC circuits: V(t) = V₀(1 - e^(-t/RC))
-- LC resonance: f = 1/(2π√LC)
-- Voltage dividers, current dividers
 
-**5% Numerical Integration** (for complex circuits)
-- RK4 solver for transistor amplifiers
-- Boolean logic engine for digital circuits
-- State machine for relay computers
+**95% Analytical Formulas** (instant, no ODE solver)
+```javascript
+// Most circuits use direct formulas
+voltage_divider = (Vin, R1, R2) => Vin * R2/(R1+R2)
+RC_charge = (V, R, C, t) => V * (1 - exp(-t/(R*C)))
+LC_frequency = (L, C) => 1/(2π*√(L*C))
+power = (V, I) => V * I
+```
 
-### Platform Considerations
+**5% Numerical (RK4 for complex circuits)**
+```javascript
+// Only for multi-transistor amplifiers
+const ode_rk4 = require('ode-rk4');
+// Lazy-loaded when needed
+```
+
+**Boolean Logic** (digital/relay circuits)
+```javascript
+// Simple gates
+AND = (a, b) => a && b
+OR = (a, b) => a || b  
+NOT = (a) => !a
+XOR = (a, b) => a !== b
+```
+
+### Platform
 **Web Version** (Primary)
-- Three.js for 3D visualization
-- Web Audio API for sound
-- Canvas/WebGL for circuit rendering
-- Local storage for saves
+- Pixi.js or Canvas 2D (sketch rendering)
+- SVG filters (pencil texture, wobble effect)
+- Web Audio API (sounds)
+- Local storage (saves)
+- IndexedDB (challenge database)
 
 **Downloadable** (Secondary)
 - Electron wrapper
+- Steam Workshop integration
 - Better performance
 - Offline play
-- Steam integration
 
 ### Performance Targets
-- 60 FPS with 100+ components on screen
+- 60 FPS with 100+ components
 - < 100ms simulation step
-- < 50MB download size (base game)
-- Works on 5-year-old hardware
+- < 50MB base download
+- Runs on 5-year-old hardware
+- Mobile-friendly touch controls
 
 ---
 
@@ -308,72 +568,77 @@ Players understand:
 
 ### Free Base Game
 - Act 1 complete (household experiments)
-- Act 2 partial (up to relay logic)
+- Act 2 partial (relay logic basics)
 - Sandbox mode (limited components)
+- Challenge system (create & play unlimited)
 
 ### Premium DLC (Optional)
-**"The Vacuum Tube Age"** - $4.99
-- Act 2 complete
-- Tube circuits and radio receivers
-- Historical challenges
+- **"Vacuum Tube Age"** ($4.99) - Act 2 complete
+- **"Transistor Revolution"** ($4.99) - Act 3 partial
+- **"Microprocessor Era"** ($4.99) - Act 3 complete
 
-**"The Transistor Revolution"** - $4.99
-- Act 3 up to basic ICs
-- Transistor circuits and amplifiers
-- CPU design basics
-
-**"The Microprocessor Era"** - $4.99
-- Act 3 complete
-- Full CPU architecture
-- Assembly programming
-
-### Alternative: One-Time Purchase
-- $14.99 for complete game
-- All acts unlocked
-- Free updates
+### Alternative Model
+- **$14.99 one-time purchase** - Everything unlocked
+- Free updates forever
 - Support indie development
+
+### Cosmetic DLC
+- Notebook themes (vintage, modern, cyberpunk)
+- Component skins (steampunk, sci-fi)
+- Sound packs (realistic, retro, futuristic)
+
+---
+
+## Marketing Strategy
+
+### Target Audiences
+1. **Students (12-18)**: "Learn while gaming"
+2. **Makers/Hobbyists**: "Build what you play"
+3. **Teachers**: "Engaging classroom tool"
+4. **Engineers**: "Remember learning this?"
+5. **Puzzle Gamers**: "Creative challenges"
+
+### Marketing Channels
+- **YouTube**: "Potato to processor" timelapses
+- **TikTok**: Short challenge completions (viral potential!)
+- **Instagram**: Daily featured challenges, sketch art
+- **Reddit**: r/electronics, r/DIY, r/gaming
+- **Discord**: Creator community hub
+- **Maker Fairs**: Playable demos
+- **STEM Conferences**: Educational tool demos
+- **Twitch**: Speedruns, challenge races
+
+### Press Angles
+- "The hand-drawn game teaching computer science"
+- "From potatoes to processors: gaming meets education"
+- "Players create 10,000+ educational challenges"
+- "User-generated STEM education that works"
+- "Minecraft meets electrical engineering"
 
 ---
 
 ## Success Metrics
 
 ### Educational Impact
-- Players can explain basic circuits after Act 1
-- Players understand boolean logic after Act 2
-- Players grasp CPU architecture after Act 3
-- Teachers request classroom licenses
+- Players explain circuits after Act 1
+- Understand boolean logic after Act 2
+- Grasp CPU architecture after Act 3
+- Teacher adoption in classrooms
 
 ### Engagement
-- Average session: 45+ minutes
-- Completion rate: 40%+ finish Act 1
-- Community: Active blueprint sharing
-- Retention: 30% return after 1 week
+- 45+ minute average sessions
+- 40%+ complete Act 1
+- 30% return after 1 week
+- **UGC**: 10K+ challenges created (year 1)
+- **UGC**: 50K+ attempts per month
+- **UGC**: 20% of players create challenges
 
 ### Commercial
-- 50K downloads in first year (web)
-- 10K sales if premium (realistic indie)
-- 4.0+ rating on Steam/stores
-- Positive press from education sector
-
----
-
-## Comparable Games & Differentiation
-
-### Similar Games
-| Game | Similarity | How We're Different |
-|------|-----------|-------------------|
-| **Minecraft** | Creative building | We teach real engineering |
-| **Factorio** | Complex systems | Focus on electronics, not factory |
-| **Human Resource Machine** | Programming education | Hardware focus, not software |
-| **Opus Magnum** | Engineering puzzles | Open-ended, not puzzle-based |
-| **Shenzhen I/O** | Circuit design | More accessible, historical context |
-
-### Our Unique Selling Points
-1. **Only game teaching real EE through play**
-2. **Household items make it tangible**
-3. **Historical progression is inherently engaging**
-4. **Both creative and educational**
-5. **Accessible to beginners, deep for experts**
+- 50K downloads first year (web)
+- 10K premium sales (indie realistic)
+- 4.0+ rating (Steam/stores)
+- Positive education press
+- 1000+ active challenge creators
 
 ---
 
@@ -381,174 +646,293 @@ Players understand:
 
 ### Phase 1: Prototype (3 months)
 - Core simulation engine
-- Act 1 basic components
-- Potato battery → LED working
-- Basic UI/UX
+- Basic sketch rendering
+- Act 1 components (potato → LED)
+- Component personality system
+- Basic UI
 
 ### Phase 2: Vertical Slice (3 months)
 - Complete Act 1
 - Polish gameplay loop
 - Tutorial system
+- **Challenge creation prototype**
 - Audio/visual polish
 
 ### Phase 3: Alpha (6 months)
-- Act 2 implementation
-- Relay logic system
+- Act 2 (relay logic)
 - Historical challenges
-- Playtesting with educators
+- **Full Challenge Workshop**
+- **Community features**
+- Educator playtesting
 
 ### Phase 4: Beta (3 months)
-- Act 3 implementation
+- Act 3 (transistors/ICs)
 - Sandbox mode
-- Community features
+- **Challenge moderation**
+- **Social features**
 - Bug fixing
 
 ### Phase 5: Launch (1 month)
 - Marketing push
-- Press outreach
+- **50+ dev challenges**
+- **Creator spotlight**
 - Community building
 - Post-launch support
 
-**Total Development Time**: 16 months  
-**Team Size**: 2-4 people (small indie team)
+**Total**: 16 months | **Team**: 2-4 people
+- 1 Programmer (simulation + gameplay)
+- 1 Artist (2D sketch + animation)
+- 1 Designer (levels + UGC tools)
+- 1 Community Manager (part-time)
 
 ---
 
-## Marketing Angles
+## Risk Mitigation
 
-### Primary Audiences
-1. **Students (12-18)**: "Learn while gaming"
-2. **Makers/Hobbyists**: "Build what you play"
-3. **Teachers**: "Classroom tool that's actually fun"
-4. **Nostalgic Engineers**: "Remember when you learned this?"
-5. **Puzzle Gamers**: "Engineering challenges"
-
-### Marketing Channels
-- **YouTube**: "I built a computer from a potato" videos
-- **Reddit**: r/electronics, r/DIY, r/gaming
-- **Maker Fairs**: Demo stations
-- **Educational Conferences**: STEM teaching tool
-- **Twitch**: Speedrun categories (fastest relay computer)
-
-### Press Angles
-- "The game that teaches electrical engineering"
-- "From potatoes to processors: gaming meets education"
-- "This game makes you want to learn physics"
-- "Minecraft meets MIT OpenCourseWare"
-
----
-
-## Risks & Mitigation
-
-### Risk: "Too educational, not fun enough"
+### Risk: "Too educational, not fun"
 **Mitigation**: 
 - Gameplay first, education second
 - No forced tutorials
-- Creative sandbox for pure play
-- Satisfying feedback loops
+- Cartoonish personality = playful
+- Community challenges = endless variety
 
-### Risk: "Too complex for casual players"
+### Risk: "Too complex for casuals"
 **Mitigation**:
-- Extremely gentle difficulty curve
+- Gentle difficulty curve
+- Sketch aesthetic reduces intimidation
 - Optional hints always available
-- Can skip to sandbox mode
-- Multiple difficulty levels
+- Beginner challenges rated by community
 
-### Risk: "Not educational enough for schools"
+### Risk: "Not educational enough"
 **Mitigation**:
-- Align with educational standards
-- Teacher resources/lesson plans
-- Assessment tools for educators
-- Curriculum integration guides
+- Align with STEM standards
+- Teacher resources
+- Assessment tools
+- Custom classroom challenges
 
-### Risk: "Simulation too difficult to build"
+### Risk: "UGC becomes low quality"
 **Mitigation**:
-- Already validated: 95% analytical
-- Start simple, add complexity gradually
-- Open source simulation libraries exist
-- Can simplify for gameplay
+- Auto-validation (must work)
+- Community ratings
+- Moderation tools
+- Featured/curated highlights
+
+---
+
+## Visual Reference Examples
+
+### Component Personality Sketches
+```
+     ⚡ Battery States         💡 LED Emotions
+    ┌─────────┐              ┌─────┐
+    │  ^  ^  │ Full         │ 🤩  │ Very Bright
+    │  ◡  ◡  │              │ ★★★ │
+    └─────────┘              └─────┘
+
+    ┌─────────┐              ┌─────┐
+    │  -  -  │ Low          │ 😊  │ Bright
+    │   ︶   │              │ ✨  │
+    └─────────┘              └─────┘
+
+    ┌─────────┐              ┌─────┐
+    │  x  x  │ Dead         │ 😐  │ Dim
+    │   __  │              │  ·  │
+    └─────────┘              └─────┘
+```
+
+### Circuit Example (Notebook Style)
+```
+    📔 Inventor's Notebook - Page 23
+    ═══════════════════════════════════
+    
+    💡 Parallel Circuits Experiment
+    
+    ╭─────╮                    
+    │ 🔋  │─┬─────●──💡 (LED 1)
+    │ 9V  │ │     │
+    │ 😊  │ └─────●──💡 (LED 2)
+    ╰─────╯       │
+                  ●──💡 (LED 3)
+    
+    ✏️ Observations:
+    - All LEDs equally bright! ⚡⚡⚡
+    - If one fails, others stay on
+    - Battery drains faster (3× current)
+    
+    💭 Idea: Use for Christmas lights?
+    
+    [Coffee stain] ☕
+```
+
+### Animation Sequence
+```
+LED Lighting Up:
+
+Frame 1:     Frame 2:     Frame 3:     Frame 4:
+┌─────┐     ┌─────┐     ┌─────┐     ┌─────┐
+│     │     │  ·  │     │ ·★· │     │ ★★★ │
+│  ◡  │ --> │  ◡  │ --> │ ◡◡◡ │ --> │ 🤩  │
+│     │     │  ·  │     │ ·★· │     │ ★★★ │
+└─────┘     └─────┘     └─────┘     └─────┘
+  Off      Warming...   Glowing     BRIGHT!
+                                   *twinkle*
+
+Current Flow:
+───→ ───→ ───→ ───→ ───→
+   ⚡  ⚡  ⚡  ⚡  ⚡
+```
+
+---
+
+## Comparable Games
+
+| Game | Similarity | Our Difference |
+|------|-----------|----------------|
+| Minecraft | Creative building | Real engineering education |
+| Factorio | Complex systems | Electronics focus + history |
+| Human Resource Machine | Programming education | Hardware, not software |
+| Opus Magnum | Engineering puzzles | Open sandbox + learning |
+| Shenzhen I/O | Circuit design | More accessible + UGC |
+| Little Big Planet | UGC platformer | Educational circuits |
+| Scribblenauts | Sketch aesthetic | Real physics simulation |
+
+**Our USPs:**
+1. Only game teaching real EE through play
+2. Household items = tangible connection
+3. Historical progression = engaging narrative
+4. 2D sketch aesthetic = approachable
+5. Robust UGC = infinite content
+6. Components with personality = charm
+7. Both creative AND educational
 
 ---
 
 ## Closing Statement
 
-**Circuit Quest** fills a gap in both gaming and education. It's the game that makes players say "I never understood electricity until I played this" and "I can't believe I built a working computer!"
+**Circuit Quest** fills a unique gap in both gaming and education. The **hand-drawn sketch aesthetic** makes circuits approachable and charming, while the **robust user-generated challenge system** ensures endless replayability and a self-sustaining community.
 
-By following the historical path of computing - from household experiments to silicon chips - players don't just learn *about* computers; they experience the journey of *inventing* them.
+Players don't just learn *about* computers - they experience the joy of *inventing* them, from potato batteries to processors. Then they share that joy by creating challenges for others.
 
-**One sentence pitch**: *Minecraft meets electrical engineering, where you build computers from scratch using historical and household components.*
+**One sentence**: *A hand-drawn educational sandbox where you build computers from potatoes to processors, then create and share circuit challenges with a global community of makers.*
 
 ---
 
 ## Next Steps
 
-To move forward, we need:
+To move forward:
 
-1. **Prototype Funding**: $20-40K for 3-month prototype
-2. **Team Assembly**: Developer, artist, educator consultant
-3. **Playtesting**: With target audiences
-4. **Partnership Exploration**: Educational institutions, maker communities
-
-**Contact**: [Your Name/Studio]  
-**Date**: September 30, 2025  
-**Version**: 1.0
+1. **Prototype Funding**: $20-40K for 3 months
+2. **Team Assembly**: Developer, artist, educator
+3. **Playtesting**: With students and teachers
+4. **Partnership**: Educational institutions, maker communities
 
 ---
 
-## Appendix: Technical Details
+**Contact**: [Your Studio]  
+**Date**: September 30, 2025  
+**Version**: 2.0 (Complete with UGC & Sketch Aesthetic)
 
-### Simulation Approach
+---
 
-**Analytical Solutions (No ODE solver needed)**
+## Appendix: Technical Implementation
+
+### Art Rendering
 ```javascript
-// 90% of game circuits
-const voltage_divider = (Vin, R1, R2) => Vin * R2 / (R1 + R2);
-const RC_charge = (V, R, C, t) => V * (1 - Math.exp(-t/(R*C)));
-const LC_frequency = (L, C) => 1 / (2 * Math.PI * Math.sqrt(L * C));
-```
-
-**Numerical Integration (RK4 for transistors)**
-```javascript
-// 5% of circuits - only when needed
-const ode_rk4 = require('ode-rk4'); // Lazy load
-// For multi-transistor amplifiers, coupled oscillators
-```
-
-**Boolean Logic (Relay/digital circuits)**
-```javascript
-// 5% of circuits
-const AND = (a, b) => a && b;
-const OR = (a, b) => a || b;
-const NOT = (a) => !a;
-```
-
-### Component Library Examples
-
-```javascript
-const COMPONENTS = {
-  potato_battery: {
-    voltage: 0.9,
-    current_max: 0.001,
-    internal_resistance: 1000,
-    degradation_rate: 0.01 // per hour
-  },
+// SVG filters for sketch effect
+const sketchFilter = `
+  <filter id="pencil">
+    <feTurbulence baseFrequency="0.05"/>
+    <feDisplacementMap scale="2"/>
+  </filter>
   
-  relay: {
-    coil_resistance: 100,
-    switching_voltage: 5,
-    contact_resistance: 0.1,
-    switching_time: 0.010 // 10ms
-  },
-  
-  npn_transistor: {
-    type: 'bjt',
-    beta: 100,
-    vbe_on: 0.7,
-    simulation: 'ode' // Needs RK4
+  <filter id="wobble">
+    <feTurbulence baseFrequency="0.02"/>
+    <feDisplacementMap scale="3"/>
+  </filter>
+`;
+
+// Component animation
+class Component {
+  animate() {
+    // Bouncy placement
+    this.scale.y = 1.2; // Squash
+    setTimeout(() => this.scale.y = 0.9, 100);
+    setTimeout(() => this.scale.y = 1.0, 200);
   }
 }
 ```
 
+### Challenge Data Structure
+```javascript
+interface Challenge {
+  id: string;
+  title: string;
+  creator: string;
+  difficulty: 1|2|3|4|5; // ⚡ count
+  
+  circuit: {
+    components: Component[];
+    connections: Wire[];
+  };
+  
+  constraints: {
+    maxComponents?: number;
+    maxPower?: number;
+    timeLimit?: number;
+  };
+  
+  validation: {
+    testCases: TestCase[];
+    acceptance: (result) => boolean;
+  };
+  
+  metadata: {
+    attempts: number;
+    completions: number;
+    rating: number; // 0-5 stars
+  };
+}
+```
+
+### Component Personality System
+```javascript
+const COMPONENTS = {
+  potato_battery: {
+    sprite: '🥔',
+    voltage: 0.9,
+    personality: {
+      expressions: ['😊', '😐', '😴', '💤'],
+      getExpression(charge) {
+        if (charge > 0.75) return '😊';
+        if (charge > 0.5) return '😐';
+        if (charge > 0.25) return '😴';
+        return '💤';
+      }
+    }
+  },
+  
+  led: {
+    sprite: '💡',
+    personality: {
+      expressions: ['😐', '😊', '😁', '🤩'],
+      animations: ['dim', 'glow', 'bright', 'sparkle'],
+      getBrightness(current) {
+        return Math.min(current / 0.020, 1.0);
+      }
+    }
+  },
+  
+  relay: {
+    sprite: '🔧',
+    personality: {
+      expressions: ['😐', '😲', '🔥'],
+      sounds: ['click.wav', 'clack.wav'],
+      animations: ['open', 'close', 'overheat']
+    }
+  }
+};
+```
+
 ---
 
-**End of Pitch Document**
+**End of Document**
