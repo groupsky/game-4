@@ -75,15 +75,15 @@ Components have expressions and reactions:
 
 ⚡ Battery               💡 LED                🔧 Relay
 ┌─────────┐            ┌─────┐              ┌───────┐
-│  ^  ^  │ (Full)     │ ★★★ │ (Bright)     │ •   • │ (Active)
-│  ◡    ◡  │            │ ◡◡◡ │              │   ◡   │
-│  (==)  │            │ ╰○╯ │              │ | ⚡ | │
+│  ^  ^   │ (Full)     │ ★★★ │ (Bright)     │ •   • │ (Active)
+│ ◡    ◡  │            │ ◡◡◡ │              │   ◡   │
+│  (==)   │            │ ╰○╯ │              │| ⚡ | │
 └─────────┘            └─────┘ *sparkle*    └───────┘ *CLACK!*
 
 ┌─────────┐            ┌─────┐              ┌───────┐
-│  -  -  │ (Low)      │     │ (Off)        │ o   o │ (Open)
-│   ︶   │            │  ◡  │              │   ◡   │
-│  zzz  │            │     │              │ |   | │
+│  -  -   │ (Low)      │     │ (Off)        │ o   o │ (Open)
+│   ︶    │            │  ◡  │              │   ◡   │
+│  zzz    │            │     │              │ |   | │
 └─────────┘            └─────┘              └───────┘ *click*
 ```
 
@@ -140,15 +140,15 @@ Based on 12 principles of animation:
 │  📔 Circuit Quest - Inventor's Notebook  │
 ├──────────────────────────────────────────┤
 │  ┌────────────────────────────┐          │
-│  │ [Graph Paper Workspace]    │  [📦]   │
+│  │ [Graph Paper Workspace]    │  [📦]    │
 │  │                            │  Parts   │
-│  │      ⚡───●───💡          │  Drawer  │
-│  │     /              \        │          │
-│  │   🔋──────────────●        │  [📋]   │
+│  │      ⚡────●────💡         │  Drawer  │
+│  │     /             \        │          │
+│  │   🔋──────────────●        │  [📋]    │
 │  │                            │  Goals   │
-│  │   V: 4.5V  I: 15mA        │          │
-│  └────────────────────────────┘  [🏆]   │
-│                                   Score   │
+│  │    V: 4.5V  I: 15mA        │          │
+│  └────────────────────────────┘  [🏆]    │
+│                                  Score   │
 │  💬 "Great! The LED is happy!"           │
 │     [Next Challenge →]                   │
 └──────────────────────────────────────────┘
@@ -330,32 +330,32 @@ Open-ended sharing:
 │  Title: ________________________       │
 │  Your Amazing Circuit Name Here        │
 │                                        │
-│  ┌──────────────────────────┐         │
-│  │  [Draw Circuit Here]     │         │
-│  │                          │   [📦]  │
-│  │    🔋───●───🔧───💡     │   Add   │
-│  │        /                 │   Parts │
-│  └──────────────────────────┘         │
+│  ┌──────────────────────────┐          │
+│  │  [Draw Circuit Here]     │          │
+│  │                          │   [📦]   │
+│  │    🔋───●───🔧───💡      │   Add    │
+│  │        /                 │   Parts  │
+│  └──────────────────────────┘          │
 │                                        │
 │  ⚙️ Constraints:                       │
-│  ☑ Max 15 components                  │
-│  ☑ Under 10 Watts                     │
-│  ☐ Time limit: [60] seconds           │
-│  ☐ Required parts: [Select...]        │
+│  ☑ Max 15 components                   │
+│  ☑ Under 10 Watts                      │
+│  ☐ Time limit: [60] seconds            │
+│  ☐ Required parts: [Select...]         │
 │                                        │
 │  ✅ Test Cases: [Add +]                │
-│  1. Input: [A=1, B=1] → Out: [1] ✓    │
-│  2. Input: [A=0, B=1] → Out: [0] ✓    │
+│  1. Input: [A=1, B=1] → Out: [1] ✓     │
+│  2. Input: [A=0, B=1] → Out: [0] ✓     │
 │                                        │
-│  🎯 Difficulty: ⚡⚡⚡○○ (Medium)        │
-│  🏷️ Tags: #logic #beginner #relay     │
+│  🎯 Difficulty: ⚡⚡⚡○○ (Medium)      │
+│  🏷️ Tags: #logic #beginner #relay      │
 │                                        │
 │  Description:                          │
-│  ┌────────────────────────────┐       │
-│  │ Build an AND gate using... │       │
-│  └────────────────────────────┘       │
+│  ┌────────────────────────────┐        │
+│  │ Build an AND gate using... │        │
+│  └────────────────────────────┘        │
 │                                        │
-│  [🧪 Test Challenge] [📤 Publish]     │
+│  [🧪 Test Challenge] [📤 Publish]       │
 └────────────────────────────────────────┘
 ```
 
@@ -366,12 +366,12 @@ Open-ended sharing:
 ├────────────────────────────────────────┤
 │  🌟 Featured Today:                    │
 │  "Mystery Calculator" by @TeslaFan     │
-│  ⚡⚡⚡⚡○ | 847 attempts | 234 solved  │
+│  ⚡⚡⚡⚡○ | 847 attempts | 234 solved │
 │  "Can you figure out how it works?"    │
 │  [Try It →]                            │
 │                                        │
 │  🔥 Trending This Week:                │
-│  1. "Potato Power Challenge" ⚡○○○○   │
+│  1. "Potato Power Challenge" ⚡○○○○    │
 │     2.4K attempts | 89% complete       │
 │  2. "Relay Logic Puzzle" ⚡⚡⚡○○      │
 │     1.8K attempts | 45% complete       │
@@ -379,7 +379,7 @@ Open-ended sharing:
 │     956 attempts | 23% complete        │
 │                                        │
 │  🔍 Search: [_________] 🔎             │
-│  Filter: [Difficulty ▼] [Era ▼]       │
+│  Filter: [Difficulty ▼] [Era ▼]        │
 │          [#Tags ▼]                     │
 │                                        │
 │  Sort: [🔥 Hot] [⭐ Top] [🆕 New]      │
@@ -725,18 +725,18 @@ XOR = (a, b) => a !== b
 ```
      ⚡ Battery States         💡 LED Emotions
     ┌─────────┐              ┌─────┐
-    │  ^  ^  │ Full         │ 🤩  │ Very Bright
-    │  ◡  ◡  │              │ ★★★ │
+    │  ^  ^   │ Full         │ 🤩  │ Very Bright
+    │  ◡  ◡   │              │ ★★★ │
     └─────────┘              └─────┘
 
     ┌─────────┐              ┌─────┐
-    │  -  -  │ Low          │ 😊  │ Bright
-    │   ︶   │              │ ✨  │
+    │  -  -   │ Low          │ 😊  │ Bright
+    │   ︶    │              │ ✨  │
     └─────────┘              └─────┘
 
     ┌─────────┐              ┌─────┐
-    │  x  x  │ Dead         │ 😐  │ Dim
-    │   __  │              │  ·  │
+    │  x  x   │ Dead         │ 😐  │ Dim
+    │   __    │              │  ·  │
     └─────────┘              └─────┘
 ```
 
