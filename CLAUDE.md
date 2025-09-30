@@ -1,5 +1,7 @@
 # CLAUDE.md
 
+**IMPORTANT: When adding to this file, ALWAYS write in compact form - remove general knowledge, keep only MUST/SHOULD/ALWAYS/NEVER rules and specific constraints.**
+
 Circuit Quest: educational sandbox game - build computers from household items, 2D "inventor's sketchbook" aesthetic.
 
 **Tech:** React + Vite + Vitest
