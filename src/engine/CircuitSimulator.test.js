@@ -118,4 +118,56 @@ describe('CircuitSimulator', () => {
     const result = simulator.power(5, 2)
     expect(result).toBe(10)
   })
+
+  it('should add voltages from series batteries', () => {
+    const simulator = new CircuitSimulator()
+
+    const battery1 = {
+      id: 1,
+      type: 'battery',
+      charge: 1.0,
+      voltage: 4.5,
+      x: 100,
+      y: 100
+    }
+
+    const battery2 = {
+      id: 2,
+      type: 'battery',
+      charge: 1.0,
+      voltage: 4.5,
+      x: 150,
+      y: 100
+    }
+
+    const led = {
+      id: 3,
+      type: 'led',
+      brightness: 0,
+      x: 200,
+      y: 100
+    }
+
+    const wire1 = {
+      id: 4,
+      from: 1,
+      to: 2
+    }
+
+    const wire2 = {
+      id: 5,
+      from: 2,
+      to: 3
+    }
+
+    simulator.setComponents([battery1, battery2, led])
+    simulator.setWires([wire1, wire2])
+
+    const result = simulator.simulate()
+
+    const updatedLed = result.find(c => c.id === 3)
+    // With 9V total, LED should be brighter than with just 4.5V
+    expect(updatedLed.brightness).toBeGreaterThan(0.3)
+    expect(updatedLed.voltage).toBeCloseTo(9.0, 0.5)
+  })
 })

@@ -12,6 +12,7 @@ export default function CircuitWorkspace() {
   const [offset, setOffset] = useState({ x: 0, y: 0 })
   const [connecting, setConnecting] = useState(null)
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 })
+  const [selectedComponent, setSelectedComponent] = useState(null)
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -50,10 +51,22 @@ export default function CircuitWorkspace() {
     }
 
     // Draw components
-    components.forEach(component => {
+    components.forEach((component, index) => {
       drawComponent(ctx, component)
+
+      // Draw selection indicator
+      if (index === selectedComponent) {
+        ctx.save()
+        ctx.strokeStyle = '#F97316'
+        ctx.lineWidth = 3
+        ctx.setLineDash([5, 5])
+        const size = component.type === 'battery' ? 70 : 40
+        ctx.strokeRect(component.x - size, component.y - size, size * 2, size * 2)
+        ctx.setLineDash([])
+        ctx.restore()
+      }
     })
-  }, [components, wires, connecting, mousePos])
+  }, [components, wires, connecting, mousePos, selectedComponent])
 
   // Run simulation every 100ms
   useEffect(() => {
@@ -66,6 +79,27 @@ export default function CircuitWorkspace() {
 
     return () => clearInterval(interval)
   }, [components, wires])
+
+  // Keyboard handler for delete
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Delete' || e.key === 'Backspace') {
+        if (selectedComponent !== null) {
+          // Delete component
+          setComponents(prev => prev.filter((_, i) => i !== selectedComponent))
+          // Delete connected wires
+          const compId = components[selectedComponent]?.id
+          if (compId) {
+            setWires(prev => prev.filter(w => w.from !== compId && w.to !== compId))
+          }
+          setSelectedComponent(null)
+        }
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [selectedComponent, components])
 
   const drawGraphPaper = (ctx, width, height) => {
     const gridSize = 20
@@ -310,8 +344,66 @@ export default function CircuitWorkspace() {
     const hit = getComponentAt(x, y)
     if (hit) {
       setDragging(hit.index)
+      setSelectedComponent(hit.index)
       setOffset({ x: x - hit.component.x, y: y - hit.component.y })
+    } else {
+      setSelectedComponent(null)
     }
+  }
+
+  const handleContextMenu = (e) => {
+    e.preventDefault()
+    const canvas = canvasRef.current
+    const rect = canvas.getBoundingClientRect()
+    const x = e.clientX - rect.left
+    const y = e.clientY - rect.top
+
+    const hit = getComponentAt(x, y)
+    if (hit) {
+      // Right-click to delete
+      setComponents(prev => prev.filter((_, i) => i !== hit.index))
+      const compId = hit.component.id
+      setWires(prev => prev.filter(w => w.from !== compId && w.to !== compId))
+      setSelectedComponent(null)
+    } else {
+      // Check if clicking on a wire
+      const wire = getWireAt(x, y)
+      if (wire) {
+        setWires(prev => prev.filter(w => w.id !== wire.id))
+      }
+    }
+  }
+
+  const getWireAt = (x, y) => {
+    const threshold = 10
+    for (const wire of wires) {
+      const from = components.find(c => c.id === wire.from)
+      const to = components.find(c => c.id === wire.to)
+      if (!from || !to) continue
+
+      // Check distance to line segment
+      const dist = distanceToLineSegment(x, y, from.x, from.y, to.x, to.y)
+      if (dist < threshold) {
+        return wire
+      }
+    }
+    return null
+  }
+
+  const distanceToLineSegment = (px, py, x1, y1, x2, y2) => {
+    const dx = x2 - x1
+    const dy = y2 - y1
+    const lengthSquared = dx * dx + dy * dy
+
+    if (lengthSquared === 0) return Math.sqrt((px - x1) ** 2 + (py - y1) ** 2)
+
+    let t = ((px - x1) * dx + (py - y1) * dy) / lengthSquared
+    t = Math.max(0, Math.min(1, t))
+
+    const projX = x1 + t * dx
+    const projY = y1 + t * dy
+
+    return Math.sqrt((px - projX) ** 2 + (py - projY) ** 2)
   }
 
   const handleMouseMove = (e) => {
@@ -396,12 +488,14 @@ export default function CircuitWorkspace() {
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
         onMouseLeave={handleMouseUp}
+        onContextMenu={handleContextMenu}
       />
 
       <div className="info-panel">
-        <p>💬 Drag components to move them around! Shift+Click to connect wires.</p>
+        <p>💬 Drag to move | Shift+Click to wire | Right-click or Delete to remove</p>
         <p>Components: {components.length} | Wires: {wires.length}</p>
         {connecting && <p>🔌 Connecting... Click another component to finish wire.</p>}
+        {selectedComponent !== null && <p>🎯 Selected: {components[selectedComponent]?.type} (Press Delete to remove)</p>}
       </div>
     </div>
   )

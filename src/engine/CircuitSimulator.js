@@ -34,21 +34,61 @@ export class CircuitSimulator {
 
   findCircuits() {
     const circuits = []
-    const batteries = this.components.filter(c => c.type === 'battery')
     const leds = this.components.filter(c => c.type === 'led')
 
-    // Simple circuit detection: battery -> LED
-    batteries.forEach(battery => {
-      leds.forEach(led => {
-        // Check if there's a wire path from battery to LED
-        const hasConnection = this.isConnected(battery, led)
-        if (hasConnection) {
-          circuits.push({ battery, led })
-        }
-      })
+    // For each LED, find all batteries connected to it (directly or through other batteries)
+    leds.forEach(led => {
+      const batteries = this.findConnectedBatteries(led)
+      if (batteries.length > 0) {
+        circuits.push({ batteries, led })
+      }
     })
 
     return circuits
+  }
+
+  findConnectedBatteries(led) {
+    // BFS to find all batteries connected to this LED
+    const visited = new Set()
+    const queue = [led.id]
+    const batteries = []
+
+    visited.add(led.id)
+
+    while (queue.length > 0) {
+      const currentId = queue.shift()
+      const current = this.components.find(c => c.id === currentId)
+
+      if (!current) continue
+
+      // If it's a battery, add it to the list
+      if (current.type === 'battery') {
+        batteries.push(current)
+      }
+
+      // Find all connected components
+      const connected = this.getConnectedComponents(currentId)
+      for (const connId of connected) {
+        if (!visited.has(connId)) {
+          visited.add(connId)
+          queue.push(connId)
+        }
+      }
+    }
+
+    return batteries
+  }
+
+  getConnectedComponents(compId) {
+    const connected = []
+    for (const wire of this.wires) {
+      if (wire.from === compId) {
+        connected.push(wire.to)
+      } else if (wire.to === compId) {
+        connected.push(wire.from)
+      }
+    }
+    return connected
   }
 
   isConnected(comp1, comp2) {
@@ -65,10 +105,20 @@ export class CircuitSimulator {
   }
 
   simulateCircuit(circuit) {
-    const { battery, led } = circuit
+    const { batteries, led } = circuit
 
-    // Get battery voltage
-    const voltage = battery.voltage * battery.charge
+    // Calculate total voltage from series batteries
+    let totalVoltage = 0
+    let totalCharge = 0
+
+    batteries.forEach(battery => {
+      totalVoltage += battery.voltage * battery.charge
+      totalCharge += battery.charge
+    })
+
+    // Average charge for drain calculation
+    const avgCharge = batteries.length > 0 ? totalCharge / batteries.length : 0
+    const voltage = totalVoltage
 
     // LED characteristics
     const LED_FORWARD_VOLTAGE = 2.0  // Typical LED forward voltage
@@ -109,9 +159,11 @@ export class CircuitSimulator {
     led.voltage = voltage
     led.current = current
 
-    // Drain battery based on current draw
-    const drainRate = current * 0.001 // Simple drain model
-    battery.charge = Math.max(0, battery.charge - drainRate)
+    // Drain all batteries based on current draw
+    const drainRate = current * 0.001 / batteries.length // Distribute drain across batteries
+    batteries.forEach(battery => {
+      battery.charge = Math.max(0, battery.charge - drainRate)
+    })
   }
 
   // Voltage divider formula
