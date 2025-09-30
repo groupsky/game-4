@@ -73,7 +73,9 @@ export default function CircuitWorkspace() {
         ctx.strokeStyle = '#F97316'
         ctx.lineWidth = 3
         ctx.setLineDash([5, 5])
-        const size = component.type === 'battery' ? 70 : 40
+        let size = 40
+        if (component.type === 'battery') size = 70
+        else if (component.type === 'resistor') size = 50
         ctx.strokeRect(component.x - size, component.y - size, size * 2, size * 2)
         ctx.setLineDash([])
         ctx.restore()
@@ -174,6 +176,8 @@ export default function CircuitWorkspace() {
       drawBattery(ctx, component)
     } else if (component.type === 'led') {
       drawLED(ctx, component)
+    } else if (component.type === 'resistor') {
+      drawResistor(ctx, component)
     }
 
     ctx.restore()
@@ -343,6 +347,89 @@ export default function CircuitWorkspace() {
 
     const status = brightness > 0.7 ? 'Bright' : brightness > 0.3 ? 'Dim' : brightness > 0 ? 'Faint' : 'Off'
     ctx.fillText(status, 0, size/2 + 20)
+  }
+
+  const drawResistor = (ctx, component) => {
+    const width = 80
+    const height = 30
+    const resistance = component.resistance || 100
+    const current = component.current || 0
+
+    // Calculate heat level for visual feedback
+    const powerDissipated = current * current * resistance  // P = I²R
+    const heatLevel = Math.min(powerDissipated / 2.0, 1.0)
+
+    // Draw resistor body with zigzag pattern
+    ctx.strokeStyle = '#4A4A4A'
+    ctx.lineWidth = 2
+
+    // Resistor body color based on heat
+    if (heatLevel > 0.9) {
+      ctx.fillStyle = '#DC2626'  // Overheating red
+    } else if (heatLevel > 0.6) {
+      ctx.fillStyle = '#F97316'  // Hot orange
+    } else if (heatLevel > 0.25) {
+      ctx.fillStyle = '#FBBF24'  // Warm yellow
+    } else {
+      ctx.fillStyle = '#E8DCC8'  // Cool beige
+    }
+
+    // Draw resistor box
+    ctx.fillRect(-width/2, -height/2, width, height)
+    ctx.strokeRect(-width/2, -height/2, width, height)
+
+    // Draw resistance bands (color code)
+    const drawBand = (x, color) => {
+      ctx.fillStyle = color
+      ctx.fillRect(x - 3, -height/2, 6, height)
+    }
+
+    // Simplified color bands for common resistances
+    if (resistance === 100) {
+      drawBand(-width/2 + 15, '#8B4513')  // Brown (1)
+      drawBand(-width/2 + 27, '#000000')  // Black (0)
+      drawBand(-width/2 + 39, '#8B4513')  // Brown (×10)
+    } else if (resistance === 220) {
+      drawBand(-width/2 + 15, '#DC2626')  // Red (2)
+      drawBand(-width/2 + 27, '#DC2626')  // Red (2)
+      drawBand(-width/2 + 39, '#8B4513')  // Brown (×10)
+    } else if (resistance === 1000) {
+      drawBand(-width/2 + 15, '#8B4513')  // Brown (1)
+      drawBand(-width/2 + 27, '#000000')  // Black (0)
+      drawBand(-width/2 + 39, '#DC2626')  // Red (×100)
+    }
+
+    // Draw heat shimmer effect if hot
+    if (heatLevel > 0.5) {
+      ctx.strokeStyle = '#F97316'
+      ctx.lineWidth = 1
+      ctx.globalAlpha = heatLevel * 0.5
+
+      const shimmerLines = Math.floor(heatLevel * 5) + 2
+      for (let i = 0; i < shimmerLines; i++) {
+        const y = -height/2 - 10 - (i * 3)
+        ctx.beginPath()
+        ctx.moveTo(-width/4, y)
+        ctx.quadraticCurveTo(0, y - 3, width/4, y)
+        ctx.stroke()
+      }
+      ctx.globalAlpha = 1
+    }
+
+    // Label
+    ctx.fillStyle = '#4A4A4A'
+    ctx.font = '12px Courier New'
+    ctx.textAlign = 'center'
+    ctx.textBaseline = 'middle'
+    ctx.fillText(`⚡ ${resistance}Ω`, 0, -height/2 - 15)
+
+    // Status text based on heat
+    let status = 'Cool'
+    if (heatLevel > 0.9) status = 'OVERHEAT!'
+    else if (heatLevel > 0.6) status = 'Hot'
+    else if (heatLevel > 0.25) status = 'Warm'
+
+    ctx.fillText(status, 0, height/2 + 15)
   }
 
   const drawWire = (ctx, wire) => {
@@ -614,6 +701,18 @@ export default function CircuitWorkspace() {
             }])}
           >
             Add 💡 LED
+          </button>
+          <button
+            onClick={() => setComponents([...components, {
+              id: Date.now(),
+              type: 'resistor',
+              x: 400 + Math.random() * 100,
+              y: 100 + Math.random() * 100,
+              resistance: 100,
+              current: 0
+            }])}
+          >
+            Add ⚡ Resistor (100Ω)
           </button>
         </div>
       </div>
