@@ -19,10 +19,13 @@ export class CircuitSimulator {
         comp.brightness = 0
         comp.voltage = 0
         comp.current = 0
+      } else if (comp.type === 'resistor') {
+        comp.voltageDrop = 0
+        comp.current = 0
       }
     })
 
-    // Find all circuits (battery connected to LED via wires)
+    // Find all circuits (battery connected to components via wires)
     const circuits = this.findCircuits()
 
     circuits.forEach(circuit => {
@@ -179,31 +182,69 @@ export class CircuitSimulator {
       minCharge = Math.min(minCharge, battery.charge)
     })
 
-    // Voltage calculation depends on configuration
-    // Parallel: each LED gets full voltage
-    // Series: voltage is divided across all LEDs
-    const voltage = isParallel ? totalVoltage : totalVoltage / totalLEDs
+    // Find all resistors in the circuit
+    const connectedComponents = this.findConnectedComponents(led)
+    const resistors = connectedComponents.filter(c => c.type === 'resistor')
+
+    // Calculate total resistance in the circuit
+    const LED_RESISTANCE = 100  // Ohms
+    let totalResistance = LED_RESISTANCE
+
+    resistors.forEach(resistor => {
+      totalResistance += resistor.resistance
+    })
+
+    // For series LEDs, each LED adds resistance
+    if (!isParallel && totalLEDs > 1) {
+      totalResistance += LED_RESISTANCE * (totalLEDs - 1)
+    }
 
     // LED characteristics
     const LED_FORWARD_VOLTAGE = 2.0  // Typical LED forward voltage
-    const LED_RESISTANCE = 100        // Ohms
     const MAX_LED_CURRENT = 0.020     // 20mA
 
+    // Voltage calculation depends on configuration
+    // Parallel: each LED gets full voltage
+    // Series: voltage is divided across all components
+    let availableVoltage = totalVoltage
+
+    if (!isParallel && totalLEDs > 1) {
+      availableVoltage = totalVoltage / totalLEDs
+    }
+
     // Check if voltage is sufficient to light LED (even dimly)
-    if (voltage < 0.5) {
+    if (availableVoltage < 0.5) {
       // Not enough voltage at all
       led.brightness = 0
-      led.voltage = voltage
+      led.voltage = availableVoltage
       led.current = 0
       return
     }
 
-    // Calculate current using Ohm's law
-    // For simplicity, assume series circuit with LED
-    let current = voltage / LED_RESISTANCE
+    // Calculate current using Ohm's law: I = V / R
+    let current = totalVoltage / totalResistance
 
     // Limit current to max LED current
     current = Math.min(current, MAX_LED_CURRENT)
+
+    // Calculate voltage drops
+    resistors.forEach(resistor => {
+      resistor.voltageDrop = current * resistor.resistance
+      resistor.current = current
+    })
+
+    // Calculate voltage across LED (after resistor drops)
+    let ledVoltage = totalVoltage
+    resistors.forEach(resistor => {
+      ledVoltage -= resistor.voltageDrop
+    })
+
+    // For series LEDs, divide remaining voltage
+    if (!isParallel && totalLEDs > 1) {
+      ledVoltage = ledVoltage / totalLEDs
+    }
+
+    const voltage = ledVoltage
 
     // Calculate LED brightness (0-1 scale)
     // LED gets brighter as current increases
