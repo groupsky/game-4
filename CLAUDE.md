@@ -34,6 +34,90 @@ npm test -- --watch
 npm test -- path/to/test.spec.js
 ```
 
+## Development Methodology: Test-Driven Development (TDD)
+
+**ALWAYS use Test-Driven Development when implementing features or fixing bugs.**
+
+### TDD Workflow
+
+1. **Write the test first** - Before writing any implementation code
+   - Define the expected behavior in a test
+   - Test should fail initially (red)
+   - Be specific about inputs, outputs, and edge cases
+
+2. **Implement minimal code** - Make the test pass
+   - Write just enough code to pass the test (green)
+   - Don't over-engineer or add extra features
+   - Keep implementation simple and focused
+
+3. **Refactor** - Improve the code while keeping tests green
+   - Clean up duplication
+   - Improve naming and structure
+   - Optimize if needed
+
+4. **Commit** - Commit working, tested code
+   - All tests must pass before committing
+   - Include both test and implementation in same commit
+
+### Example TDD Session
+
+```javascript
+// 1. Write test first (RED)
+it('should add voltages from series batteries', () => {
+  const simulator = new CircuitSimulator()
+  const battery1 = { id: 1, type: 'battery', voltage: 4.5, charge: 1.0 }
+  const battery2 = { id: 2, type: 'battery', voltage: 4.5, charge: 1.0 }
+  const led = { id: 3, type: 'led', brightness: 0 }
+
+  simulator.setComponents([battery1, battery2, led])
+  simulator.setWires([{ from: 1, to: 2 }, { from: 2, to: 3 }])
+
+  const result = simulator.simulate()
+  const updatedLed = result.find(c => c.id === 3)
+
+  expect(updatedLed.voltage).toBeCloseTo(9.0, 0.5)
+  expect(updatedLed.brightness).toBeGreaterThan(0.3)
+})
+
+// 2. Run test - it fails (RED)
+// 3. Implement feature to make test pass (GREEN)
+// 4. Refactor if needed
+// 5. Commit when all tests pass
+```
+
+### When to Write Tests
+
+**Engine/Logic Layer (MUST have tests):**
+- Circuit simulation algorithms
+- Component behavior calculations
+- Wire connectivity logic
+- Voltage/current calculations
+- Graph traversal algorithms
+- State management logic
+
+**UI Layer (Tests optional but encouraged):**
+- React components (can use React Testing Library)
+- Canvas rendering (harder to test, focus on logic)
+- User interactions (integration tests when practical)
+
+### Test Quality Guidelines
+
+- **Unit tests**: Test individual functions/methods in isolation
+- **Integration tests**: Test component interactions (e.g., battery + wire + LED)
+- **Edge cases**: Test boundary conditions, zero values, extreme values
+- **Descriptive names**: Test names should clearly state what they verify
+- **Arrange-Act-Assert**: Structure tests clearly (setup, execute, verify)
+- **One assertion focus**: Each test should verify one behavior
+- **Fast execution**: Tests should run quickly (< 1ms each)
+
+### Benefits of TDD in Circuit Quest
+
+1. **Confidence**: Simulation accuracy is critical - tests prove correctness
+2. **Refactoring**: Can improve code without fear of breaking circuits
+3. **Documentation**: Tests show how the system should behave
+4. **Bug prevention**: Catches regressions immediately
+5. **Design**: Writing tests first leads to better API design
+
 ## Core Architecture
 
 ### Game Structure (Three Acts)
