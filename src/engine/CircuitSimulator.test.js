@@ -1108,4 +1108,71 @@ describe('CircuitSimulator', () => {
     expect(updatedLed.voltage).toBeCloseTo(0.9, 0.1)
     expect(updatedLed.brightness).toBeGreaterThan(0)
   })
+
+  it('should verify parallel LED battery drain uses parallelMultiplier correctly', () => {
+    const simulator = new CircuitSimulator()
+
+    // Test 1: Single LED
+    const battery1 = {
+      id: 1,
+      type: 'battery',
+      charge: 1.0,
+      voltage: 0.9,
+      x: 100,
+      y: 100
+    }
+
+    const led1 = {
+      id: 2,
+      type: 'led',
+      brightness: 0,
+      x: 150,
+      y: 100
+    }
+
+    simulator.setComponents([battery1, led1])
+    simulator.setWires([{ id: 3, from: 1, to: 2 }])
+
+    simulator.simulate()
+    const drainSingle = 1.0 - battery1.charge
+
+    // Test 2: Two parallel LEDs
+    const battery2 = {
+      id: 4,
+      type: 'battery',
+      charge: 1.0,
+      voltage: 0.9,
+      x: 100,
+      y: 100
+    }
+
+    const led2 = {
+      id: 5,
+      type: 'led',
+      brightness: 0,
+      x: 150,
+      y: 50
+    }
+
+    const led3 = {
+      id: 6,
+      type: 'led',
+      brightness: 0,
+      x: 150,
+      y: 150
+    }
+
+    simulator.setComponents([battery2, led2, led3])
+    simulator.setWires([
+      { id: 7, from: 4, to: 5 },
+      { id: 8, from: 4, to: 6 }
+    ])
+
+    simulator.simulate()
+    const drainParallel = 1.0 - battery2.charge
+
+    // Parallel LEDs should drain ~2x as fast (2 LEDs drawing current)
+    // Allow some tolerance for calculation differences
+    expect(drainParallel).toBeCloseTo(drainSingle * 2, 0.001)
+  })
 })
