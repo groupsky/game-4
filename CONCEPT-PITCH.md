@@ -11,7 +11,7 @@
 **Target Audience**: Ages 12+, makers, engineers, puzzle enthusiasts  
 **Tagline**: *"Build a computer using everything in your house... then invent the future"*
 
-**Core Innovation**: 2D hand-drawn sketch aesthetic with personality-driven components and robust user-generated challenge system.
+**Core Innovation**: 2D hand-drawn sketch aesthetic with sophisticated visual feedback system and robust user-generated challenge platform.
 
 ---
 
@@ -19,7 +19,7 @@
 
 Players **literally build the history of computing** - starting with a potato battery powering an LED, ending with designing their own CPU architecture. Every component is crafted from household items or unlocked historical parts.
 
-The game uses a **charming 2D sketch aesthetic** (like an inventor's notebook) where components have personality - batteries yawn when low, LEDs smile when lit, relays wink when they click. Players can create and share circuit challenges with the community.
+The game uses a **charming 2D sketch aesthetic** (like an inventor's notebook) where components show state through sophisticated visual feedback - fill levels, glow intensity, and mechanical animations rather than childish expressions. Players can create and share circuit challenges with the community.
 
 ### Why This Works
 - **Educational**: Learn real electrical engineering through play
@@ -27,7 +27,7 @@ The game uses a **charming 2D sketch aesthetic** (like an inventor's notebook) w
 - **Progressive**: Start simple, get infinitely complex
 - **Creative**: Sandbox mode + user-generated challenges
 - **Historical**: Understand *why* technology evolved
-- **Accessible**: 2D sketch style reduces intimidation
+- **Accessible**: 2D sketch style is approachable, not intimidating
 - **Endless Content**: Community creates challenges forever
 
 ---
@@ -42,12 +42,12 @@ Scavenge → Craft → Test → Learn → Unlock → Share/Challenge → Repeat
 
 1. **Tutorial**: "Find items in your kitchen"
 2. **Scavenge**: Player clicks on potato, nails, copper wire
-3. **Craft**: Drag-and-drop to build battery (components animate with personality)
-4. **Test**: Connect to LED - see voltage readout: 0.9V! LED smiles! ⚡😊
-5. **Challenge**: Try to power calculator - fails! LED frowns 😞
+3. **Craft**: Drag-and-drop to build battery (components animate smoothly)
+4. **Test**: Connect to LED - see voltage readout: 0.9V! LED glows softly ⚡
+5. **Challenge**: Try to power calculator - fails! LED dims and flickers
 6. **Learn**: Game explains series circuits with animated sketch
 7. **Experiment**: Build 5 potato batteries in series → 4.5V
-8. **Success**: Calculator powers on! Achievement unlocked, confetti animation!
+8. **Success**: Calculator powers on! Achievement unlocked, satisfying spark animation!
 9. **Unlock**: "Battery Tech Tree" opens, new components available
 10. **Share**: "Turn this into a challenge for friends?"
 11. **Hook**: "Want to power something bigger? Try building a radio..."
@@ -69,23 +69,36 @@ Scavenge → Craft → Test → Learn → Unlock → Share/Challenge → Repeat
 - Doodles in margins (failed experiments, ideas)
 - Post-it notes for tutorials
 
-**2. Component Personalities**
+**2. Component Visual Feedback (Subtle & Sophisticated)**
 ```
-Components have expressions and reactions:
+Components show state through visual cues, not faces:
 
 ⚡ Battery               💡 LED                🔧 Relay
-┌─────────┐            ┌─────┐              ┌───────┐
-│  ^  ^   │ (Full)     │ ★★★ │ (Bright)     │ •   • │ (Active)
-│ ◡    ◡  │            │ ◡◡◡ │              │   ◡   │
-│  (==)   │            │ ╰○╯ │              │| ⚡ | │
-└─────────┘            └─────┘ *sparkle*    └───────┘ *CLACK!*
+┌──────────┐           ┌─────┐              ┌───────┐
+│ ████████ │ (Full)    │ ≈≈≈ │ (Bright)     │ ═══╗  │ (Closed)
+│ ████████ │           │ ≈≈≈ │              │    ║  │
+│   100%   │           │ ✧✧✧ │              │    ║  │
+└──────────┘           └─────┘ *glow*       └────╨──┘ *CLACK!*
 
-┌─────────┐            ┌─────┐              ┌───────┐
-│  -  -   │ (Low)      │     │ (Off)        │ o   o │ (Open)
-│   ︶    │            │  ◡  │              │   ◡   │
-│  zzz    │            │     │              │ |   | │
-└─────────┘            └─────┘              └───────┘ *click*
+┌──────────┐           ┌─────┐              ┌───────┐
+│ ██░░░░░░ │ (Low)     │ ··· │ (Dim)        │ ═══   │ (Open)
+│ ██░░░░░░ │           │ ··· │              │       │
+│   25%    │           │  ·  │              │     ╷ │
+└──────────┘           └─────┘              └─────╵─┘ *click*
+
+┌──────────┐           ┌─────┐              ┌───────┐
+│ ░░░░░░░░ │ (Dead)    │     │ (Off)        │ ═══   │ (Error)
+│ ░░░░░░░░ │           │     │              │  ⚠️   │
+│    0%    │           │     │              │       │
+└──────────┘           └─────┘              └───────┘
 ```
+
+**Visual Language:**
+- **Charge/Energy**: Fill levels, progress bars, glow intensity
+- **Activity**: Pulsing animations, particle flows, wave patterns
+- **State Changes**: Smooth transitions, mechanical movements
+- **Errors/Warnings**: Warning icons, red highlights, smoke effects
+- **Success**: Subtle sparkles, check marks, green highlights
 
 **3. Hand-Drawn Aesthetic**
 - Wobbly lines (not perfect CAD)
@@ -95,13 +108,13 @@ Components have expressions and reactions:
 - Imperfect circles and curves (human touch)
 - Notebook margin notes in cursive
 
-**4. Visual Feedback**
-- **Electricity Flow**: Cartoon lightning bolts ⚡ and sparks ✨
-- **Current**: Animated dotted arrows ──→⚡──→
-- **Voltage**: Glowing intensity (brighter = higher voltage)
-- **Smoke**: Puffy cartoon clouds when overcurrent 💨
-- **Success**: Stars, sparkles, happy component faces
-- **Failure**: Sad faces, question marks, X marks
+**4. Visual Feedback (Sophisticated Indicators)**
+- **Electricity Flow**: Stylized lightning paths ⚡ with glow trails
+- **Current**: Animated particle streams with directional arrows
+- **Voltage**: Color-coded intensity (blue→yellow→orange→red gradient)
+- **Smoke**: Sketch-style wisps when overcurrent 
+- **Success**: Subtle sparkles ✧, check marks ✓, soft green glow
+- **Failure**: Warning triangles ⚠, red highlights, X marks
 
 #### Color Palette
 ```
@@ -119,20 +132,20 @@ Accent Colors:
 ```
 
 #### Animation Style
-Based on 12 principles of animation:
-- **Bouncy physics**: Components wiggle when placed
-- **Squash and stretch**: Wires flex, components compress
-- **Anticipation**: Components "wind up" before activating
-- **Follow-through**: Sparks linger, smoke drifts slowly
-- **Personality**: Each component type has unique movement style
+Based on 12 principles of animation, but sophisticated:
+- **Smooth physics**: Components settle naturally when placed
+- **Elastic transitions**: Wires flex realistically, springs compress
+- **Anticipation**: Relays wind up slightly before clicking
+- **Follow-through**: Energy dissipates naturally, smoke drifts
+- **State feedback**: Visual indicators show component status clearly
 
 ### Audio Design
-- **Satisfying clicks**: Relay switches (mechanical clack!)
-- **Electrical hum**: Transformers, power supplies (bzzzz)
-- **Cartoonish sounds**: Boings, zaps, pops, whooshes
-- **Era music**: 1920s jazz → 1950s rock → 1980s synth
-- **Voice-over**: Friendly inventor character (optional)
-- **Component voices**: Subtle personality sounds (happy beep, sad buzz)
+- **Mechanical sounds**: Relay switches (realistic clack!)
+- **Electrical hum**: Transformers, power supplies (authentic bzzzz)
+- **Subtle feedback**: Component state changes (soft clicks, beeps)
+- **Era music**: 1920s → 1950s → 1980s (period-appropriate)
+- **Voice-over**: Professional narrator (optional, toggle-able)
+- **Ambient workshop**: Pencil scratching, paper rustling
 
 ### UI/UX: "Inventor's Desk"
 ```
@@ -148,7 +161,7 @@ Based on 12 principles of animation:
 │  │                            │  Goals   │
 │  │    V: 4.5V  I: 15mA        │          │
 │  └────────────────────────────┘  [🏆]    │
-│                                  Score   │
+│                                   Score  │
 │  💬 "Great! The LED is happy!"           │
 │     [Next Challenge →]                   │
 └──────────────────────────────────────────┘
@@ -159,7 +172,7 @@ Based on 12 principles of animation:
 - **Pencil cursor**: Changes to eraser, ruler, wire tool
 - **Component drawer**: Pull-out sketchbook pages
 - **Margin notes**: Tips in cursive handwriting
-- **Speech bubbles**: Components give hints and reactions
+- **Tooltips**: Information boxes with technical details
 
 ---
 
@@ -189,15 +202,15 @@ Based on 12 principles of animation:
     
     ╭─────╮                 ┌─────┐
     │ 🥔  │~~~~~~~~~~~~~~~~~│ 💡  │
-    │😊9V │  copper wire    │ 🤩  │
+    │ 9V  │  copper wire    │ ≈≈≈ │
     ╰─────╯                 └─────┘
     Potato                  LED
-    Battery                 (SO BRIGHT!)
+    Battery                 (glowing!)
     
     ✏️ Notes: 
     - Used nail from garage
     - Copper from old lamp
-    - IT ACTUALLY WORKS!!!
+    - Working on first try!
     
     Next idea: Can I power a calculator? 🤔
 ```
@@ -721,65 +734,70 @@ XOR = (a, b) => a !== b
 
 ## Visual Reference Examples
 
-### Component Personality Sketches
+### Component Visual States (Sophisticated)
 ```
-     ⚡ Battery States         💡 LED Emotions
-    ┌─────────┐              ┌─────┐
-    │  ^  ^   │ Full         │ 🤩  │ Very Bright
-    │  ◡  ◡   │              │ ★★★ │
-    └─────────┘              └─────┘
+     ⚡ Battery States         💡 LED States
+    ┌──────────┐             ┌─────┐
+    │ ████████ │ Full        │ ≈≈≈ │ Bright
+    │ ████████ │             │ ≈≈≈ │
+    │   100%   │             │ ✧✧✧ │
+    └──────────┘             └─────┘
 
-    ┌─────────┐              ┌─────┐
-    │  -  -   │ Low          │ 😊  │ Bright
-    │   ︶    │              │ ✨  │
-    └─────────┘              └─────┘
+    ┌──────────┐             ┌─────┐
+    │ ███░░░░░ │ Medium      │ ··· │ Dim
+    │ ███░░░░░ │             │ ··· │
+    │   40%    │             │  ·  │
+    └──────────┘             └─────┘
 
-    ┌─────────┐              ┌─────┐
-    │  x  x   │ Dead         │ 😐  │ Dim
-    │   __    │              │  ·  │
-    └─────────┘              └─────┘
+    ┌──────────┐             ┌─────┐
+    │ ░░░░░░░░ │ Depleted    │     │ Off
+    │ ░░░░░░░░ │             │     │
+    │    0%    │             │     │
+    └──────────┘             └─────┘
 ```
 
-### Circuit Example (Notebook Style)
+### Circuit Example (Professional Notebook Style)
 ```
-    📔 Inventor's Notebook - Page 23
+    📔 Engineering Notebook - Entry 23
     ═══════════════════════════════════
     
-    💡 Parallel Circuits Experiment
+    💡 Parallel Circuit Analysis
     
     ╭─────╮                    
-    │ 🔋  │─┬─────●──💡 (LED 1)
+    │ 🔋  │─┬─────●──[LED 1: 2.1V]
     │ 9V  │ │     │
-    │ 😊  │ └─────●──💡 (LED 2)
+    │100% │ └─────●──[LED 2: 2.1V]
     ╰─────╯       │
-                  ●──💡 (LED 3)
+                  ●──[LED 3: 2.1V]
     
-    ✏️ Observations:
-    - All LEDs equally bright! ⚡⚡⚡
-    - If one fails, others stay on
-    - Battery drains faster (3× current)
+    ✏️ Measurements:
+    - Voltage across each LED: ~2.1V
+    - Current per branch: ~15mA
+    - Total current draw: 45mA
+    - If one LED fails, others continue
     
-    💭 Idea: Use for Christmas lights?
+    💭 Application: Reliable lighting systems
     
-    [Coffee stain] ☕
+    [Coffee ring stain] ☕
 ```
 
-### Animation Sequence
+### Animation Sequence (Smooth Transitions)
 ```
-LED Lighting Up:
+LED Power-Up Sequence:
 
 Frame 1:     Frame 2:     Frame 3:     Frame 4:
 ┌─────┐     ┌─────┐     ┌─────┐     ┌─────┐
-│     │     │  ·  │     │ ·★· │     │ ★★★ │
-│  ◡  │ --> │  ◡  │ --> │ ◡◡◡ │ --> │ 🤩  │
-│     │     │  ·  │     │ ·★· │     │ ★★★ │
+│     │     │  ·  │     │ ··· │     │ ≈≈≈ │
+│     │ --> │  ·  │ --> │ ··· │ --> │ ≈≈≈ │
+│     │     │  ·  │     │ ··· │     │ ✧✧✧ │
 └─────┘     └─────┘     └─────┘     └─────┘
-  Off      Warming...   Glowing     BRIGHT!
-                                   *twinkle*
+  Off      Warming...   Glowing     Full
+                                   *steady*
 
-Current Flow:
+Current Flow Visualization:
 ───→ ───→ ───→ ───→ ───→
    ⚡  ⚡  ⚡  ⚡  ⚡
+Smooth particle stream along traces
 ```
 
 ---
@@ -800,20 +818,20 @@ Current Flow:
 1. Only game teaching real EE through play
 2. Household items = tangible connection
 3. Historical progression = engaging narrative
-4. 2D sketch aesthetic = approachable
+4. Professional sketch aesthetic = sophisticated yet approachable
 5. Robust UGC = infinite content
-6. Components with personality = charm
+6. Clear visual feedback without childishness
 7. Both creative AND educational
 
 ---
 
 ## Closing Statement
 
-**Circuit Quest** fills a unique gap in both gaming and education. The **hand-drawn sketch aesthetic** makes circuits approachable and charming, while the **robust user-generated challenge system** ensures endless replayability and a self-sustaining community.
+**Circuit Quest** fills a unique gap in both gaming and education. The **hand-drawn sketch aesthetic** with sophisticated visual feedback makes circuits approachable without being childish, while the **robust user-generated challenge system** ensures endless replayability and a self-sustaining community.
 
 Players don't just learn *about* computers - they experience the joy of *inventing* them, from potato batteries to processors. Then they share that joy by creating challenges for others.
 
-**One sentence**: *A hand-drawn educational sandbox where you build computers from potatoes to processors, then create and share circuit challenges with a global community of makers.*
+**One sentence**: *A professionally illustrated educational sandbox where you build computers from potatoes to processors, then create and share circuit challenges with a global community of makers and engineers.*
 
 ---
 
@@ -894,40 +912,42 @@ interface Challenge {
 }
 ```
 
-### Component Personality System
+### Component Visual System
 ```javascript
 const COMPONENTS = {
   potato_battery: {
     sprite: '🥔',
     voltage: 0.9,
-    personality: {
-      expressions: ['😊', '😐', '😴', '💤'],
-      getExpression(charge) {
-        if (charge > 0.75) return '😊';
-        if (charge > 0.5) return '😐';
-        if (charge > 0.25) return '😴';
-        return '💤';
+    visual: {
+      chargeBar: true,
+      glowIntensity: (charge) => charge * 0.5,
+      states: ['full', 'medium', 'low', 'depleted'],
+      getState(charge) {
+        if (charge > 0.75) return 'full';
+        if (charge > 0.5) return 'medium';
+        if (charge > 0.25) return 'low';
+        return 'depleted';
       }
     }
   },
   
   led: {
     sprite: '💡',
-    personality: {
-      expressions: ['😐', '😊', '😁', '🤩'],
-      animations: ['dim', 'glow', 'bright', 'sparkle'],
-      getBrightness(current) {
-        return Math.min(current / 0.020, 1.0);
-      }
+    visual: {
+      brightness: (current) => Math.min(current / 0.020, 1.0),
+      glowRadius: (brightness) => 5 + brightness * 15,
+      colorGradient: ['#333', '#ff8800', '#ffff00'],
+      pulseEffect: true
     }
   },
   
   relay: {
     sprite: '🔧',
-    personality: {
-      expressions: ['😐', '😲', '🔥'],
-      sounds: ['click.wav', 'clack.wav'],
-      animations: ['open', 'close', 'overheat']
+    visual: {
+      states: ['open', 'closed', 'switching'],
+      switchAnimation: 'mechanical-spring',
+      contactPosition: (state) => state === 'closed' ? 'down' : 'up',
+      sparkEffect: true
     }
   }
 };
