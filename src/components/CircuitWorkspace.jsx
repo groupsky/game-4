@@ -599,10 +599,10 @@ export default function CircuitWorkspace() {
               x: 100 + Math.random() * 100,
               y: 100 + Math.random() * 100,
               charge: 1.0,
-              voltage: 4.5  // 5 potatoes in series
+              voltage: 0.9  // Single potato battery
             }])}
           >
-            Add 🥔 Battery (5x)
+            Add 🥔 Potato
           </button>
           <button
             onClick={() => setComponents([...components, {
