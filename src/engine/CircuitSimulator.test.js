@@ -305,6 +305,104 @@ describe('CircuitSimulator', () => {
     expect(updatedLed4.brightness).toBeCloseTo(updatedLed1.brightness, 0.05)
   })
 
+  it('should produce very dim LED with single potato battery (0.9V)', () => {
+    const simulator = new CircuitSimulator()
+
+    const potato = {
+      id: 1,
+      type: 'battery',
+      charge: 1.0,
+      voltage: 0.9,
+      x: 100,
+      y: 100
+    }
+
+    const led = {
+      id: 2,
+      type: 'led',
+      brightness: 0,
+      x: 150,
+      y: 100
+    }
+
+    simulator.setComponents([potato, led])
+    simulator.setWires([{ id: 3, from: 1, to: 2 }])
+
+    const result = simulator.simulate()
+    const updatedLed = result.find(c => c.id === 2)
+
+    // Single potato (0.9V) should produce dim LED (~16% brightness)
+    expect(updatedLed.voltage).toBeCloseTo(0.9, 0.1)
+    expect(updatedLed.brightness).toBeGreaterThan(0)
+    expect(updatedLed.brightness).toBeLessThan(0.2)
+  })
+
+  it('should progressively brighten LED as more potatoes added in series', () => {
+    const simulator = new CircuitSimulator()
+
+    // Test with 1, 2, 3, and 5 potatoes
+    const testCases = [
+      { count: 1, expectedVoltage: 0.9 },
+      { count: 2, expectedVoltage: 1.8 },
+      { count: 3, expectedVoltage: 2.7 },
+      { count: 5, expectedVoltage: 4.5 }
+    ]
+
+    const brightnesses = []
+
+    testCases.forEach(({ count, expectedVoltage }) => {
+      const components = []
+      const wires = []
+
+      // Add potatoes in series
+      for (let i = 0; i < count; i++) {
+        components.push({
+          id: i + 1,
+          type: 'battery',
+          charge: 1.0,
+          voltage: 0.9,
+          x: 100 + i * 50,
+          y: 100
+        })
+
+        if (i > 0) {
+          wires.push({ id: 100 + i, from: i, to: i + 1 })
+        }
+      }
+
+      // Add LED
+      const ledId = count + 1
+      components.push({
+        id: ledId,
+        type: 'led',
+        brightness: 0,
+        x: 100 + count * 50,
+        y: 100
+      })
+
+      // Connect last potato to LED
+      wires.push({ id: 200, from: count, to: ledId })
+
+      simulator.setComponents(components)
+      simulator.setWires(wires)
+
+      const result = simulator.simulate()
+      const led = result.find(c => c.id === ledId)
+
+      // Verify voltage
+      expect(led.voltage).toBeCloseTo(expectedVoltage, 0.5)
+
+      // Store brightness for comparison
+      brightnesses.push({ count, brightness: led.brightness })
+    })
+
+    // Verify brightness increases with more potatoes (until max brightness reached)
+    expect(brightnesses[1].brightness).toBeGreaterThan(brightnesses[0].brightness)
+    expect(brightnesses[2].brightness).toBeGreaterThan(brightnesses[1].brightness)
+    // Note: 3 and 5 potatoes both reach max brightness (1.0), so they're equal
+    expect(brightnesses[3].brightness).toBeGreaterThanOrEqual(brightnesses[2].brightness)
+  })
+
   it('should make LED brighter with multiple batteries vs single battery', () => {
     const simulator = new CircuitSimulator()
 
