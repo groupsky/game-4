@@ -287,4 +287,71 @@ export class CircuitSimulator {
   power(v, i) {
     return v * i
   }
+
+  // Visual state getters for rendering
+  getBatteryVisualState(battery) {
+    const chargePercent = Math.round(battery.charge * 100)
+    const chargeBarFill = battery.charge
+
+    let state
+    if (battery.charge > 0.75) state = 'full'
+    else if (battery.charge > 0.5) state = 'medium'
+    else if (battery.charge > 0.25) state = 'low'
+    else if (battery.charge > 0) state = 'depleted'
+    else state = 'dead'
+
+    return {
+      chargePercent,
+      chargeBarFill,
+      state,
+      glowIntensity: battery.charge * 0.5  // Dim glow based on charge
+    }
+  }
+
+  getLEDVisualState(led) {
+    const brightness = led.brightness || 0
+    const brightnessPercent = Math.round(brightness * 100)
+    const glowIntensity = brightness
+    const glowRadius = 5 + brightness * 15  // 5px base + up to 15px
+
+    let state
+    if (brightness === 0) state = 'off'
+    else if (brightness < 0.4) state = 'dim'
+    else if (brightness < 0.8) state = 'medium'
+    else state = 'bright'
+
+    return {
+      brightness,
+      brightnessPercent,
+      glowIntensity,
+      glowRadius,
+      state
+    }
+  }
+
+  getResistorVisualState(resistor) {
+    const current = resistor.current || 0
+    const resistance = resistor.resistance || 0
+
+    // P = I² × R (power dissipated as heat)
+    const powerDissipated = current * current * resistance
+
+    // Heat level (0-1 scale)
+    // 0.5W = warm, 1W = hot, 2W+ = very hot
+    let heatLevel = Math.min(powerDissipated / 2.0, 1.0)
+
+    let state
+    if (heatLevel < 0.25) state = 'cool'
+    else if (heatLevel < 0.6) state = 'warm'
+    else if (heatLevel < 0.9) state = 'hot'
+    else state = 'overheating'
+
+    return {
+      powerDissipated,
+      heatLevel,
+      state,
+      voltageDrop: resistor.voltageDrop || 0,
+      current
+    }
+  }
 }
