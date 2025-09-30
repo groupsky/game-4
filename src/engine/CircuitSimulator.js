@@ -24,6 +24,11 @@ export class CircuitSimulator {
       } else if (comp.type === 'resistor') {
         comp.voltageDrop = 0
         comp.current = 0
+      } else if (comp.type === 'lightbulb') {
+        comp.brightness = 0
+        comp.voltage = 0
+        comp.current = 0
+        comp.power = 0
       }
     })
 
@@ -34,7 +39,11 @@ export class CircuitSimulator {
     const circuits = this.findCircuits()
 
     circuits.forEach(circuit => {
-      this.simulateCircuit(circuit)
+      if (circuit.type === 'led') {
+        this.simulateCircuit(circuit)
+      } else if (circuit.type === 'lightbulb') {
+        this.simulateLightBulb(circuit)
+      }
     })
 
     return this.components
@@ -43,6 +52,7 @@ export class CircuitSimulator {
   findCircuits() {
     const circuits = []
     const leds = this.components.filter(c => c.type === 'led')
+    const bulbs = this.components.filter(c => c.type === 'lightbulb')
 
     // For each LED, find all batteries and other LEDs in the same circuit
     leds.forEach(led => {
@@ -53,7 +63,17 @@ export class CircuitSimulator {
       if (batteries.length > 0) {
         // Determine if this LED is in series or parallel with other LEDs
         const isParallel = this.isParallelConfiguration(led, batteries)
-        circuits.push({ batteries, led, totalLEDs: ledsInCircuit.length, isParallel })
+        circuits.push({ batteries, led, totalLEDs: ledsInCircuit.length, isParallel, type: 'led' })
+      }
+    })
+
+    // For each light bulb, find batteries
+    bulbs.forEach(bulb => {
+      const connectedComponents = this.findConnectedComponents(bulb)
+      const batteries = connectedComponents.filter(c => c.type === 'battery')
+
+      if (batteries.length > 0) {
+        circuits.push({ batteries, bulb, type: 'lightbulb' })
       }
     })
 
@@ -440,5 +460,82 @@ export class CircuitSimulator {
       const maxVoltage = capacitor.maxVoltage || 10.0
       capacitor.voltage = Math.max(0, Math.min(capacitor.voltage, maxVoltage))
     })
+  }
+
+  simulateLightBulb(circuit) {
+    const { batteries, bulb } = circuit
+
+    // Calculate total voltage from series batteries
+    let totalVoltage = 0
+    let minCharge = 1.0
+
+    batteries.forEach(battery => {
+      totalVoltage += battery.voltage * (battery.charge > 0 ? 1 : 0)
+      minCharge = Math.min(minCharge, battery.charge)
+    })
+
+    // Light bulb characteristics
+    const BULB_MIN_VOLTAGE = 2.5  // Minimum voltage for visible glow
+    const bulbResistance = bulb.resistance || 50  // Ohms (lower than LED)
+
+    // Check if voltage is sufficient
+    if (totalVoltage < BULB_MIN_VOLTAGE) {
+      bulb.brightness = 0
+      bulb.voltage = totalVoltage
+      bulb.current = 0
+      return
+    }
+
+    // Calculate current using Ohm's law: I = V / R
+    const current = totalVoltage / bulbResistance
+
+    // Calculate power dissipated (as light and heat)
+    const power = current * current * bulbResistance  // P = I²R
+
+    // Brightness is based on power (incandescent: more power = more light)
+    // Normalized to 0-1 scale (1W = full brightness)
+    let brightness = Math.min(power / 1.0, 1.0)
+
+    // Apply voltage-based scaling for dim operation
+    if (totalVoltage < 4.0) {
+      brightness *= (totalVoltage / 4.0) * 0.7
+    }
+
+    // Update bulb state
+    bulb.brightness = Math.max(0, Math.min(1, brightness))
+    bulb.voltage = totalVoltage
+    bulb.current = current
+    bulb.power = power
+
+    // Drain batteries (bulbs draw more current than LEDs)
+    const drainRate = current * 0.001 / batteries.length
+    batteries.forEach(battery => {
+      battery.charge = Math.max(0, battery.charge - drainRate)
+    })
+  }
+
+  getLightBulbVisualState(bulb) {
+    const brightness = bulb.brightness || 0
+    const brightnessPercent = Math.round(brightness * 100)
+    const glowIntensity = brightness
+    const power = bulb.power || 0
+
+    // Filament heat based on power dissipation (incandescent heats up)
+    const filamentHeat = Math.min(power / 1.0, 1.0)
+
+    let state
+    if (brightness === 0) state = 'off'
+    else if (brightness < 0.3) state = 'dim'
+    else if (brightness < 0.7) state = 'warm'
+    else state = 'bright'
+
+    return {
+      brightness,
+      brightnessPercent,
+      glowIntensity,
+      filamentHeat,
+      state,
+      power
+    }
   }
 }
