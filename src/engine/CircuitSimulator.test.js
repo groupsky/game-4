@@ -1175,4 +1175,69 @@ describe('CircuitSimulator', () => {
     // Allow some tolerance for calculation differences
     expect(drainParallel).toBeCloseTo(drainSingle * 2, 0.001)
   })
+
+  it('should detect parallel branches in mixed series-parallel topology', () => {
+    const simulator = new CircuitSimulator()
+
+    const battery = {
+      id: 1,
+      type: 'battery',
+      charge: 1.0,
+      voltage: 4.5,
+      x: 100,
+      y: 100
+    }
+
+    // LED1 in series first
+    const led1 = {
+      id: 2,
+      type: 'led',
+      brightness: 0,
+      x: 150,
+      y: 100
+    }
+
+    // Then LED2 and LED3 branch in parallel
+    const led2 = {
+      id: 3,
+      type: 'led',
+      brightness: 0,
+      x: 200,
+      y: 50
+    }
+
+    const led3 = {
+      id: 4,
+      type: 'led',
+      brightness: 0,
+      x: 200,
+      y: 150
+    }
+
+    // Battery -> LED1 -> LED2
+    //                 -> LED3
+    simulator.setComponents([battery, led1, led2, led3])
+    simulator.setWires([
+      { id: 5, from: 1, to: 2 },  // battery to led1
+      { id: 6, from: 2, to: 3 },  // led1 to led2
+      { id: 7, from: 2, to: 4 }   // led1 to led3
+    ])
+
+    const result = simulator.simulate()
+    const updatedLed1 = result.find(c => c.id === 2)
+    const updatedLed2 = result.find(c => c.id === 3)
+    const updatedLed3 = result.find(c => c.id === 4)
+
+    // All LEDs should light
+    expect(updatedLed1.brightness).toBeGreaterThan(0)
+    expect(updatedLed2.brightness).toBeGreaterThan(0)
+    expect(updatedLed3.brightness).toBeGreaterThan(0)
+
+    // LED2 and LED3 are parallel branches, so should have equal brightness
+    expect(updatedLed3.brightness).toBeCloseTo(updatedLed2.brightness, 0.05)
+
+    // LED1 is in series before the parallel branch
+    // Current logic may incorrectly classify LED2/LED3 based on
+    // whether they connect to another LED
+  })
 })

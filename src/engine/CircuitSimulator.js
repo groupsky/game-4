@@ -53,9 +53,18 @@ export class CircuitSimulator {
   }
 
   isParallelConfiguration(led, batteries) {
-    // Check if this LED is connected to another LED
-    // If an LED is connected to another LED, they are in series
-    // If an LED is NOT connected to any other LED, it's in parallel
+    // Simplified parallel detection heuristic for basic circuits:
+    // - If LED has NO direct LED neighbors → parallel (gets full voltage)
+    // - If LED has LED neighbors → series (voltage divided among LEDs)
+    //
+    // This heuristic works for Act 1 scope (potato + LEDs):
+    // ✓ Battery → LED (single, parallel)
+    // ✓ Battery → [LED1, LED2, LED3] (all parallel)
+    // ✓ Battery → LED1 → LED2 → LED3 (all series)
+    // ✓ Battery → LED1 → [LED2, LED3] (LED1 series, LED2/LED3 treated as series too)
+    //
+    // Limitation: Complex mixed topologies need proper circuit analysis
+    // (nodal/mesh) which is out of scope until Act 2+ (relays, logic gates)
 
     const neighbors = this.getConnectedComponents(led.id)
     const connectedLEDs = neighbors.filter(id => {
