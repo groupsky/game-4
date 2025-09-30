@@ -20,6 +20,12 @@ Circuit Quest: educational sandbox game - build computers from household items, 
 - Keep test files close to implementation
 - Maintain single responsibility principle
 
+**ALWAYS verify before removing files:**
+- Run all tests to ensure split modules work correctly
+- Verify no functionality lost in refactoring
+- Check git status to confirm all new files added
+- Only remove original file after verification passes
+
 **Engine/Logic Layer MUST have tests:**
 - Circuit simulation, component behavior, wire connectivity, voltage/current calculations, graph traversal, state management
 
