@@ -14,6 +14,12 @@ Circuit Quest: educational sandbox game - build computers from household items, 
 3. Refactor while keeping tests green
 4. Commit only when all tests pass - include test + implementation together
 
+**MUST refactor when file exceeds 500 lines:**
+- Split into logical modules/classes
+- Extract related functions into separate files
+- Keep test files close to implementation
+- Maintain single responsibility principle
+
 **Engine/Logic Layer MUST have tests:**
 - Circuit simulation, component behavior, wire connectivity, voltage/current calculations, graph traversal, state management
 
