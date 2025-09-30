@@ -43,11 +43,29 @@ export class CircuitSimulator {
       const ledsInCircuit = connectedComponents.filter(c => c.type === 'led')
 
       if (batteries.length > 0) {
-        circuits.push({ batteries, led, totalLEDs: ledsInCircuit.length })
+        // Determine if this LED is in series or parallel with other LEDs
+        const isParallel = this.isParallelConfiguration(led, batteries)
+        circuits.push({ batteries, led, totalLEDs: ledsInCircuit.length, isParallel })
       }
     })
 
     return circuits
+  }
+
+  isParallelConfiguration(led, batteries) {
+    // Check if this LED is connected to another LED
+    // If an LED is connected to another LED, they are in series
+    // If an LED is NOT connected to any other LED, it's in parallel
+
+    const neighbors = this.getConnectedComponents(led.id)
+    const connectedLEDs = neighbors.filter(id => {
+      const comp = this.components.find(c => c.id === id)
+      return comp && comp.type === 'led'
+    })
+
+    // If this LED is connected to other LEDs, it's part of a series chain
+    // Return false (not parallel)
+    return connectedLEDs.length === 0
   }
 
   findConnectedComponents(startComponent) {
@@ -137,7 +155,7 @@ export class CircuitSimulator {
   }
 
   simulateCircuit(circuit) {
-    const { batteries, led, totalLEDs } = circuit
+    const { batteries, led, totalLEDs, isParallel } = circuit
 
     // Calculate total voltage from series batteries
     let totalVoltage = 0
@@ -148,8 +166,10 @@ export class CircuitSimulator {
       totalCharge += battery.charge
     })
 
-    // Voltage is divided across all LEDs in series
-    const voltage = totalVoltage / totalLEDs
+    // Voltage calculation depends on configuration
+    // Parallel: each LED gets full voltage
+    // Series: voltage is divided across all LEDs
+    const voltage = isParallel ? totalVoltage : totalVoltage / totalLEDs
 
     // LED characteristics
     const LED_FORWARD_VOLTAGE = 2.0  // Typical LED forward voltage
@@ -191,7 +211,9 @@ export class CircuitSimulator {
     led.current = current
 
     // Drain all batteries based on current draw
-    const drainRate = current * 0.001 / batteries.length // Distribute drain across batteries
+    // For parallel LEDs, each LED draws current, so multiply by number of parallel LEDs
+    const parallelMultiplier = isParallel ? totalLEDs : 1
+    const drainRate = current * 0.001 * parallelMultiplier / batteries.length // Distribute drain across batteries
     batteries.forEach(battery => {
       battery.charge = Math.max(0, battery.charge - drainRate)
     })
