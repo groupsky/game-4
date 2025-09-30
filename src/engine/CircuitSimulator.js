@@ -159,11 +159,15 @@ export class CircuitSimulator {
 
     // Calculate total voltage from series batteries
     let totalVoltage = 0
-    let totalCharge = 0
+    let minCharge = 1.0
 
     batteries.forEach(battery => {
-      totalVoltage += battery.voltage * battery.charge
-      totalCharge += battery.charge
+      // Voltage adds in series, regardless of charge level
+      // A battery maintains its voltage until nearly depleted
+      totalVoltage += battery.voltage * (battery.charge > 0 ? 1 : 0)
+
+      // Track minimum charge (circuit is limited by weakest battery)
+      minCharge = Math.min(minCharge, battery.charge)
     })
 
     // Voltage calculation depends on configuration

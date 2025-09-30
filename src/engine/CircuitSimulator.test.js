@@ -1017,4 +1017,95 @@ describe('CircuitSimulator', () => {
     expect(updatedLed3.voltage).toBeCloseTo(0.9, 0.1)
     expect(updatedLed3.brightness).toBeGreaterThan(0)
   })
+
+  it('should calculate series battery voltage correctly regardless of charge level', () => {
+    const simulator = new CircuitSimulator()
+
+    // Two batteries with DIFFERENT charge levels in series
+    const battery1 = {
+      id: 1,
+      type: 'battery',
+      charge: 1.0,  // Full
+      voltage: 0.9,
+      x: 100,
+      y: 100
+    }
+
+    const battery2 = {
+      id: 2,
+      type: 'battery',
+      charge: 0.5,  // Half charged
+      voltage: 0.9,
+      x: 150,
+      y: 100
+    }
+
+    const led = {
+      id: 3,
+      type: 'led',
+      brightness: 0,
+      x: 200,
+      y: 100
+    }
+
+    simulator.setComponents([battery1, battery2, led])
+    simulator.setWires([
+      { id: 4, from: 1, to: 2 },
+      { id: 5, from: 2, to: 3 }
+    ])
+
+    const result = simulator.simulate()
+    const updatedLed = result.find(c => c.id === 3)
+
+    // Series batteries: voltage adds (0.9V + 0.9V = 1.8V)
+    // Charge level should NOT affect voltage, only capacity
+    expect(updatedLed.voltage).toBeCloseTo(1.8, 0.1)
+
+    // LED should light (above 0.5V threshold)
+    expect(updatedLed.brightness).toBeGreaterThan(0)
+  })
+
+  it('should handle depleted battery in series (0V contribution)', () => {
+    const simulator = new CircuitSimulator()
+
+    const battery1 = {
+      id: 1,
+      type: 'battery',
+      charge: 1.0,
+      voltage: 0.9,
+      x: 100,
+      y: 100
+    }
+
+    const battery2 = {
+      id: 2,
+      type: 'battery',
+      charge: 0.0,  // Completely depleted
+      voltage: 0.9,
+      x: 150,
+      y: 100
+    }
+
+    const led = {
+      id: 3,
+      type: 'led',
+      brightness: 0,
+      x: 200,
+      y: 100
+    }
+
+    simulator.setComponents([battery1, battery2, led])
+    simulator.setWires([
+      { id: 4, from: 1, to: 2 },
+      { id: 5, from: 2, to: 3 }
+    ])
+
+    const result = simulator.simulate()
+    const updatedLed = result.find(c => c.id === 3)
+
+    // Depleted battery contributes 0V (0.9V * 0.0 charge = 0V)
+    // This behavior is acceptable: dead battery = open circuit
+    expect(updatedLed.voltage).toBeCloseTo(0.9, 0.1)
+    expect(updatedLed.brightness).toBeGreaterThan(0)
+  })
 })
