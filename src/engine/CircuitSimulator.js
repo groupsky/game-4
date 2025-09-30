@@ -36,15 +36,47 @@ export class CircuitSimulator {
     const circuits = []
     const leds = this.components.filter(c => c.type === 'led')
 
-    // For each LED, find all batteries connected to it (directly or through other batteries)
+    // For each LED, find all batteries and other LEDs in the same circuit
     leds.forEach(led => {
-      const batteries = this.findConnectedBatteries(led)
+      const connectedComponents = this.findConnectedComponents(led)
+      const batteries = connectedComponents.filter(c => c.type === 'battery')
+      const ledsInCircuit = connectedComponents.filter(c => c.type === 'led')
+
       if (batteries.length > 0) {
-        circuits.push({ batteries, led })
+        circuits.push({ batteries, led, totalLEDs: ledsInCircuit.length })
       }
     })
 
     return circuits
+  }
+
+  findConnectedComponents(startComponent) {
+    // BFS to find all components connected to this one
+    const visited = new Set()
+    const queue = [startComponent.id]
+    const connected = []
+
+    visited.add(startComponent.id)
+
+    while (queue.length > 0) {
+      const currentId = queue.shift()
+      const current = this.components.find(c => c.id === currentId)
+
+      if (!current) continue
+
+      connected.push(current)
+
+      // Find all connected components
+      const neighbors = this.getConnectedComponents(currentId)
+      for (const connId of neighbors) {
+        if (!visited.has(connId)) {
+          visited.add(connId)
+          queue.push(connId)
+        }
+      }
+    }
+
+    return connected
   }
 
   findConnectedBatteries(led) {
@@ -105,7 +137,7 @@ export class CircuitSimulator {
   }
 
   simulateCircuit(circuit) {
-    const { batteries, led } = circuit
+    const { batteries, led, totalLEDs } = circuit
 
     // Calculate total voltage from series batteries
     let totalVoltage = 0
@@ -116,9 +148,8 @@ export class CircuitSimulator {
       totalCharge += battery.charge
     })
 
-    // Average charge for drain calculation
-    const avgCharge = batteries.length > 0 ? totalCharge / batteries.length : 0
-    const voltage = totalVoltage
+    // Voltage is divided across all LEDs in series
+    const voltage = totalVoltage / totalLEDs
 
     // LED characteristics
     const LED_FORWARD_VOLTAGE = 2.0  // Typical LED forward voltage

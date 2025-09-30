@@ -13,6 +13,8 @@ export default function CircuitWorkspace() {
   const [connecting, setConnecting] = useState(null)
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 })
   const [selectedComponent, setSelectedComponent] = useState(null)
+  const [selectedComponents, setSelectedComponents] = useState([])
+  const [selectionBox, setSelectionBox] = useState(null)
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -50,12 +52,23 @@ export default function CircuitWorkspace() {
       }
     }
 
+    // Draw selection box
+    if (selectionBox) {
+      ctx.strokeStyle = '#F97316'
+      ctx.lineWidth = 2
+      ctx.setLineDash([5, 5])
+      ctx.fillStyle = 'rgba(249, 115, 22, 0.1)'
+      ctx.fillRect(selectionBox.x, selectionBox.y, selectionBox.width, selectionBox.height)
+      ctx.strokeRect(selectionBox.x, selectionBox.y, selectionBox.width, selectionBox.height)
+      ctx.setLineDash([])
+    }
+
     // Draw components
     components.forEach((component, index) => {
       drawComponent(ctx, component)
 
       // Draw selection indicator
-      if (index === selectedComponent) {
+      if (index === selectedComponent || selectedComponents.includes(index)) {
         ctx.save()
         ctx.strokeStyle = '#F97316'
         ctx.lineWidth = 3
@@ -66,7 +79,7 @@ export default function CircuitWorkspace() {
         ctx.restore()
       }
     })
-  }, [components, wires, connecting, mousePos, selectedComponent])
+  }, [components, wires, connecting, mousePos, selectedComponent, selectedComponents, selectionBox])
 
   // Run simulation every 100ms
   useEffect(() => {
@@ -84,10 +97,16 @@ export default function CircuitWorkspace() {
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key === 'Delete' || e.key === 'Backspace') {
-        if (selectedComponent !== null) {
-          // Delete component
+        if (selectedComponents.length > 0) {
+          // Delete multiple components
+          const compIds = selectedComponents.map(i => components[i]?.id).filter(Boolean)
+          setComponents(prev => prev.filter((_, i) => !selectedComponents.includes(i)))
+          setWires(prev => prev.filter(w => !compIds.includes(w.from) && !compIds.includes(w.to)))
+          setSelectedComponents([])
+          setSelectedComponent(null)
+        } else if (selectedComponent !== null) {
+          // Delete single component
           setComponents(prev => prev.filter((_, i) => i !== selectedComponent))
-          // Delete connected wires
           const compId = components[selectedComponent]?.id
           if (compId) {
             setWires(prev => prev.filter(w => w.from !== compId && w.to !== compId))
@@ -99,7 +118,7 @@ export default function CircuitWorkspace() {
 
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [selectedComponent, components])
+  }, [selectedComponent, selectedComponents, components])
 
   const drawGraphPaper = (ctx, width, height) => {
     const gridSize = 20
@@ -364,13 +383,13 @@ export default function CircuitWorkspace() {
   }
 
   const handleMouseDown = (e) => {
+    const canvas = canvasRef.current
+    const rect = canvas.getBoundingClientRect()
+    const x = e.clientX - rect.left
+    const y = e.clientY - rect.top
+
     if (e.shiftKey) {
       // Shift+click to start wire connection
-      const canvas = canvasRef.current
-      const rect = canvas.getBoundingClientRect()
-      const x = e.clientX - rect.left
-      const y = e.clientY - rect.top
-
       const hit = getComponentAt(x, y)
       if (hit) {
         setConnecting(hit.component.id)
@@ -378,19 +397,36 @@ export default function CircuitWorkspace() {
       return
     }
 
-    // Regular click for dragging
-    const canvas = canvasRef.current
-    const rect = canvas.getBoundingClientRect()
-    const x = e.clientX - rect.left
-    const y = e.clientY - rect.top
-
     const hit = getComponentAt(x, y)
+
     if (hit) {
-      setDragging(hit.index)
-      setSelectedComponent(hit.index)
-      setOffset({ x: x - hit.component.x, y: y - hit.component.y })
+      // Clicking on a component
+      if (e.ctrlKey || e.metaKey) {
+        // Ctrl/Cmd+click to add to selection
+        if (selectedComponents.includes(hit.index)) {
+          setSelectedComponents(prev => prev.filter(i => i !== hit.index))
+        } else {
+          setSelectedComponents(prev => [...prev, hit.index])
+        }
+      } else {
+        // Regular click - select and drag
+        setDragging(hit.index)
+
+        if (selectedComponents.includes(hit.index)) {
+          // If already in multi-selection, drag all selected
+          setOffset({ x: x - hit.component.x, y: y - hit.component.y })
+        } else {
+          // Single selection
+          setSelectedComponent(hit.index)
+          setSelectedComponents([])
+          setOffset({ x: x - hit.component.x, y: y - hit.component.y })
+        }
+      }
     } else {
+      // Clicking on empty space - start rectangle selection
+      setSelectionBox({ x, y, width: 0, height: 0, startX: x, startY: y })
       setSelectedComponent(null)
+      setSelectedComponents([])
     }
   }
 
@@ -457,16 +493,49 @@ export default function CircuitWorkspace() {
 
     setMousePos({ x, y })
 
-    if (dragging !== null) {
-      setComponents(prev => {
-        const newComponents = [...prev]
-        newComponents[dragging] = {
-          ...newComponents[dragging],
-          x: x - offset.x,
-          y: y - offset.y
-        }
-        return newComponents
-      })
+    if (selectionBox && selectionBox.startX !== undefined) {
+      // Update selection rectangle
+      const newBox = {
+        ...selectionBox,
+        x: Math.min(x, selectionBox.startX),
+        y: Math.min(y, selectionBox.startY),
+        width: Math.abs(x - selectionBox.startX),
+        height: Math.abs(y - selectionBox.startY)
+      }
+      setSelectionBox(newBox)
+    } else if (dragging !== null) {
+      const dx = x - offset.x
+      const dy = y - offset.y
+      const draggedComp = components[dragging]
+
+      if (selectedComponents.includes(dragging)) {
+        // Move all selected components together
+        const deltaX = dx - draggedComp.x
+        const deltaY = dy - draggedComp.y
+
+        setComponents(prev => {
+          const newComponents = [...prev]
+          selectedComponents.forEach(i => {
+            newComponents[i] = {
+              ...newComponents[i],
+              x: newComponents[i].x + deltaX,
+              y: newComponents[i].y + deltaY
+            }
+          })
+          return newComponents
+        })
+      } else {
+        // Move single component
+        setComponents(prev => {
+          const newComponents = [...prev]
+          newComponents[dragging] = {
+            ...newComponents[dragging],
+            x: dx,
+            y: dy
+          }
+          return newComponents
+        })
+      }
     }
   }
 
@@ -490,6 +559,31 @@ export default function CircuitWorkspace() {
       setConnecting(null)
     }
 
+    if (selectionBox && selectionBox.width > 5 && selectionBox.height > 5) {
+      // Find all components within selection box
+      const selected = []
+      components.forEach((comp, index) => {
+        const size = comp.type === 'battery' ? 60 : 30
+        const compLeft = comp.x - size
+        const compRight = comp.x + size
+        const compTop = comp.y - size
+        const compBottom = comp.y + size
+
+        const boxLeft = selectionBox.x
+        const boxRight = selectionBox.x + selectionBox.width
+        const boxTop = selectionBox.y
+        const boxBottom = selectionBox.y + selectionBox.height
+
+        // Check if component overlaps with selection box
+        if (compRight >= boxLeft && compLeft <= boxRight &&
+            compBottom >= boxTop && compTop <= boxBottom) {
+          selected.push(index)
+        }
+      })
+      setSelectedComponents(selected)
+    }
+
+    setSelectionBox(null)
     setDragging(null)
   }
 
@@ -535,10 +629,11 @@ export default function CircuitWorkspace() {
       />
 
       <div className="info-panel">
-        <p>💬 Drag to move | Shift+Click to wire | Right-click or Delete to remove</p>
+        <p>💬 Drag to move | Shift+Click to wire | Drag rectangle to multi-select | Ctrl+Click to add to selection</p>
         <p>Components: {components.length} | Wires: {wires.length}</p>
         {connecting && <p>🔌 Connecting... Click another component to finish wire.</p>}
-        {selectedComponent !== null && <p>🎯 Selected: {components[selectedComponent]?.type} (Press Delete to remove)</p>}
+        {selectedComponents.length > 0 && <p>🎯 Selected: {selectedComponents.length} components (Press Delete to remove)</p>}
+        {selectedComponent !== null && selectedComponents.length === 0 && <p>🎯 Selected: {components[selectedComponent]?.type} (Press Delete to remove)</p>}
       </div>
     </div>
   )
