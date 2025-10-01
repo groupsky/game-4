@@ -33,6 +33,11 @@ Circuit Quest: educational sandbox game - build computers from household items, 
 
 **UI Layer tests optional but encouraged**
 
+**Challenge Tests MUST include:**
+- Positive test: Working solution that passes validation (in ChallengeSolutions.test.js)
+- Negative tests: Verify challenge cannot be cheesed with easier solutions (in ChallengeNegative.test.js)
+- ALWAYS create both when adding/modifying challenges
+
 **Test Quality:** < 1ms per test, descriptive names, Arrange-Act-Assert structure, one assertion focus per test
 
 ## Architecture Constraints
@@ -74,6 +79,6 @@ src/
 
 ## Important Rules
 - ALL circuits MUST use real electrical engineering principles
-- Challenges MUST be auto-validated (must be solvable)
+- Challenges MUST be auto-validated AND have solution tests proving solvability
 - NO lectures or forced tutorials - learning by doing only
 - Performance: <50MB download, runs on 5-year-old hardware
