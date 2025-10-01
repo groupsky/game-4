@@ -438,7 +438,7 @@ export default function CircuitWorkspace() {
               x: 700 + Math.random() * 100,
               y: 100 + Math.random() * 100,
               brightness: 0,
-              resistance: 30,  // Lower resistance = draws much more current, drains batteries faster
+              resistance: 3,  // Very low resistance = draws 10x more current than before (30Ω → 3Ω)
               current: 0,
               power: 0
             }])}
