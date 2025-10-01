@@ -62,9 +62,25 @@ export function ChallengePanel({ challengeSystem, circuit }) {
           <h3>{activeChallenge.title}</h3>
           <p className="challenge-description">{activeChallenge.description}</p>
 
-          <button className="check-solution-btn" onClick={handleCheckSolution}>
-            Check Solution
-          </button>
+          {activeChallenge.requiresTime && (
+            <div className="time-display">
+              <div className="timer">
+                ⏱️ {challengeSystem.getTimeTracker().getFormattedTime()} / {Math.floor(activeChallenge.goalTime / 60)}:00
+              </div>
+              <div className="progress-bar">
+                <div
+                  className="progress-fill"
+                  style={{ width: `${challengeSystem.getTimeTracker().getProgress(activeChallenge.goalTime) * 100}%` }}
+                />
+              </div>
+            </div>
+          )}
+
+          {!activeChallenge.requiresTime && (
+            <button className="check-solution-btn" onClick={handleCheckSolution}>
+              Check Solution
+            </button>
+          )}
 
           {validationResult && (
             <div className={`validation-result ${validationResult.success ? 'success' : 'failure'}`}>

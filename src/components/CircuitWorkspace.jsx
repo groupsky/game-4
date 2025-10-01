@@ -46,7 +46,7 @@ export default function CircuitWorkspace() {
 
     // Draw wires
     wires.forEach(wire => {
-      drawWire(ctx, wire)
+      drawWire(ctx, wire, components)
     })
 
     // Draw wire being created
@@ -104,6 +104,9 @@ export default function CircuitWorkspace() {
       simulator.setWires(wires)
       const updated = simulator.simulate()
       setComponents([...updated])
+
+      // Update time tracking for active challenge
+      challengeSystem.updateTimeTracking({ components: updated, wires })
     }, 100)
 
     return () => clearInterval(interval)

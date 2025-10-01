@@ -5,9 +5,12 @@
  * Tracks completion state and unlocks next challenges
  */
 
+import { TimeTracker } from './TimeTracker.js'
+
 export class ChallengeSystem {
   constructor() {
     this.challenges = this.loadChallenges()
+    this.timeTracker = new TimeTracker()
   }
 
   loadChallenges() {
@@ -28,6 +31,8 @@ export class ChallengeSystem {
         description: 'Keep a light bulb powered for at least 1 minute using potato batteries.',
         unlocked: false,
         completed: false,
+        requiresTime: true,
+        goalTime: 60,
         validator: (circuit) => this.validatePowerBulb(circuit)
       },
       {
@@ -101,6 +106,43 @@ export class ChallengeSystem {
     }
   }
 
+  // Time tracking methods
+
+  updateTimeTracking(circuit) {
+    const activeChallenge = this.getActiveChallenge()
+
+    if (!activeChallenge || !activeChallenge.requiresTime) {
+      return
+    }
+
+    // Check if condition is met for time-based challenge
+    const validationResult = activeChallenge.validator(circuit)
+    const conditionMet = validationResult.success || validationResult.tracking
+
+    if (!this.timeTracker.running && conditionMet) {
+      this.timeTracker.start()
+    } else if (!conditionMet) {
+      this.timeTracker.reset()
+    }
+
+    this.timeTracker.update(() => conditionMet)
+
+    // Check if goal time reached
+    if (this.timeTracker.hasReachedGoal(activeChallenge.goalTime)) {
+      activeChallenge.completed = true
+      this.unlockNextChallenge(activeChallenge.id)
+      this.timeTracker.stop()
+    }
+  }
+
+  getTimeTracker() {
+    return this.timeTracker
+  }
+
+  resetTimeTracker() {
+    this.timeTracker.reset()
+  }
+
   // Validation functions
 
   validateLightLED(circuit) {
@@ -132,7 +174,8 @@ export class ChallengeSystem {
       return { success: false, message: 'Light bulb needs more power' }
     }
 
-    return { success: true, message: 'Light bulb is glowing! Keep it powered for 1 minute.' }
+    // Return tracking: true to signal time tracking should continue
+    return { success: false, tracking: true, message: 'Light bulb is glowing! Keep it powered...' }
   }
 
   validateSeriesBatteries(circuit) {
