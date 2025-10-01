@@ -1,5 +1,7 @@
 import { useRef, useState, useEffect } from 'react'
 import { CircuitSimulator } from '../engine/CircuitSimulator'
+import { ChallengeSystem } from '../challenges/ChallengeSystem'
+import { ChallengePanel } from './ChallengePanel'
 import {
   drawBattery,
   drawLED,
@@ -12,6 +14,7 @@ import {
 import './CircuitWorkspace.css'
 
 const simulator = new CircuitSimulator()
+const challengeSystem = new ChallengeSystem()
 
 export default function CircuitWorkspace() {
   const canvasRef = useRef(null)
@@ -459,6 +462,11 @@ export default function CircuitWorkspace() {
         {selectedComponents.length > 0 && <p>🎯 Selected: {selectedComponents.length} components (Press Delete to remove)</p>}
         {selectedComponent !== null && selectedComponents.length === 0 && <p>🎯 Selected: {components[selectedComponent]?.type} (Press Delete to remove)</p>}
       </div>
+
+      <ChallengePanel
+        challengeSystem={challengeSystem}
+        circuit={{ components, wires }}
+      />
     </div>
   )
 }
