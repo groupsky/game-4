@@ -214,4 +214,768 @@ describe('Challenge Solutions - Verify all challenges are solvable', () => {
     expect(capacitor.voltage).toBeGreaterThanOrEqual(2.0)
     expect(bulb.brightness).toBeGreaterThanOrEqual(0.05)
   })
+
+  // Challenge 10: Capacitor Bank
+  it('Challenge 10: Capacitor Bank - parallel capacitors', () => {
+    const simulator = new CircuitSimulator()
+
+    const battery1 = { id: 1, type: 'battery', charge: 1.0, voltage: 0.9 }
+    const battery2 = { id: 2, type: 'battery', charge: 1.0, voltage: 0.9 }
+    const cap1 = { id: 3, type: 'capacitor', capacitance: 0.01, voltage: 0 }
+    const cap2 = { id: 4, type: 'capacitor', capacitance: 0.01, voltage: 0 }
+    const led = { id: 5, type: 'led', brightness: 0 }
+
+    simulator.setComponents([battery1, battery2, cap1, cap2, led])
+    simulator.setWires([
+      { id: 6, from: 1, to: 2 },
+      { id: 7, from: 2, to: 3 },  // Battery -> Cap1
+      { id: 8, from: 2, to: 4 },  // Battery -> Cap2 (parallel)
+      { id: 9, from: 2, to: 5 }   // Battery -> LED
+    ])
+
+    for (let i = 0; i < 10; i++) {
+      simulator.simulate(0.1)
+    }
+
+    const result = ChallengeValidators.validateCapNetwork({
+      components: simulator.components
+    })
+
+    expect(result.success).toBe(true)
+  })
+
+  // Challenge 12: Triple Chain
+  it('Challenge 12: Triple Chain - 3 LEDs in series', () => {
+    const simulator = new CircuitSimulator()
+
+    const batteries = Array.from({ length: 8 }, (_, i) => ({
+      id: i + 1,
+      type: 'battery',
+      charge: 1.0,
+      voltage: 0.9
+    }))
+    const led1 = { id: 10, type: 'led', brightness: 0 }
+    const led2 = { id: 11, type: 'led', brightness: 0 }
+    const led3 = { id: 12, type: 'led', brightness: 0 }
+
+    simulator.setComponents([...batteries, led1, led2, led3])
+    const wires = batteries.slice(0, -1).map((b, i) => ({
+      id: 20 + i,
+      from: b.id,
+      to: batteries[i + 1].id
+    }))
+    wires.push({ id: 30, from: batteries[batteries.length - 1].id, to: led1.id })
+    wires.push({ id: 31, from: led1.id, to: led2.id })
+    wires.push({ id: 32, from: led2.id, to: led3.id })
+    simulator.setWires(wires)
+    simulator.simulate(0.1)
+
+    const result = ChallengeValidators.validateTripleChain({
+      components: simulator.components
+    })
+
+    expect(result.success).toBe(true)
+  })
+
+  // Challenge 17: Power Efficiency
+  it('Challenge 17: Power Efficiency - 1 battery with optimal resistance', () => {
+    const simulator = new CircuitSimulator()
+
+    const battery = { id: 1, type: 'battery', charge: 1.0, voltage: 0.9 }
+    const resistor = { id: 2, type: 'resistor', resistance: 22 } // 22Ω for 0.1+ brightness
+    const led = { id: 3, type: 'led', brightness: 0 }
+
+    simulator.setComponents([battery, resistor, led])
+    simulator.setWires([
+      { id: 4, from: 1, to: 2 },
+      { id: 5, from: 2, to: 3 }
+    ])
+    simulator.simulate(0.1)
+
+    const result = ChallengeValidators.validateEfficiency({
+      components: simulator.components
+    })
+
+    expect(result.success).toBe(true)
+    expect(led.brightness).toBeGreaterThan(0.1)
+  })
+
+  // Challenge 18: Maximum Brightness
+  it('Challenge 18: Maximum Brightness - optimal LED power', () => {
+    const simulator = new CircuitSimulator()
+
+    // Optimal: 3 batteries + 47Ω resistor for brightness 0.6-0.95
+    const batteries = Array.from({ length: 3 }, (_, i) => ({
+      id: i + 1,
+      type: 'battery',
+      charge: 1.0,
+      voltage: 0.9
+    }))
+    const resistor = { id: 10, type: 'resistor', resistance: 47 } // 47Ω to keep brightness in range
+    const led = { id: 11, type: 'led', brightness: 0 }
+
+    simulator.setComponents([...batteries, resistor, led])
+    const wires = batteries.slice(0, -1).map((b, i) => ({
+      id: 20 + i,
+      from: b.id,
+      to: batteries[i + 1].id
+    }))
+    wires.push({ id: 30, from: batteries[batteries.length - 1].id, to: resistor.id })
+    wires.push({ id: 31, from: resistor.id, to: led.id })
+    simulator.setWires(wires)
+    simulator.simulate(0.1)
+
+    const result = ChallengeValidators.validateMaxBright({
+      components: simulator.components
+    })
+
+    expect(result.success).toBe(true)
+    expect(led.brightness).toBeGreaterThan(0.6)
+    expect(led.brightness).toBeLessThan(0.95)
+  })
+
+  // Challenge 5: Battery Blues - bulb lit for 30s (timed challenge)
+  it('Challenge 5: Battery Blues - bulb bright enough', () => {
+    const simulator = new CircuitSimulator()
+
+    const batteries = Array.from({ length: 5 }, (_, i) => ({
+      id: i + 1,
+      type: 'battery',
+      charge: 1.0,
+      voltage: 0.9
+    }))
+    const bulb = { id: 10, type: 'lightbulb', brightness: 0 }
+
+    simulator.setComponents([...batteries, bulb])
+    const wires = batteries.slice(0, -1).map((b, i) => ({
+      id: 20 + i,
+      from: b.id,
+      to: batteries[i + 1].id
+    }))
+    wires.push({ id: 30, from: batteries[batteries.length - 1].id, to: bulb.id })
+    simulator.setWires(wires)
+    simulator.simulate(0.1)
+
+    const result = ChallengeValidators.validateBatteryBlues({
+      components: simulator.components
+    })
+
+    // Returns tracking: true for timed challenges
+    expect(result.tracking).toBe(true)
+    expect(bulb.brightness).toBeGreaterThan(0.2)
+  })
+
+  // Challenge 6: Parallel Power - 4+ batteries with bulb (60s timed)
+  it('Challenge 6: Parallel Power - series batteries for bulb', () => {
+    const simulator = new CircuitSimulator()
+
+    // 6 batteries in series to power bulb for 60s challenge
+    const batteries = Array.from({ length: 6 }, (_, i) => ({
+      id: i + 1,
+      type: 'battery',
+      charge: 1.0,
+      voltage: 0.9
+    }))
+    const bulb = { id: 10, type: 'lightbulb', brightness: 0 }
+
+    simulator.setComponents([...batteries, bulb])
+    const wires = batteries.slice(0, -1).map((b, i) => ({
+      id: 20 + i,
+      from: b.id,
+      to: batteries[i + 1].id
+    }))
+    wires.push({ id: 30, from: batteries[batteries.length - 1].id, to: bulb.id })
+    simulator.setWires(wires)
+    simulator.simulate(0.1)
+
+    const result = ChallengeValidators.validateParallelPower({
+      components: simulator.components
+    })
+
+    expect(result.tracking).toBe(true)
+    expect(bulb.brightness).toBeGreaterThan(0.2)
+  })
+
+  // Challenge 13: LED Array - 3x3 grid of 9 LEDs
+  it('Challenge 13: LED Array - 3x3 grid of 9 LEDs', () => {
+    const simulator = new CircuitSimulator()
+
+    // Need lots of batteries (9+ for 9 LEDs)
+    const batteries = Array.from({ length: 12 }, (_, i) => ({
+      id: i + 1,
+      type: 'battery',
+      charge: 1.0,
+      voltage: 0.9
+    }))
+    const leds = Array.from({ length: 9 }, (_, i) => ({
+      id: 20 + i,
+      type: 'led',
+      brightness: 0
+    }))
+
+    simulator.setComponents([...batteries, ...leds])
+
+    // Wire batteries in series
+    const wires = batteries.slice(0, -1).map((b, i) => ({
+      id: 50 + i,
+      from: b.id,
+      to: batteries[i + 1].id
+    }))
+
+    // Wire LEDs in parallel from last battery
+    leds.forEach((led, i) => {
+      wires.push({ id: 100 + i, from: batteries[batteries.length - 1].id, to: led.id })
+    })
+
+    simulator.setWires(wires)
+    simulator.simulate(0.1)
+
+    const result = ChallengeValidators.validateLEDArray({
+      components: simulator.components
+    })
+
+    expect(result.success).toBe(true)
+    const litLEDs = leds.filter(led => led.brightness >= 0.05)
+    expect(litLEDs.length).toBeGreaterThanOrEqual(9)
+  })
+
+  // Challenge 14: Voltage Divider - 2 resistors in series with LED
+  it('Challenge 14: Voltage Divider - resistor voltage division', () => {
+    const simulator = new CircuitSimulator()
+
+    // Need 3+ batteries for LED brightness >= 0.05
+    const batteries = Array.from({ length: 3 }, (_, i) => ({
+      id: i + 1,
+      type: 'battery',
+      charge: 1.0,
+      voltage: 0.9
+    }))
+    const resistor1 = { id: 10, type: 'resistor', resistance: 220 }
+    const resistor2 = { id: 11, type: 'resistor', resistance: 220 }
+    const led = { id: 12, type: 'led', brightness: 0 }
+
+    simulator.setComponents([...batteries, resistor1, resistor2, led])
+    const wires = batteries.slice(0, -1).map((b, i) => ({
+      id: 20 + i,
+      from: b.id,
+      to: batteries[i + 1].id
+    }))
+    wires.push({ id: 30, from: batteries[batteries.length - 1].id, to: resistor1.id })
+    wires.push({ id: 31, from: resistor1.id, to: resistor2.id })
+    wires.push({ id: 32, from: resistor2.id, to: led.id })
+    simulator.setWires(wires)
+    simulator.simulate(0.1)
+
+    const result = ChallengeValidators.validateVoltageDivide({
+      components: simulator.components
+    })
+
+    expect(result.success).toBe(true)
+    expect(led.brightness).toBeGreaterThanOrEqual(0.05)
+  })
+
+  // Challenge 16: RC Timing - capacitor + resistor + LED
+  it('Challenge 16: RC Timing - capacitor discharge timing', () => {
+    const simulator = new CircuitSimulator()
+
+    // Need 4+ batteries for capacitor voltage >= 1.0
+    const batteries = Array.from({ length: 4 }, (_, i) => ({
+      id: i + 1,
+      type: 'battery',
+      charge: 1.0,
+      voltage: 0.9
+    }))
+    const capacitor = { id: 10, type: 'capacitor', capacitance: 0.01, voltage: 0 }
+    const resistor = { id: 11, type: 'resistor', resistance: 220 }
+    const led = { id: 12, type: 'led', brightness: 0 }
+
+    simulator.setComponents([...batteries, capacitor, resistor, led])
+    const wires = batteries.slice(0, -1).map((b, i) => ({
+      id: 20 + i,
+      from: b.id,
+      to: batteries[i + 1].id
+    }))
+    wires.push({ id: 30, from: batteries[batteries.length - 1].id, to: capacitor.id })
+    wires.push({ id: 31, from: batteries[batteries.length - 1].id, to: resistor.id })
+    wires.push({ id: 32, from: resistor.id, to: led.id })
+    simulator.setWires(wires)
+
+    // Charge capacitor
+    for (let i = 0; i < 10; i++) {
+      simulator.simulate(0.1)
+    }
+
+    const result = ChallengeValidators.validateRCTiming({
+      components: simulator.components
+    })
+
+    expect(result.success).toBe(true)
+    expect(capacitor.voltage).toBeGreaterThan(1.0)
+  })
+
+  // Challenge 19: Battery Bank - 3x3 battery bank (9 batteries)
+  it('Challenge 19: Battery Bank - 3x3 battery bank powers LED', () => {
+    const simulator = new CircuitSimulator()
+
+    // 3 series chains of 3 batteries each, in parallel
+    const batteries = Array.from({ length: 9 }, (_, i) => ({
+      id: i + 1,
+      type: 'battery',
+      charge: 1.0,
+      voltage: 0.9
+    }))
+    const led = { id: 20, type: 'led', brightness: 0 }
+
+    simulator.setComponents([...batteries, led])
+
+    // Wire 3 chains of 3 batteries
+    const wires = [
+      // Chain 1: batteries 1,2,3
+      { id: 30, from: 1, to: 2 },
+      { id: 31, from: 2, to: 3 },
+      // Chain 2: batteries 4,5,6
+      { id: 32, from: 4, to: 5 },
+      { id: 33, from: 5, to: 6 },
+      // Chain 3: batteries 7,8,9
+      { id: 34, from: 7, to: 8 },
+      { id: 35, from: 8, to: 9 },
+      // Connect all chains to LED in parallel
+      { id: 40, from: 3, to: 20 },
+      { id: 41, from: 6, to: 20 },
+      { id: 42, from: 9, to: 20 }
+    ]
+
+    simulator.setWires(wires)
+    simulator.simulate(0.1)
+
+    const result = ChallengeValidators.validateBatteryBank({
+      components: simulator.components
+    })
+
+    expect(result.success).toBe(true)
+    expect(led.brightness).toBeGreaterThan(0.1)
+  })
+
+  // Challenge 15: Endurance - 2 LEDs lit for 90s (timed)
+  it('Challenge 15: Endurance - 2 LEDs stay lit', () => {
+    const simulator = new CircuitSimulator()
+
+    const batteries = Array.from({ length: 4 }, (_, i) => ({
+      id: i + 1,
+      type: 'battery',
+      charge: 1.0,
+      voltage: 0.9
+    }))
+    const led1 = { id: 10, type: 'led', brightness: 0 }
+    const led2 = { id: 11, type: 'led', brightness: 0 }
+
+    simulator.setComponents([...batteries, led1, led2])
+    const wires = batteries.slice(0, -1).map((b, i) => ({
+      id: 20 + i,
+      from: b.id,
+      to: batteries[i + 1].id
+    }))
+    wires.push({ id: 30, from: batteries[batteries.length - 1].id, to: led1.id })
+    wires.push({ id: 31, from: batteries[batteries.length - 1].id, to: led2.id })
+    simulator.setWires(wires)
+    simulator.simulate(0.1)
+
+    const result = ChallengeValidators.validateEndurance({
+      components: simulator.components
+    })
+
+    expect(result.tracking).toBe(true)
+    expect(led1.brightness).toBeGreaterThan(0.1)
+    expect(led2.brightness).toBeGreaterThan(0.1)
+  })
+
+  // Challenge 20: Marathon - bulb lit for 2 minutes (6+ batteries)
+  it('Challenge 20: Marathon - bulb with 6+ batteries', () => {
+    const simulator = new CircuitSimulator()
+
+    const batteries = Array.from({ length: 8 }, (_, i) => ({
+      id: i + 1,
+      type: 'battery',
+      charge: 1.0,
+      voltage: 0.9
+    }))
+    const bulb = { id: 10, type: 'lightbulb', brightness: 0 }
+
+    simulator.setComponents([...batteries, bulb])
+    const wires = batteries.slice(0, -1).map((b, i) => ({
+      id: 20 + i,
+      from: b.id,
+      to: batteries[i + 1].id
+    }))
+    wires.push({ id: 30, from: batteries[batteries.length - 1].id, to: bulb.id })
+    simulator.setWires(wires)
+    simulator.simulate(0.1)
+
+    const result = ChallengeValidators.validateMarathon({
+      components: simulator.components
+    })
+
+    expect(result.tracking).toBe(true)
+    expect(bulb.brightness).toBeGreaterThan(0.2)
+  })
+
+  // Challenge 21: Dual Power - LED + bulb both lit
+  it('Challenge 21: Dual Power - LED and bulb from same source', () => {
+    const simulator = new CircuitSimulator()
+
+    const batteries = Array.from({ length: 6 }, (_, i) => ({
+      id: i + 1,
+      type: 'battery',
+      charge: 1.0,
+      voltage: 0.9
+    }))
+    const led = { id: 10, type: 'led', brightness: 0 }
+    const bulb = { id: 11, type: 'lightbulb', brightness: 0 }
+
+    simulator.setComponents([...batteries, led, bulb])
+    const wires = batteries.slice(0, -1).map((b, i) => ({
+      id: 20 + i,
+      from: b.id,
+      to: batteries[i + 1].id
+    }))
+    wires.push({ id: 30, from: batteries[batteries.length - 1].id, to: led.id })
+    wires.push({ id: 31, from: batteries[batteries.length - 1].id, to: bulb.id })
+    simulator.setWires(wires)
+    simulator.simulate(0.1)
+
+    const result = ChallengeValidators.validateDualPower({
+      components: simulator.components
+    })
+
+    expect(result.success).toBe(true)
+    expect(led.brightness).toBeGreaterThan(0.1)
+    expect(bulb.brightness).toBeGreaterThan(0.2)
+  })
+
+  // Challenge 22: Capacitor Network - 2 parallel capacitors (same as Challenge 10)
+  it('Challenge 22: Capacitor Network - parallel capacitors', () => {
+    const simulator = new CircuitSimulator()
+
+    const battery1 = { id: 1, type: 'battery', charge: 1.0, voltage: 0.9 }
+    const battery2 = { id: 2, type: 'battery', charge: 1.0, voltage: 0.9 }
+    const cap1 = { id: 3, type: 'capacitor', capacitance: 0.01, voltage: 0 }
+    const cap2 = { id: 4, type: 'capacitor', capacitance: 0.01, voltage: 0 }
+
+    simulator.setComponents([battery1, battery2, cap1, cap2])
+    simulator.setWires([
+      { id: 6, from: 1, to: 2 },
+      { id: 7, from: 2, to: 3 },  // Battery -> Cap1
+      { id: 8, from: 2, to: 4 }   // Battery -> Cap2 (parallel)
+    ])
+
+    for (let i = 0; i < 10; i++) {
+      simulator.simulate(0.1)
+    }
+
+    const result = ChallengeValidators.validateCapNetwork({
+      components: simulator.components
+    })
+
+    expect(result.success).toBe(true)
+    expect(cap1.voltage).toBeGreaterThan(1.5)
+    expect(cap2.voltage).toBeGreaterThan(1.5)
+  })
+
+  // Challenge 23: Series Capacitors - 2 caps in series
+  it('Challenge 23: Series Capacitors - capacitors in series', () => {
+    const simulator = new CircuitSimulator()
+
+    const battery1 = { id: 1, type: 'battery', charge: 1.0, voltage: 0.9 }
+    const battery2 = { id: 2, type: 'battery', charge: 1.0, voltage: 0.9 }
+    const cap1 = { id: 3, type: 'capacitor', capacitance: 0.01, voltage: 0 }
+    const cap2 = { id: 4, type: 'capacitor', capacitance: 0.01, voltage: 0 }
+
+    simulator.setComponents([battery1, battery2, cap1, cap2])
+    simulator.setWires([
+      { id: 6, from: 1, to: 2 },
+      { id: 7, from: 2, to: 3 },  // Battery -> Cap1
+      { id: 8, from: 3, to: 4 }   // Cap1 -> Cap2 (series)
+    ])
+
+    for (let i = 0; i < 10; i++) {
+      simulator.simulate(0.1)
+    }
+
+    const result = ChallengeValidators.validateSeriesCaps({
+      components: simulator.components
+    })
+
+    expect(result.success).toBe(true)
+    expect(cap1.voltage).toBeGreaterThan(0.5)
+    expect(cap2.voltage).toBeGreaterThan(0.5)
+  })
+
+  // Challenge 24: Mixed Load - 3 LEDs (2 series + 1 parallel)
+  it('Challenge 24: Mixed Load - series and parallel LEDs', () => {
+    const simulator = new CircuitSimulator()
+
+    const batteries = Array.from({ length: 8 }, (_, i) => ({
+      id: i + 1,
+      type: 'battery',
+      charge: 1.0,
+      voltage: 0.9
+    }))
+    const led1 = { id: 10, type: 'led', brightness: 0 }
+    const led2 = { id: 11, type: 'led', brightness: 0 }
+    const led3 = { id: 12, type: 'led', brightness: 0 }
+
+    simulator.setComponents([...batteries, led1, led2, led3])
+    const wires = batteries.slice(0, -1).map((b, i) => ({
+      id: 20 + i,
+      from: b.id,
+      to: batteries[i + 1].id
+    }))
+    // Series chain: LED1 -> LED2
+    wires.push({ id: 30, from: batteries[batteries.length - 1].id, to: led1.id })
+    wires.push({ id: 31, from: led1.id, to: led2.id })
+    // Parallel: LED3
+    wires.push({ id: 32, from: batteries[batteries.length - 1].id, to: led3.id })
+    simulator.setWires(wires)
+    simulator.simulate(0.1)
+
+    const result = ChallengeValidators.validateMixedLoad({
+      components: simulator.components
+    })
+
+    expect(result.success).toBe(true)
+    expect(led1.brightness).toBeGreaterThan(0.05)
+    expect(led2.brightness).toBeGreaterThan(0.05)
+    expect(led3.brightness).toBeGreaterThan(0.05)
+  })
+
+  // Challenge 25: Resistor Ladder - 3 resistors in series
+  it('Challenge 25: Resistor Ladder - 3 series resistors with LED', () => {
+    const simulator = new CircuitSimulator()
+
+    const battery1 = { id: 1, type: 'battery', charge: 1.0, voltage: 0.9 }
+    const battery2 = { id: 2, type: 'battery', charge: 1.0, voltage: 0.9 }
+    const battery3 = { id: 3, type: 'battery', charge: 1.0, voltage: 0.9 }
+    const resistor1 = { id: 4, type: 'resistor', resistance: 100 }
+    const resistor2 = { id: 5, type: 'resistor', resistance: 100 }
+    const resistor3 = { id: 6, type: 'resistor', resistance: 100 }
+    const led = { id: 7, type: 'led', brightness: 0 }
+
+    simulator.setComponents([battery1, battery2, battery3, resistor1, resistor2, resistor3, led])
+    simulator.setWires([
+      { id: 10, from: 1, to: 2 },
+      { id: 11, from: 2, to: 3 },
+      { id: 12, from: 3, to: 4 },
+      { id: 13, from: 4, to: 5 },
+      { id: 14, from: 5, to: 6 },
+      { id: 15, from: 6, to: 7 }
+    ])
+    simulator.simulate(0.1)
+
+    const result = ChallengeValidators.validateResistorLadder({
+      components: simulator.components
+    })
+
+    expect(result.success).toBe(true)
+    expect(resistor1.current).toBeGreaterThan(0.001)
+    expect(resistor2.current).toBeGreaterThan(0.001)
+    expect(resistor3.current).toBeGreaterThan(0.001)
+  })
+
+  // Challenge 26: Power Distribution - 3 parallel LEDs
+  it('Challenge 26: Power Distribution - 3 parallel LED branches', () => {
+    const simulator = new CircuitSimulator()
+
+    const batteries = Array.from({ length: 4 }, (_, i) => ({
+      id: i + 1,
+      type: 'battery',
+      charge: 1.0,
+      voltage: 0.9
+    }))
+    const led1 = { id: 10, type: 'led', brightness: 0 }
+    const led2 = { id: 11, type: 'led', brightness: 0 }
+    const led3 = { id: 12, type: 'led', brightness: 0 }
+
+    simulator.setComponents([...batteries, led1, led2, led3])
+    const wires = batteries.slice(0, -1).map((b, i) => ({
+      id: 20 + i,
+      from: b.id,
+      to: batteries[i + 1].id
+    }))
+    wires.push({ id: 30, from: batteries[batteries.length - 1].id, to: led1.id })
+    wires.push({ id: 31, from: batteries[batteries.length - 1].id, to: led2.id })
+    wires.push({ id: 32, from: batteries[batteries.length - 1].id, to: led3.id })
+    simulator.setWires(wires)
+    simulator.simulate(0.1)
+
+    const result = ChallengeValidators.validatePowerDist({
+      components: simulator.components
+    })
+
+    expect(result.success).toBe(true)
+    expect(led1.brightness).toBeGreaterThan(0.1)
+    expect(led2.brightness).toBeGreaterThan(0.1)
+    expect(led3.brightness).toBeGreaterThan(0.1)
+  })
+
+  // Challenge 27: Sustained Flash - batteries + capacitors + bulb (timed)
+  it('Challenge 27: Sustained Flash - batteries and capacitors power bulb', () => {
+    const simulator = new CircuitSimulator()
+
+    const batteries = Array.from({ length: 6 }, (_, i) => ({
+      id: i + 1,
+      type: 'battery',
+      charge: 1.0,
+      voltage: 0.9
+    }))
+    const cap1 = { id: 10, type: 'capacitor', capacitance: 0.05, voltage: 0 }
+    const cap2 = { id: 11, type: 'capacitor', capacitance: 0.05, voltage: 0 }
+    const bulb = { id: 12, type: 'lightbulb', brightness: 0 }
+
+    simulator.setComponents([...batteries, cap1, cap2, bulb])
+    const wires = batteries.slice(0, -1).map((b, i) => ({
+      id: 20 + i,
+      from: b.id,
+      to: batteries[i + 1].id
+    }))
+    wires.push({ id: 30, from: batteries[batteries.length - 1].id, to: cap1.id })
+    wires.push({ id: 31, from: batteries[batteries.length - 1].id, to: cap2.id })
+    wires.push({ id: 32, from: batteries[batteries.length - 1].id, to: bulb.id })
+    simulator.setWires(wires)
+
+    for (let i = 0; i < 10; i++) {
+      simulator.simulate(0.1)
+    }
+
+    const result = ChallengeValidators.validateSustainedFlash({
+      components: simulator.components
+    })
+
+    expect(result.tracking).toBe(true)
+    expect(bulb.brightness).toBeGreaterThan(0.2)
+  })
+
+  // Challenge 28: Efficiency Master - 3 LEDs with EXACTLY 3 batteries (timed)
+  it('Challenge 28: Efficiency Master - 3 LEDs on 3 batteries', () => {
+    const simulator = new CircuitSimulator()
+
+    const batteries = Array.from({ length: 3 }, (_, i) => ({
+      id: i + 1,
+      type: 'battery',
+      charge: 1.0,
+      voltage: 0.9
+    }))
+    const led1 = { id: 10, type: 'led', brightness: 0 }
+    const led2 = { id: 11, type: 'led', brightness: 0 }
+    const led3 = { id: 12, type: 'led', brightness: 0 }
+
+    simulator.setComponents([...batteries, led1, led2, led3])
+    const wires = batteries.slice(0, -1).map((b, i) => ({
+      id: 20 + i,
+      from: b.id,
+      to: batteries[i + 1].id
+    }))
+    wires.push({ id: 30, from: batteries[batteries.length - 1].id, to: led1.id })
+    wires.push({ id: 31, from: batteries[batteries.length - 1].id, to: led2.id })
+    wires.push({ id: 32, from: batteries[batteries.length - 1].id, to: led3.id })
+    simulator.setWires(wires)
+    simulator.simulate(0.1)
+
+    const result = ChallengeValidators.validateEfficiencyMaster({
+      components: simulator.components
+    })
+
+    expect(result.tracking).toBe(true)
+    expect(led1.brightness).toBeGreaterThan(0.1)
+    expect(led2.brightness).toBeGreaterThan(0.1)
+    expect(led3.brightness).toBeGreaterThan(0.1)
+  })
+
+  // Challenge 29: Grand Circuit - everything combined (60s timed)
+  it('Challenge 29: Grand Circuit - LED + bulb + resistor + capacitor', () => {
+    const simulator = new CircuitSimulator()
+
+    const batteries = Array.from({ length: 8 }, (_, i) => ({
+      id: i + 1,
+      type: 'battery',
+      charge: 1.0,
+      voltage: 0.9
+    }))
+    const led = { id: 10, type: 'led', brightness: 0 }
+    const bulb = { id: 11, type: 'lightbulb', brightness: 0 }
+    const resistor = { id: 12, type: 'resistor', resistance: 220 }
+    const capacitor = { id: 13, type: 'capacitor', capacitance: 0.01, voltage: 0 }
+
+    simulator.setComponents([...batteries, led, bulb, resistor, capacitor])
+    const wires = batteries.slice(0, -1).map((b, i) => ({
+      id: 20 + i,
+      from: b.id,
+      to: batteries[i + 1].id
+    }))
+    wires.push({ id: 30, from: batteries[batteries.length - 1].id, to: resistor.id })
+    wires.push({ id: 31, from: resistor.id, to: led.id })
+    wires.push({ id: 32, from: batteries[batteries.length - 1].id, to: bulb.id })
+    wires.push({ id: 33, from: batteries[batteries.length - 1].id, to: capacitor.id })
+    simulator.setWires(wires)
+
+    for (let i = 0; i < 10; i++) {
+      simulator.simulate(0.1)
+    }
+
+    const result = ChallengeValidators.validateGrandCircuit({
+      components: simulator.components
+    })
+
+    expect(result.success).toBe(true)
+    expect(result.tracking).toBe(true)
+    expect(led.brightness).toBeGreaterThan(0.1)
+    expect(bulb.brightness).toBeGreaterThan(0.2)
+    expect(capacitor.voltage).toBeGreaterThan(1.0)
+  })
+
+  // Challenge 30: Master Inventor - 5+ lit components
+  it('Challenge 30: Master Inventor - 5+ lit LEDs and bulbs', () => {
+    const simulator = new CircuitSimulator()
+
+    const batteries = Array.from({ length: 12 }, (_, i) => ({
+      id: i + 1,
+      type: 'battery',
+      charge: 1.0,
+      voltage: 0.9
+    }))
+    const leds = Array.from({ length: 3 }, (_, i) => ({
+      id: 20 + i,
+      type: 'led',
+      brightness: 0
+    }))
+    const bulbs = Array.from({ length: 2 }, (_, i) => ({
+      id: 30 + i,
+      type: 'lightbulb',
+      brightness: 0
+    }))
+
+    simulator.setComponents([...batteries, ...leds, ...bulbs])
+    const wires = batteries.slice(0, -1).map((b, i) => ({
+      id: 50 + i,
+      from: b.id,
+      to: batteries[i + 1].id
+    }))
+    // Wire all LEDs and bulbs in parallel
+    leds.forEach((led, i) => {
+      wires.push({ id: 100 + i, from: batteries[batteries.length - 1].id, to: led.id })
+    })
+    bulbs.forEach((bulb, i) => {
+      wires.push({ id: 110 + i, from: batteries[batteries.length - 1].id, to: bulb.id })
+    })
+    simulator.setWires(wires)
+    simulator.simulate(0.1)
+
+    const result = ChallengeValidators.validateMasterInventor({
+      components: simulator.components
+    })
+
+    expect(result.success).toBe(true)
+    const litLEDs = leds.filter(led => led.brightness >= 0.1)
+    const litBulbs = bulbs.filter(bulb => bulb.brightness >= 0.2)
+    expect(litLEDs.length + litBulbs.length).toBeGreaterThanOrEqual(5)
+  })
 })
