@@ -35,6 +35,13 @@ export default function CircuitWorkspace() {
   useEffect(() => {
     simulationState.onChange((running) => {
       setIsRunning(running)
+
+      // Reset circuit when simulation stops
+      if (!running) {
+        setComponents(prevComponents => {
+          return simulator.resetCircuit(prevComponents)
+        })
+      }
     })
   }, [])
 

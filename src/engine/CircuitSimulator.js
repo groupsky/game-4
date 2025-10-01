@@ -21,6 +21,42 @@ export class CircuitSimulator {
     this.wires = wires
   }
 
+  /**
+   * Reset circuit to initial state
+   * - Batteries: full charge (1.0)
+   * - Capacitors: empty (voltage = 0)
+   * - Resistors: cold (current = 0)
+   * - LEDs: off (brightness = 0)
+   * - Light bulbs: off (brightness = 0, current = 0, power = 0)
+   * @param {Array} components - Components to reset
+   * @returns {Array} Reset components
+   */
+  resetCircuit(components) {
+    return components.map(comp => {
+      const reset = { ...comp }
+
+      if (comp.type === 'battery') {
+        reset.charge = 1.0 // Full charge
+      } else if (comp.type === 'capacitor') {
+        reset.voltage = 0 // Empty
+      } else if (comp.type === 'resistor') {
+        reset.current = 0 // Cold
+        reset.voltageDrop = 0
+      } else if (comp.type === 'led') {
+        reset.brightness = 0 // Off
+        reset.voltage = 0
+        reset.current = 0
+      } else if (comp.type === 'lightbulb') {
+        reset.brightness = 0 // Off
+        reset.current = 0
+        reset.power = 0
+        reset.voltage = 0
+      }
+
+      return reset
+    })
+  }
+
   simulate(deltaTime = 0.1) {
     // deltaTime in seconds (default 100ms)
     this.deltaTime = deltaTime  // Store for use in other methods
