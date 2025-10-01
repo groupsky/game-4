@@ -208,30 +208,96 @@ Implemented for time-based challenges:
 - Auto-start/stop based on circuit state
 - Goal completion detection
 
-## 🚫 Remaining Missing Features
+## 🚫 Pending UI/UX Improvements
 
-### 1. Additional Components (OPTIONAL)
-**Priority: LOW**
+### 1. Simulation Control (HIGH PRIORITY)
+**Status: PLANNED**
 
-Act 1 MVP complete with core components. Optional additions:
+Start/Stop button for simulation control:
+- Simulation runs ONLY when started
+- Editing allowed ONLY when stopped
+- Stop resets all state: batteries full, capacitors empty, resistors cold
+- Challenge validation ONLY when simulation running
+- Clear separation between edit mode and test mode
+
+### 2. Win Effects & Feedback (HIGH PRIORITY)
+**Status: PLANNED**
+
+Victory celebration when challenge completed:
+- Visual effects (confetti, sparkles, glow)
+- Success animation
+- Sound effect (optional)
+- Clear feedback that challenge is complete
+
+### 3. Level Navigator (HIGH PRIORITY)
+**Status: PLANNED**
+
+Improved challenge navigation:
+- Visual level selector (grid or list view)
+- Levels unlock ONLY when previous level solved (strict progression)
+- Current level highlighted
+- Clear visual indication of locked/unlocked/completed states
+
+### 4. Star Rating System (MEDIUM PRIORITY)
+**Status: PLANNED**
+
+Efficiency-based 3-star rating:
+- ⭐ 1 star: Challenge completed (any solution)
+- ⭐⭐ 2 stars: Efficient solution (fewer components)
+- ⭐⭐⭐ 3 stars: Optimal solution (minimal components, fast time)
+- Display stars earned for each challenge
+- Track total stars earned
+
+### 5. Challenge Design Review (HIGH PRIORITY)
+**Status: PLANNED**
+
+Review all 30 challenges for:
+- Logical progression (one new concept per level)
+- Gradual complexity increase
+- Clear teaching moments
+- No sudden difficulty spikes
+- Combination challenges appear AFTER individual concepts mastered
+- Hints clarity and progressive disclosure
+
+### 6. Improved Hints System (MEDIUM PRIORITY)
+**Status: PLANNED**
+
+Multi-level hint system:
+- First hint: High-level concept
+- Second hint: More specific guidance (if circuit unchanged)
+- Third hint: Step-by-step solution (if still stuck)
+- Detect if player is stuck (same state, multiple hint requests)
+- Adjust hint level based on struggle
+
+### 7. UI Improvements Completed ✅
+**Status: COMPLETE**
+
+Recent improvements:
+- ✅ Keyboard shortcuts (Space = Check, H = Toggle)
+- ✅ Difficulty tiers with visual grouping
+- ✅ Styled kbd elements
+- ✅ Scrollable challenge list
+
+### 8. Additional UI Improvements (LOW PRIORITY)
+**Status: PLANNED**
+
+Future enhancements:
+- Responsive design for smaller screens
+- Component palette/toolbar
+- Wire creation animation
+- Undo/redo functionality
+- Component hover tooltips
+- Save/load system
+- Audio feedback
+- Component crafting/discovery UI
+
+### 9. Additional Components (LOW PRIORITY)
+**Status: OPTIONAL**
+
+Act 1 MVP complete. Optional additions:
 - Buzzer - Audio output
 - Motor - Mechanical output
 - Inductor/Coil - Electromagnets
-
-### 2. Component Crafting System (OPTIONAL)
-**Priority: MEDIUM**
-
-The "Scavenge → Craft → Test" loop is missing:
-- Kitchen/garage scavenging UI
-- Component crafting recipes
-- Inventory management
-
-### 3. Audio Feedback (OPTIONAL)
-**Priority: LOW**
-
-- Click sounds for wiring
-- Success chimes
-- Component placement sounds
 
 ## Next Development Steps
 
@@ -286,7 +352,7 @@ The "Scavenge → Craft → Test" loop is missing:
 ### Low Priority
 - [ ] No undo/redo system
 - [ ] No circuit save/load
-- [ ] No keyboard shortcuts beyond Delete
+- [x] No keyboard shortcuts beyond Delete (FIXED: Space, H shortcuts added)
 
 ## Dependencies
 

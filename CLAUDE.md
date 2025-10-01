@@ -78,8 +78,29 @@ src/
 - Act 2: Machine Era (1930s-1970s) - relays, tubes, logic gates
 - Act 3: Silicon Era (1980s-2000s) - transistors, ICs, CPUs
 
+## Challenge Design Rules
+
+**MUST follow puzzle game best practices:**
+- One new concept per level (component OR technique)
+- Gradual complexity increase (no difficulty spikes)
+- Combination challenges ONLY after individual concepts mastered
+- Clear progression: learn → practice → combine
+- Each challenge unlocks ONLY when previous solved (strict progression)
+
+**Hint system guidelines:**
+- Multi-level hints (concept → guidance → solution)
+- Track circuit state between hint requests
+- If unchanged state + new hint request = player stuck, give more help
+- Progressive disclosure: don't reveal full solution immediately
+
+**Star rating criteria (for future):**
+- ⭐ 1 star: Challenge completed (any solution)
+- ⭐⭐ 2 stars: Efficient (fewer components)
+- ⭐⭐⭐ 3 stars: Optimal (minimal components + fast time)
+
 ## Important Rules
 - ALL circuits MUST use real electrical engineering principles
 - Challenges MUST be auto-validated AND have solution tests proving solvability
 - NO lectures or forced tutorials - learning by doing only
 - Performance: <50MB download, runs on 5-year-old hardware
+- Simulation/Edit mode separation: edit when stopped, test when running
