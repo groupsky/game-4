@@ -12,7 +12,8 @@ Circuit Quest: educational sandbox game - build computers from household items, 
 1. Write test first (RED) - test must fail initially
 2. Implement minimal code to pass (GREEN) - don't over-engineer
 3. Refactor while keeping tests green
-4. Commit only when all tests pass - include test + implementation together
+4. Commit when all tests pass - include test + implementation together
+5. ALWAYS commit after successful change - don't accumulate multiple unrelated changes
 
 **MUST refactor when file exceeds line limits:**
 - Implementation files: 500 lines
