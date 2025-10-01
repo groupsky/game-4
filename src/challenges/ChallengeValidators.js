@@ -188,6 +188,7 @@ export const ChallengeValidators = {
   validateFlashPhoto(circuit) {
     const capacitors = circuit.components.filter(c => c.type === 'capacitor')
     const bulbs = circuit.components.filter(c => c.type === 'lightbulb')
+    const batteries = circuit.components.filter(c => c.type === 'battery')
 
     if (capacitors.length === 0) {
       return { success: false, message: 'Add a capacitor for the energy burst!' }
@@ -197,17 +198,31 @@ export const ChallengeValidators = {
       return { success: false, message: 'Add a light bulb to see the flash!' }
     }
 
-    const chargedCap = capacitors.find(cap => cap.voltage >= 2.5)
+    // Need large capacitor (high capacitance) to provide burst of current
+    const largeCap = capacitors.find(cap => cap.capacitance >= 0.05)  // 50mF+
+    if (!largeCap) {
+      return { success: false, message: 'Use a larger capacitor (50mF+) for more burst energy!' }
+    }
+
+    // Capacitor should have stored significant energy (voltage >= 2V)
+    const chargedCap = capacitors.find(cap => cap.voltage >= 2.0)
     if (!chargedCap) {
-      return { success: false, message: 'Charge capacitor to at least 2.5V for a bright flash!' }
+      return { success: false, message: 'Charge capacitor to at least 2V with batteries!' }
     }
 
-    const brightBulb = bulbs.find(bulb => bulb.brightness >= 0.4)
-    if (!brightBulb) {
-      return { success: false, message: 'Bulb needs to flash bright! More capacitor charge needed.' }
+    // Bulb should be lit (capacitor discharging into it)
+    // Very low threshold - bulb brightness from capacitor discharge is brief/dim
+    const litBulb = bulbs.find(bulb => bulb.brightness >= 0.05)
+    if (!litBulb) {
+      return { success: false, message: 'Connect bulb to capacitor to see the flash!' }
     }
 
-    return { success: true, message: '📸 Flash! That\'s a capacitor discharge!' }
+    // Check if using capacitor without battery (pure discharge mode)
+    if (batteries.length > 0 && batteries.some(b => b.charge > 0)) {
+      return { success: false, message: 'For a burst, use ONLY capacitor power (disconnect/deplete batteries)!' }
+    }
+
+    return { success: true, message: '📸 Flash! That\'s a capacitor discharge burst!' }
   },
 
   // 12. Triple Chain - 3 LEDs in series
