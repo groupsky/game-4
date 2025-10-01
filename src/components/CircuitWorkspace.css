@@ -48,6 +48,34 @@
   box-shadow: 1px 1px 0 #4A4A4A;
 }
 
+.simulation-control-btn {
+  font-weight: bold;
+  font-size: 15px !important;
+  min-width: 100px;
+}
+
+.simulation-control-btn.running {
+  background: #DC2626 !important;
+  color: white;
+  border-color: #991B1B;
+}
+
+.simulation-control-btn.running:hover {
+  background: #EF4444 !important;
+  border-color: #991B1B;
+}
+
+.simulation-control-btn.stopped {
+  background: #16A34A !important;
+  color: white;
+  border-color: #065F46;
+}
+
+.simulation-control-btn.stopped:hover {
+  background: #22C55E !important;
+  border-color: #065F46;
+}
+
 .circuit-canvas {
   flex: 1;
   cursor: crosshair;

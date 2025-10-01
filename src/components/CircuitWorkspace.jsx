@@ -1,5 +1,6 @@
 import { useRef, useState, useEffect } from 'react'
 import { CircuitSimulator } from '../engine/CircuitSimulator'
+import { SimulationState } from '../engine/SimulationState'
 import { ChallengeSystem } from '../challenges/ChallengeSystem'
 import { ChallengePanel } from './ChallengePanel'
 import {
@@ -14,6 +15,7 @@ import {
 import './CircuitWorkspace.css'
 
 const simulator = new CircuitSimulator()
+const simulationState = new SimulationState()
 const challengeSystem = new ChallengeSystem()
 
 export default function CircuitWorkspace() {
@@ -27,6 +29,14 @@ export default function CircuitWorkspace() {
   const [selectedComponent, setSelectedComponent] = useState(null)
   const [selectedComponents, setSelectedComponents] = useState([])
   const [selectionBox, setSelectionBox] = useState(null)
+  const [isRunning, setIsRunning] = useState(false)
+
+  // Listen to simulation state changes
+  useEffect(() => {
+    simulationState.onChange((running) => {
+      setIsRunning(running)
+    })
+  }, [])
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -98,7 +108,10 @@ export default function CircuitWorkspace() {
   }, [components, wires, connecting, mousePos, selectedComponent, selectedComponents, selectionBox])
 
   // Run simulation every 100ms (with 10ms physics step for finer granularity)
+  // ONLY when simulation is running
   useEffect(() => {
+    if (!isRunning) return
+
     const interval = setInterval(() => {
       simulator.setComponents(components)
       simulator.setWires(wires)
@@ -110,7 +123,7 @@ export default function CircuitWorkspace() {
     }, 100)
 
     return () => clearInterval(interval)
-  }, [components, wires])
+  }, [components, wires, isRunning])
 
   // Keyboard handler for delete
   useEffect(() => {
@@ -383,6 +396,12 @@ export default function CircuitWorkspace() {
       <div className="workspace-header">
         <h1>📔 Circuit Quest - Inventor's Notebook</h1>
         <div className="toolbar">
+          <button
+            className={`simulation-control-btn ${isRunning ? 'running' : 'stopped'}`}
+            onClick={() => simulationState.toggle()}
+          >
+            {isRunning ? '⏸️ Stop' : '▶️ Start'}
+          </button>
           <button
             onClick={() => setComponents([...components, {
               id: Date.now(),
