@@ -1,3 +1,12 @@
+import { simulateCapacitors } from './CapacitorSimulation.js'
+import {
+  getBatteryVisualState,
+  getLEDVisualState,
+  getResistorVisualState,
+  getCapacitorVisualState,
+  getLightBulbVisualState
+} from './VisualState.js'
+
 export class CircuitSimulator {
   constructor() {
     this.components = []
@@ -33,7 +42,7 @@ export class CircuitSimulator {
     })
 
     // Update capacitors (charge/discharge based on connected circuits)
-    this.simulateCapacitors(deltaTime)
+    simulateCapacitors(this.components, this.wires, deltaTime, (comp) => this.findConnectedComponents(comp))
 
     // Find all circuits (battery connected to components via wires)
     const circuits = this.findCircuits()
@@ -298,168 +307,38 @@ export class CircuitSimulator {
     })
   }
 
-  // Voltage divider formula
+  // Visual state getters (delegated to VisualState module)
+  getBatteryVisualState(battery) {
+    return getBatteryVisualState(battery)
+  }
+
+  getLEDVisualState(led) {
+    return getLEDVisualState(led)
+  }
+
+  getResistorVisualState(resistor) {
+    return getResistorVisualState(resistor)
+  }
+
+  getCapacitorVisualState(capacitor) {
+    return getCapacitorVisualState(capacitor)
+  }
+
+  getLightBulbVisualState(bulb) {
+    return getLightBulbVisualState(bulb)
+  }
+
+  // Helper formulas
   voltageDivider(vin, r1, r2) {
     return vin * r2 / (r1 + r2)
   }
 
-  // RC charge formula
   rcCharge(v, r, c, t) {
     return v * (1 - Math.exp(-t / (r * c)))
   }
 
-  // Power calculation
   power(v, i) {
     return v * i
-  }
-
-  // Visual state getters for rendering
-  getBatteryVisualState(battery) {
-    const chargePercent = Math.round(battery.charge * 100)
-    const chargeBarFill = battery.charge
-
-    let state
-    if (battery.charge > 0.75) state = 'full'
-    else if (battery.charge > 0.5) state = 'medium'
-    else if (battery.charge > 0.25) state = 'low'
-    else if (battery.charge > 0) state = 'depleted'
-    else state = 'dead'
-
-    return {
-      chargePercent,
-      chargeBarFill,
-      state,
-      glowIntensity: battery.charge * 0.5  // Dim glow based on charge
-    }
-  }
-
-  getLEDVisualState(led) {
-    const brightness = led.brightness || 0
-    const brightnessPercent = Math.round(brightness * 100)
-    const glowIntensity = brightness
-    const glowRadius = 5 + brightness * 15  // 5px base + up to 15px
-
-    let state
-    if (brightness === 0) state = 'off'
-    else if (brightness < 0.4) state = 'dim'
-    else if (brightness < 0.8) state = 'medium'
-    else state = 'bright'
-
-    return {
-      brightness,
-      brightnessPercent,
-      glowIntensity,
-      glowRadius,
-      state
-    }
-  }
-
-  getResistorVisualState(resistor) {
-    const current = resistor.current || 0
-    const resistance = resistor.resistance || 0
-
-    // P = I² × R (power dissipated as heat)
-    const powerDissipated = current * current * resistance
-
-    // Heat level (0-1 scale)
-    // 0.5W = warm, 1W = hot, 2W+ = very hot
-    let heatLevel = Math.min(powerDissipated / 2.0, 1.0)
-
-    let state
-    if (heatLevel < 0.25) state = 'cool'
-    else if (heatLevel < 0.6) state = 'warm'
-    else if (heatLevel < 0.9) state = 'hot'
-    else state = 'overheating'
-
-    return {
-      powerDissipated,
-      heatLevel,
-      state,
-      voltageDrop: resistor.voltageDrop || 0,
-      current
-    }
-  }
-
-  getCapacitorVisualState(capacitor) {
-    const voltage = capacitor.voltage || 0
-    const maxVoltage = capacitor.maxVoltage || 5.0
-    const chargePercent = Math.round((voltage / maxVoltage) * 100)
-    const chargeFill = voltage / maxVoltage
-
-    let state
-    if (chargeFill < 0.1) state = 'empty'
-    else if (chargeFill < 0.5) state = 'charging'
-    else if (chargeFill < 0.9) state = 'charged'
-    else state = 'full'
-
-    return {
-      chargePercent,
-      chargeFill,
-      state,
-      voltage,
-      maxVoltage
-    }
-  }
-
-  simulateCapacitors(deltaTime) {
-    const capacitors = this.components.filter(c => c.type === 'capacitor')
-
-    capacitors.forEach(capacitor => {
-      // Initialize voltage if not set
-      if (capacitor.voltage === undefined) {
-        capacitor.voltage = 0
-      }
-
-      // Find connected components
-      const connected = this.findConnectedComponents(capacitor)
-      const batteries = connected.filter(c => c.type === 'battery')
-      const resistors = connected.filter(c => c.type === 'resistor')
-
-      // Calculate total resistance in circuit (for RC time constant)
-      let totalResistance = 10  // Default 10Ω (wire resistance)
-      resistors.forEach(r => {
-        totalResistance += r.resistance
-      })
-
-      if (batteries.length > 0) {
-        // Charging: battery connected to capacitor
-        let sourceVoltage = 0
-        batteries.forEach(battery => {
-          sourceVoltage += battery.voltage * (battery.charge > 0 ? 1 : 0)
-        })
-
-        // RC charging: V(t) = Vs × (1 - e^(-t/RC))
-        const capacitance = capacitor.capacitance || 0.001  // 1mF default
-        const timeConstant = totalResistance * capacitance
-        const voltageDiff = sourceVoltage - capacitor.voltage
-
-        // Calculate voltage change for this time step
-        const deltaV = voltageDiff * (1 - Math.exp(-deltaTime / timeConstant))
-        capacitor.voltage += deltaV
-
-        // Drain battery based on charging current
-        const chargingCurrent = deltaV / totalResistance / deltaTime
-        const drainRate = chargingCurrent * deltaTime * 0.001 / batteries.length
-        batteries.forEach(battery => {
-          battery.charge = Math.max(0, battery.charge - drainRate)
-        })
-
-      } else {
-        // Discharging: capacitor through resistor (no battery)
-        if (resistors.length > 0 && capacitor.voltage > 0) {
-          const capacitance = capacitor.capacitance || 0.001
-          const timeConstant = totalResistance * capacitance
-
-          // RC discharge: V(t) = V0 × e^(-t/RC)
-          const dischargeFactor = Math.exp(-deltaTime / timeConstant)
-          capacitor.voltage *= dischargeFactor
-        }
-      }
-
-      // Clamp voltage to max rating
-      const maxVoltage = capacitor.maxVoltage || 10.0
-      capacitor.voltage = Math.max(0, Math.min(capacitor.voltage, maxVoltage))
-    })
   }
 
   simulateLightBulb(circuit) {
@@ -512,30 +391,5 @@ export class CircuitSimulator {
     batteries.forEach(battery => {
       battery.charge = Math.max(0, battery.charge - drainRate)
     })
-  }
-
-  getLightBulbVisualState(bulb) {
-    const brightness = bulb.brightness || 0
-    const brightnessPercent = Math.round(brightness * 100)
-    const glowIntensity = brightness
-    const power = bulb.power || 0
-
-    // Filament heat based on power dissipation (incandescent heats up)
-    const filamentHeat = Math.min(power / 1.0, 1.0)
-
-    let state
-    if (brightness === 0) state = 'off'
-    else if (brightness < 0.3) state = 'dim'
-    else if (brightness < 0.7) state = 'warm'
-    else state = 'bright'
-
-    return {
-      brightness,
-      brightnessPercent,
-      glowIntensity,
-      filamentHeat,
-      state,
-      power
-    }
   }
 }
