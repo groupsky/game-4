@@ -85,11 +85,77 @@ export class CircuitSimulator {
       const capacitors = connectedComponents.filter(c => c.type === 'capacitor' && c.voltage > 0.1)
 
       if (batteries.length > 0 || capacitors.length > 0) {
-        circuits.push({ batteries, capacitors, bulb, type: 'lightbulb' })
+        // Analyze battery topology (series/parallel chains)
+        const batteryTopology = this.analyzeBatteryTopology(batteries, bulb)
+        circuits.push({ batteries, capacitors, bulb, batteryTopology, type: 'lightbulb' })
       }
     })
 
     return circuits
+  }
+
+  analyzeBatteryTopology(batteries, load) {
+    // Detect series/parallel battery configurations
+    // Returns: { seriesChains: [[bat1, bat2], [bat3, bat4]], voltage: V, parallelCount: N }
+
+    if (batteries.length === 0) {
+      return { seriesChains: [], voltage: 0, parallelCount: 0 }
+    }
+
+    // Find series chains: batteries connected to each other
+    const visited = new Set()
+    const seriesChains = []
+
+    batteries.forEach(startBattery => {
+      if (visited.has(startBattery.id)) return
+
+      // Build a chain starting from this battery
+      const chain = [startBattery]
+      visited.add(startBattery.id)
+
+      // Follow the chain in both directions
+      let current = startBattery
+      let foundNext = true
+
+      while (foundNext) {
+        foundNext = false
+        const neighbors = this.getConnectedComponents(current.id)
+
+        for (const neighborId of neighbors) {
+          const neighbor = batteries.find(b => b.id === neighborId)
+          if (neighbor && !visited.has(neighbor.id)) {
+            chain.push(neighbor)
+            visited.add(neighbor.id)
+            current = neighbor
+            foundNext = true
+            break
+          }
+        }
+      }
+
+      seriesChains.push(chain)
+    })
+
+    // Calculate voltage per chain (series batteries add voltage)
+    const voltagePerChain = seriesChains.length > 0
+      ? seriesChains[0].reduce((sum, bat) => sum + (bat.charge > 0 ? bat.voltage : 0), 0)
+      : 0
+
+    // Parallel chains all connect to the same load
+    // Count how many chains reach the load
+    const chainsConnectedToLoad = seriesChains.filter(chain => {
+      // Check if any battery in this chain is directly connected to the load
+      return chain.some(battery => {
+        const neighbors = this.getConnectedComponents(battery.id)
+        return neighbors.includes(load.id)
+      })
+    }).length
+
+    return {
+      seriesChains,
+      voltage: voltagePerChain,
+      parallelCount: chainsConnectedToLoad
+    }
   }
 
   isParallelConfiguration(led, batteries) {
@@ -366,16 +432,22 @@ export class CircuitSimulator {
   }
 
   simulateLightBulb(circuit) {
-    const { batteries = [], capacitors = [], bulb } = circuit
+    const { batteries = [], capacitors = [], bulb, batteryTopology } = circuit
 
-    // Calculate total voltage from series batteries and charged capacitors
+    // Use battery topology analysis for accurate series/parallel handling
     let totalVoltage = 0
-    let minCharge = 1.0
+    let parallelCount = 1
 
-    batteries.forEach(battery => {
-      totalVoltage += battery.voltage * (battery.charge > 0 ? 1 : 0)
-      minCharge = Math.min(minCharge, battery.charge)
-    })
+    if (batteryTopology) {
+      // Use analyzed topology
+      totalVoltage = batteryTopology.voltage
+      parallelCount = batteryTopology.parallelCount || 1
+    } else {
+      // Fallback: treat all batteries as series (old behavior)
+      batteries.forEach(battery => {
+        totalVoltage += battery.voltage * (battery.charge > 0 ? 1 : 0)
+      })
+    }
 
     // Add capacitor voltage
     capacitors.forEach(capacitor => {
@@ -416,10 +488,15 @@ export class CircuitSimulator {
     bulb.power = power
 
     // Drain batteries (bulbs draw more current than LEDs)
+    // For parallel chains: current is divided, so each battery drains slower
+    // For series chains: all batteries in chain drain at same rate
     const totalSources = batteries.length + capacitors.length
 
     if (batteries.length > 0) {
-      const drainRate = current * 0.001 / totalSources
+      // Divide current by number of parallel chains
+      const currentPerChain = current / parallelCount
+      const drainRate = currentPerChain * 0.001 / totalSources
+
       batteries.forEach(battery => {
         battery.charge = Math.max(0, battery.charge - drainRate)
       })
