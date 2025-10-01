@@ -313,23 +313,38 @@ export class CircuitSimulator {
   simulateCircuit(circuit) {
     const { batteries = [], capacitors = [], led, totalLEDs, isParallel } = circuit
 
-    // Calculate total voltage from series batteries and charged capacitors
-    let totalVoltage = 0
+    // Calculate total voltage from series batteries
+    let batteryVoltage = 0
     let minCharge = 1.0
 
     batteries.forEach(battery => {
       // Voltage adds in series, regardless of charge level
       // A battery maintains its voltage until nearly depleted
-      totalVoltage += battery.voltage * (battery.charge > 0 ? 1 : 0)
+      batteryVoltage += battery.voltage * (battery.charge > 0 ? 1 : 0)
 
       // Track minimum charge (circuit is limited by weakest battery)
       minCharge = Math.min(minCharge, battery.charge)
     })
 
-    // Add capacitor voltage (capacitors act as voltage sources)
-    capacitors.forEach(capacitor => {
-      totalVoltage += capacitor.voltage
-    })
+    // Handle capacitors:
+    // - If battery present: capacitor opposes battery (blocks DC when fully charged)
+    //   totalVoltage = batteryVoltage - capacitorVoltage
+    // - If no battery: capacitor acts as voltage source (discharging mode)
+    //   totalVoltage = capacitorVoltage
+    let totalVoltage
+    if (batteries.length > 0) {
+      // Capacitors in series with battery: oppose the battery voltage as they charge
+      totalVoltage = batteryVoltage
+      capacitors.forEach(capacitor => {
+        totalVoltage -= capacitor.voltage
+      })
+    } else {
+      // Capacitor-only circuit: capacitor acts as voltage source (discharge mode)
+      totalVoltage = 0
+      capacitors.forEach(capacitor => {
+        totalVoltage += capacitor.voltage
+      })
+    }
 
     // Find resistors in THIS LED's branch (not all connected resistors)
     const resistorsInPath = this.findResistorsInPath(led, batteries)

@@ -144,7 +144,7 @@ describe('CircuitSimulator - Capacitors', () => {
     expect(visualState.state).toBe('charged')  // 50% = charged state (0.5 >= 0.5 threshold)
   })
 
-  it('should handle capacitor in LED circuit for smoothing', () => {
+  it('should handle capacitor in series with LED (capacitor blocks DC when charged)', () => {
     const simulator = new CircuitSimulator()
 
     const battery = {
@@ -173,23 +173,28 @@ describe('CircuitSimulator - Capacitors', () => {
       y: 100
     }
 
-    // Battery charges capacitor, capacitor powers LED
+    // Battery -> Capacitor -> LED (series)
     simulator.setComponents([battery, capacitor, led])
     simulator.setWires([
       { id: 4, from: 1, to: 2 },
       { id: 5, from: 2, to: 3 }
     ])
 
-    // LED should light as capacitor charges
-    for (let i = 0; i < 5; i++) {
+    // Initially, LED may light briefly as capacitor charges
+    simulator.simulate(0.01)
+    const initialLed = simulator.components.find(c => c.id === 3)
+    const initialBrightness = initialLed.brightness
+
+    // After capacitor charges, LED should go dim/off (capacitor blocks DC)
+    for (let i = 0; i < 20; i++) {
       simulator.simulate()
     }
 
     const updatedLed = simulator.components.find(c => c.id === 3)
     const updatedCap = simulator.components.find(c => c.id === 2)
 
-    expect(updatedCap.voltage).toBeGreaterThan(0)
-    expect(updatedLed.brightness).toBeGreaterThan(0)
+    expect(updatedCap.voltage).toBeGreaterThan(0)  // Capacitor charged
+    expect(updatedLed.brightness).toBeLessThan(0.3)  // LED dim/off once capacitor charged
   })
 
   it('should discharge capacitor through LED when battery disconnected', () => {
