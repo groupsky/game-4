@@ -285,6 +285,41 @@ export class CircuitSimulator {
     return resistors
   }
 
+  isCapacitorInSeriesWithLED(capacitor, led, batteries) {
+    // Determine if capacitor is in series (between battery and LED)
+    // or in parallel (both connected to same battery nodes)
+
+    if (batteries.length === 0) return false
+
+    // Check if capacitor is between battery and LED using BFS
+    // Series: Battery -> ... -> Capacitor -> ... -> LED
+    // Parallel: Battery -> LED AND Battery -> Capacitor (separate paths)
+
+    // Find path from battery to LED that goes through capacitor
+    const visited = new Set()
+    const queue = [{ id: batteries[0].id, path: [] }]
+    visited.add(batteries[0].id)
+
+    while (queue.length > 0) {
+      const { id, path } = queue.shift()
+
+      // If we reached the LED, check if capacitor was in the path
+      if (id === led.id) {
+        return path.includes(capacitor.id)
+      }
+
+      const connected = this.getConnectedComponents(id)
+      for (const connId of connected) {
+        if (!visited.has(connId)) {
+          visited.add(connId)
+          queue.push({ id: connId, path: [...path, id] })
+        }
+      }
+    }
+
+    return false
+  }
+
   getConnectedComponents(compId) {
     const connected = []
     for (const wire of this.wires) {
@@ -326,21 +361,26 @@ export class CircuitSimulator {
       minCharge = Math.min(minCharge, battery.charge)
     })
 
-    // Handle capacitors:
-    // - If battery present: capacitor opposes battery (blocks DC when fully charged)
-    //   totalVoltage = batteryVoltage - capacitorVoltage
-    // - If no battery: capacitor acts as voltage source (discharging mode)
-    //   totalVoltage = capacitorVoltage
-    let totalVoltage
+    // Handle capacitors based on their configuration:
+    // - Series with LED: oppose battery (blocks DC when charged)
+    // - Parallel with LED: add to voltage (smoothing/boost)
+    // - No battery: act as voltage source (discharge mode)
+    let totalVoltage = batteryVoltage
+
     if (batteries.length > 0) {
-      // Capacitors in series with battery: oppose the battery voltage as they charge
-      totalVoltage = batteryVoltage
+      // Check each capacitor: series or parallel?
       capacitors.forEach(capacitor => {
-        totalVoltage -= capacitor.voltage
+        const inSeries = this.isCapacitorInSeriesWithLED(capacitor, led, batteries)
+        if (inSeries) {
+          // Series: capacitor opposes battery voltage as it charges
+          totalVoltage -= capacitor.voltage
+        } else {
+          // Parallel: capacitor adds to voltage (both provide power)
+          totalVoltage += capacitor.voltage
+        }
       })
     } else {
-      // Capacitor-only circuit: capacitor acts as voltage source (discharge mode)
-      totalVoltage = 0
+      // No battery: capacitor acts as voltage source (discharge mode)
       capacitors.forEach(capacitor => {
         totalVoltage += capacitor.voltage
       })
@@ -439,13 +479,13 @@ export class CircuitSimulator {
       })
     }
 
-    // Discharge capacitors when powering LED
-    if (capacitors.length > 0) {
-      // Calculate energy drawn from capacitors: E = V * I * t
-      // Voltage drop: dV = I * dt / C
+    // Discharge capacitors when powering LED (only if no battery, or if series with battery)
+    if (capacitors.length > 0 && batteries.length === 0) {
+      // Only discharge capacitors if they're the sole power source
+      // If battery is present, battery charges/powers and capacitor just charges
       capacitors.forEach(capacitor => {
         const capacitance = capacitor.capacitance || 0.001
-        const dischargeCurrent = current * parallelMultiplier / totalSources
+        const dischargeCurrent = current * parallelMultiplier / capacitors.length
         const voltageDrop = (dischargeCurrent * this.deltaTime) / capacitance
         capacitor.voltage = Math.max(0, capacitor.voltage - voltageDrop)
       })

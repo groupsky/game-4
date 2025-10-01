@@ -37,7 +37,7 @@ export function simulateCapacitors(components, wires, deltaTime, findConnectedCo
       capacitor.voltage += deltaV
 
       // Drain battery based on charging current
-      const chargingCurrent = deltaV / totalResistance / deltaTime
+      const chargingCurrent = Math.abs(deltaV / totalResistance / deltaTime)
       const drainRate = chargingCurrent * deltaTime * 0.001 / batteries.length
       batteries.forEach(battery => {
         battery.charge = Math.max(0, battery.charge - drainRate)
