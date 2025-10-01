@@ -141,18 +141,56 @@ export function ChallengePanel({ challengeSystem, circuit }) {
         </div>
       ) : (
         <div className="all-challenges-list">
-          {challenges.map((challenge, index) => (
-            <div
-              key={challenge.id}
-              className={`challenge-item ${challenge.completed ? 'completed' : ''} ${!challenge.unlocked ? 'locked' : ''}`}
-            >
-              <span className="challenge-number">{index + 1}.</span>
-              <span className="challenge-title">{challenge.title}</span>
-              <span className="challenge-status">
-                {challenge.completed ? '✅' : challenge.unlocked ? '🔓' : '🔒'}
-              </span>
-            </div>
-          ))}
+          {/* Basics (1-10) */}
+          <div className="challenge-tier">
+            <div className="tier-header">⭐ Basics (1-10)</div>
+            {challenges.slice(0, 10).map((challenge, index) => (
+              <div
+                key={challenge.id}
+                className={`challenge-item ${challenge.completed ? 'completed' : ''} ${!challenge.unlocked ? 'locked' : ''}`}
+              >
+                <span className="challenge-number">{index + 1}.</span>
+                <span className="challenge-title">{challenge.title}</span>
+                <span className="challenge-status">
+                  {challenge.completed ? '✅' : challenge.unlocked ? '🔓' : '🔒'}
+                </span>
+              </div>
+            ))}
+          </div>
+
+          {/* Intermediate (11-20) */}
+          <div className="challenge-tier">
+            <div className="tier-header">⭐⭐ Intermediate (11-20)</div>
+            {challenges.slice(10, 20).map((challenge, index) => (
+              <div
+                key={challenge.id}
+                className={`challenge-item ${challenge.completed ? 'completed' : ''} ${!challenge.unlocked ? 'locked' : ''}`}
+              >
+                <span className="challenge-number">{index + 11}.</span>
+                <span className="challenge-title">{challenge.title}</span>
+                <span className="challenge-status">
+                  {challenge.completed ? '✅' : challenge.unlocked ? '🔓' : '🔒'}
+                </span>
+              </div>
+            ))}
+          </div>
+
+          {/* Advanced (21-30) */}
+          <div className="challenge-tier">
+            <div className="tier-header">⭐⭐⭐ Advanced (21-30)</div>
+            {challenges.slice(20, 30).map((challenge, index) => (
+              <div
+                key={challenge.id}
+                className={`challenge-item ${challenge.completed ? 'completed' : ''} ${!challenge.unlocked ? 'locked' : ''}`}
+              >
+                <span className="challenge-number">{index + 21}.</span>
+                <span className="challenge-title">{challenge.title}</span>
+                <span className="challenge-status">
+                  {challenge.completed ? '✅' : challenge.unlocked ? '🔓' : '🔒'}
+                </span>
+              </div>
+            ))}
+          </div>
         </div>
       )}
     </div>

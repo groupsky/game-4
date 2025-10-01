@@ -112,7 +112,26 @@
 .all-challenges-list {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 16px;
+  max-height: 70vh;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.challenge-tier {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.tier-header {
+  font-size: 14px;
+  font-weight: bold;
+  color: #1E3A8A;
+  padding: 6px 8px;
+  background: #E0E0D0;
+  border-left: 4px solid #1E3A8A;
+  margin-bottom: 4px;
 }
 
 .challenge-item {
