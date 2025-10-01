@@ -16,12 +16,12 @@ describe('ChallengeSystem', () => {
       expect(challenges[0].act).toBe(1)
     })
 
-    it('should have "Light an LED" as first challenge', () => {
+    it('should have "First Light" as first challenge', () => {
       const challenges = challengeSystem.getChallenges()
       const firstChallenge = challenges[0]
 
-      expect(firstChallenge.id).toBe('light-led')
-      expect(firstChallenge.title).toBe('Light an LED')
+      expect(firstChallenge.id).toBe('first-light')
+      expect(firstChallenge.title).toContain('First Light')
       expect(firstChallenge.description).toContain('potato battery')
     })
 
@@ -44,10 +44,10 @@ describe('ChallengeSystem', () => {
         wires: []
       }
 
-      const result = challengeSystem.validate('light-led', circuit)
+      const result = challengeSystem.validate('first-light', circuit)
 
       expect(result.success).toBe(true)
-      expect(result.message).toContain('LED is lit')
+      expect(result.message).toContain('Success')
     })
 
     it('should fail validation if LED is not bright enough', () => {
@@ -59,10 +59,10 @@ describe('ChallengeSystem', () => {
         wires: []
       }
 
-      const result = challengeSystem.validate('light-led', circuit)
+      const result = challengeSystem.validate('first-light', circuit)
 
       expect(result.success).toBe(false)
-      expect(result.message).toContain('too dim')
+      expect(result.message).toContain('dim')
     })
 
     it('should fail validation if no LED present', () => {
@@ -73,7 +73,7 @@ describe('ChallengeSystem', () => {
         wires: []
       }
 
-      const result = challengeSystem.validate('light-led', circuit)
+      const result = challengeSystem.validate('first-light', circuit)
 
       expect(result.success).toBe(false)
       expect(result.message).toContain('LED')
@@ -90,8 +90,8 @@ describe('ChallengeSystem', () => {
         wires: []
       }
 
-      challengeSystem.validate('light-led', circuit)
-      const challenge = challengeSystem.getChallenge('light-led')
+      challengeSystem.validate('first-light', circuit)
+      const challenge = challengeSystem.getChallenge('first-light')
 
       expect(challenge.completed).toBe(true)
     })
@@ -105,7 +105,7 @@ describe('ChallengeSystem', () => {
         wires: []
       }
 
-      challengeSystem.validate('light-led', circuit)
+      challengeSystem.validate('first-light', circuit)
       const challenges = challengeSystem.getChallenges()
       const secondChallenge = challenges[1]
 
@@ -117,7 +117,7 @@ describe('ChallengeSystem', () => {
     it('should return first unlocked challenge as active', () => {
       const active = challengeSystem.getActiveChallenge()
 
-      expect(active.id).toBe('light-led')
+      expect(active.id).toBe('first-light')
       expect(active.unlocked).toBe(true)
     })
 
@@ -130,10 +130,10 @@ describe('ChallengeSystem', () => {
         wires: []
       }
 
-      challengeSystem.validate('light-led', circuit)
+      challengeSystem.validate('first-light', circuit)
       const active = challengeSystem.getActiveChallenge()
 
-      expect(active.id).not.toBe('light-led')
+      expect(active.id).not.toBe('first-light')
     })
   })
 })

@@ -16,52 +16,111 @@ export class ChallengeSystem {
 
   loadChallenges() {
     return [
+      // 1. Tutorial - Basic Connection
       {
-        id: 'light-led',
+        id: 'first-light',
         act: 1,
-        title: 'Light an LED',
-        description: 'Connect an LED to a potato battery and make it light up. The LED needs enough voltage to glow.',
+        title: '1. First Light',
+        description: 'Connect an LED to a potato battery. Watch it glow! This is your first circuit.',
         unlocked: true,
         completed: false,
-        validator: (circuit) => this.validateLightLED(circuit)
+        validator: (circuit) => this.validateFirstLight(circuit)
       },
+      // 2. Introduce Resistor
       {
-        id: 'power-bulb-1min',
+        id: 'current-control',
         act: 1,
-        title: 'Power a Light Bulb',
-        description: 'Keep a light bulb powered for at least 1 minute using potato batteries.',
+        title: '2. Current Control',
+        description: 'Add a resistor to protect your LED. Without it, too much current can damage components!',
+        unlocked: false,
+        completed: false,
+        validator: (circuit) => this.validateCurrentControl(circuit)
+      },
+      // 3. Series Batteries
+      {
+        id: 'power-up',
+        act: 1,
+        title: '3. Power Up',
+        description: 'One battery is too weak. Connect 2 or more batteries in series (end-to-end) to increase voltage and make your LED brighter!',
+        unlocked: false,
+        completed: false,
+        validator: (circuit) => this.validatePowerUp(circuit)
+      },
+      // 4. Introduce Light Bulb
+      {
+        id: 'warm-glow',
+        act: 1,
+        title: '4. The Warm Glow',
+        description: 'Light bulbs need more power than LEDs. Use series batteries to power a light bulb.',
+        unlocked: false,
+        completed: false,
+        validator: (circuit) => this.validateWarmGlow(circuit)
+      },
+      // 5. Battery Drain (30s)
+      {
+        id: 'battery-blues',
+        act: 1,
+        title: '5. Battery Blues',
+        description: 'Light bulbs drain batteries fast! Keep one lit for 30 seconds. You\'ll need enough batteries to last.',
+        unlocked: false,
+        completed: false,
+        requiresTime: true,
+        goalTime: 30,
+        validator: (circuit) => this.validateBatteryBlues(circuit)
+      },
+      // 6. Parallel Batteries
+      {
+        id: 'parallel-power',
+        act: 1,
+        title: '6. Parallel Power',
+        description: 'To last longer, connect battery pairs in parallel (side-by-side). This increases capacity, not voltage. Keep the bulb lit for 60 seconds!',
         unlocked: false,
         completed: false,
         requiresTime: true,
         goalTime: 60,
-        validator: (circuit) => this.validatePowerBulb(circuit)
+        validator: (circuit) => this.validateParallelPower(circuit)
       },
+      // 7. Parallel LEDs
       {
-        id: 'series-batteries',
+        id: 'double-bright',
         act: 1,
-        title: 'Series Battery Power',
-        description: 'Connect multiple potato batteries in series to increase voltage.',
+        title: '7. Double Bright',
+        description: 'Light up 2 LEDs at once using parallel connections. Each LED needs its own resistor!',
         unlocked: false,
         completed: false,
-        validator: (circuit) => this.validateSeriesBatteries(circuit)
+        validator: (circuit) => this.validateDoubleBright(circuit)
       },
+      // 8. Capacitor Smoothing
       {
-        id: 'parallel-leds',
+        id: 'energy-bank',
         act: 1,
-        title: 'Multiple LEDs',
-        description: 'Light up multiple LEDs in parallel from the same battery.',
+        title: '8. Energy Bank',
+        description: 'Add a capacitor to store energy. Charge it up with batteries and watch it power your LED smoothly!',
         unlocked: false,
         completed: false,
-        validator: (circuit) => this.validateParallelLEDs(circuit)
+        validator: (circuit) => this.validateEnergyBank(circuit)
       },
+      // 9. Capacitor Burst
       {
-        id: 'capacitor-charging',
+        id: 'flash-photo',
         act: 1,
-        title: 'Energy Storage',
-        description: 'Charge a capacitor and use it to power an LED.',
+        title: '9. Flash Photography',
+        description: 'Charge a large capacitor to high voltage. Use its burst of energy to make a light bulb flash bright!',
         unlocked: false,
         completed: false,
-        validator: (circuit) => this.validateCapacitorCharging(circuit)
+        validator: (circuit) => this.validateFlashPhoto(circuit)
+      },
+      // 10. Final Challenge
+      {
+        id: 'grand-circuit',
+        act: 1,
+        title: '10. The Grand Circuit',
+        description: 'Build the ultimate circuit: series batteries for voltage, parallel banks for capacity, power both LED and bulb, use resistors for control, add a capacitor for smoothing. Keep it running for 45 seconds!',
+        unlocked: false,
+        completed: false,
+        requiresTime: true,
+        goalTime: 45,
+        validator: (circuit) => this.validateGrandCircuit(circuit)
       }
     ]
   }
@@ -152,87 +211,256 @@ export class ChallengeSystem {
     this.timeTracker.reset()
   }
 
-  // Validation functions
+  // Validation functions for 10 progressive challenges
 
-  validateLightLED(circuit) {
+  // 1. First Light - Basic LED + Battery
+  validateFirstLight(circuit) {
     const leds = circuit.components.filter(c => c.type === 'led')
+    const batteries = circuit.components.filter(c => c.type === 'battery')
+
+    if (batteries.length === 0) {
+      return { success: false, message: 'Add a potato battery to the circuit' }
+    }
 
     if (leds.length === 0) {
       return { success: false, message: 'Add an LED to the circuit' }
     }
 
     const brightLED = leds.find(led => led.brightness >= 0.1)
-
     if (!brightLED) {
-      return { success: false, message: 'LED is too dim - add more voltage or check connections' }
+      return { success: false, message: 'LED is too dim. Check your connections!' }
     }
 
-    return { success: true, message: 'Success! LED is lit.' }
+    return { success: true, message: '✨ Success! Your first circuit works!' }
   }
 
-  validatePowerBulb(circuit) {
+  // 2. Current Control - Add Resistor
+  validateCurrentControl(circuit) {
+    const leds = circuit.components.filter(c => c.type === 'led')
+    const resistors = circuit.components.filter(c => c.type === 'resistor')
+
+    if (resistors.length === 0) {
+      return { success: false, message: 'Add a resistor to protect your LED!' }
+    }
+
+    if (leds.length === 0) {
+      return { success: false, message: 'Add an LED to see the resistor in action' }
+    }
+
+    const brightLED = leds.find(led => led.brightness >= 0.1)
+    if (!brightLED) {
+      return { success: false, message: 'LED needs to light up. Check connections!' }
+    }
+
+    // Check if LED is overdriven (too bright = bad)
+    const overdriven = leds.find(led => led.brightness > 0.85)
+    if (overdriven) {
+      return { success: false, message: 'LED is too bright! Use a higher resistance resistor.' }
+    }
+
+    return { success: true, message: '⚡ Perfect! Your LED is safely protected.' }
+  }
+
+  // 3. Power Up - Series Batteries
+  validatePowerUp(circuit) {
+    const batteries = circuit.components.filter(c => c.type === 'battery')
+    const leds = circuit.components.filter(c => c.type === 'led')
+
+    if (batteries.length < 2) {
+      return { success: false, message: 'Add at least 2 batteries and connect them in series (end-to-end)!' }
+    }
+
+    if (leds.length === 0) {
+      return { success: false, message: 'Add an LED to see the power boost!' }
+    }
+
+    const brightLED = leds.find(led => led.brightness >= 0.3)
+    if (!brightLED) {
+      return { success: false, message: 'LED should be brighter with more batteries. Check series connection!' }
+    }
+
+    return { success: true, message: '🔋 More voltage = More brightness!' }
+  }
+
+  // 4. The Warm Glow - Introduce Light Bulb
+  validateWarmGlow(circuit) {
     const bulbs = circuit.components.filter(c => c.type === 'lightbulb')
+    const batteries = circuit.components.filter(c => c.type === 'battery')
 
     if (bulbs.length === 0) {
       return { success: false, message: 'Add a light bulb to the circuit' }
     }
 
-    const litBulb = bulbs.find(bulb => bulb.brightness >= 0.1)
-
-    if (!litBulb) {
-      return { success: false, message: 'Light bulb needs more power' }
+    if (batteries.length < 2) {
+      return { success: false, message: 'Light bulbs need more power. Use at least 2 batteries in series!' }
     }
 
-    // Return tracking: true to signal time tracking should continue
-    return { success: false, tracking: true, message: 'Light bulb is glowing! Keep it powered...' }
+    const litBulb = bulbs.find(bulb => bulb.brightness >= 0.2)
+    if (!litBulb) {
+      return { success: false, message: 'Light bulb needs more voltage. Add more batteries!' }
+    }
+
+    return { success: true, message: '💡 The warm glow of incandescent!' }
   }
 
-  validateSeriesBatteries(circuit) {
+  // 5. Battery Blues - 30 second timed challenge
+  validateBatteryBlues(circuit) {
+    const bulbs = circuit.components.filter(c => c.type === 'lightbulb')
+
+    if (bulbs.length === 0) {
+      return { success: false, message: 'Add a light bulb' }
+    }
+
+    const litBulb = bulbs.find(bulb => bulb.brightness >= 0.2)
+    if (!litBulb) {
+      return { success: false, message: 'Light bulb is too dim. Add more batteries!' }
+    }
+
+    // Return tracking: true for time-based challenge
+    return { success: false, tracking: true, message: 'Keep it lit! Batteries draining...' }
+  }
+
+  // 6. Parallel Power - 60 second challenge with parallel batteries
+  validateParallelPower(circuit) {
+    const bulbs = circuit.components.filter(c => c.type === 'lightbulb')
     const batteries = circuit.components.filter(c => c.type === 'battery')
 
-    if (batteries.length < 2) {
-      return { success: false, message: 'Connect at least 2 batteries in series' }
+    if (bulbs.length === 0) {
+      return { success: false, message: 'Add a light bulb' }
     }
 
-    // Check if we have significant voltage (series connection)
-    const totalVoltage = batteries.reduce((sum, b) => sum + (b.voltage || 0), 0)
-
-    if (totalVoltage < 1.5) {
-      return { success: false, message: 'Batteries need to be connected in series' }
+    if (batteries.length < 4) {
+      return { success: false, message: 'You need at least 4 batteries (2 series pairs in parallel) to last 60 seconds!' }
     }
 
-    return { success: true, message: 'Series batteries working! Higher voltage achieved.' }
+    const litBulb = bulbs.find(bulb => bulb.brightness >= 0.2)
+    if (!litBulb) {
+      return { success: false, message: 'Light bulb needs power!' }
+    }
+
+    // Return tracking: true for time-based challenge
+    return { success: false, tracking: true, message: 'Parallel banks give more capacity! Keep going...' }
   }
 
-  validateParallelLEDs(circuit) {
+  // 7. Double Bright - Parallel LEDs
+  validateDoubleBright(circuit) {
     const leds = circuit.components.filter(c => c.type === 'led')
+    const resistors = circuit.components.filter(c => c.type === 'resistor')
 
     if (leds.length < 2) {
       return { success: false, message: 'Add at least 2 LEDs to the circuit' }
     }
 
-    const litLEDs = leds.filter(led => led.brightness >= 0.1)
-
-    if (litLEDs.length < 2) {
-      return { success: false, message: 'Light up at least 2 LEDs' }
+    if (resistors.length < 2) {
+      return { success: false, message: 'Each LED needs its own resistor for current control!' }
     }
 
-    return { success: true, message: 'Multiple LEDs lit in parallel!' }
+    const litLEDs = leds.filter(led => led.brightness >= 0.1)
+    if (litLEDs.length < 2) {
+      return { success: false, message: 'Both LEDs need to light up! Check parallel connections.' }
+    }
+
+    return { success: true, message: '✨ Double the light! Parallel circuits rock.' }
   }
 
-  validateCapacitorCharging(circuit) {
+  // 8. Energy Bank - Capacitor with LED
+  validateEnergyBank(circuit) {
     const capacitors = circuit.components.filter(c => c.type === 'capacitor')
+    const leds = circuit.components.filter(c => c.type === 'led')
 
     if (capacitors.length === 0) {
-      return { success: false, message: 'Add a capacitor to the circuit' }
+      return { success: false, message: 'Add a capacitor to store energy!' }
     }
 
-    const chargedCapacitor = capacitors.find(cap => cap.voltage >= 1.0)
-
-    if (!chargedCapacitor) {
-      return { success: false, message: 'Capacitor needs more charge' }
+    if (leds.length === 0) {
+      return { success: false, message: 'Add an LED to see the capacitor work!' }
     }
 
-    return { success: true, message: 'Capacitor charged! Energy storage working.' }
+    const chargedCap = capacitors.find(cap => cap.voltage >= 1.5)
+    if (!chargedCap) {
+      return { success: false, message: 'Charge your capacitor to at least 1.5V!' }
+    }
+
+    const brightLED = leds.find(led => led.brightness >= 0.1)
+    if (!brightLED) {
+      return { success: false, message: 'LED should be lit by the capacitor!' }
+    }
+
+    return { success: true, message: '🔋 Capacitor is storing energy!' }
+  }
+
+  // 9. Flash Photography - Capacitor burst for bulb
+  validateFlashPhoto(circuit) {
+    const capacitors = circuit.components.filter(c => c.type === 'capacitor')
+    const bulbs = circuit.components.filter(c => c.type === 'lightbulb')
+
+    if (capacitors.length === 0) {
+      return { success: false, message: 'Add a capacitor for the energy burst!' }
+    }
+
+    if (bulbs.length === 0) {
+      return { success: false, message: 'Add a light bulb to see the flash!' }
+    }
+
+    const chargedCap = capacitors.find(cap => cap.voltage >= 2.5)
+    if (!chargedCap) {
+      return { success: false, message: 'Charge capacitor to at least 2.5V for a bright flash!' }
+    }
+
+    const brightBulb = bulbs.find(bulb => bulb.brightness >= 0.4)
+    if (!brightBulb) {
+      return { success: false, message: 'Bulb needs to flash bright! More capacitor charge needed.' }
+    }
+
+    return { success: true, message: '📸 Flash! That\'s a capacitor discharge!' }
+  }
+
+  // 10. Grand Circuit - Everything combined, 45 second challenge
+  validateGrandCircuit(circuit) {
+    const batteries = circuit.components.filter(c => c.type === 'battery')
+    const leds = circuit.components.filter(c => c.type === 'led')
+    const bulbs = circuit.components.filter(c => c.type === 'lightbulb')
+    const resistors = circuit.components.filter(c => c.type === 'resistor')
+    const capacitors = circuit.components.filter(c => c.type === 'capacitor')
+
+    // Check all components present
+    if (batteries.length < 4) {
+      return { success: false, message: 'Need at least 4 batteries (series + parallel)!' }
+    }
+
+    if (leds.length === 0) {
+      return { success: false, message: 'Add an LED!' }
+    }
+
+    if (bulbs.length === 0) {
+      return { success: false, message: 'Add a light bulb!' }
+    }
+
+    if (resistors.length === 0) {
+      return { success: false, message: 'Use resistors for current control!' }
+    }
+
+    if (capacitors.length === 0) {
+      return { success: false, message: 'Add a capacitor for power smoothing!' }
+    }
+
+    // Check components are working
+    const brightLED = leds.find(led => led.brightness >= 0.1)
+    if (!brightLED) {
+      return { success: false, message: 'LED must be lit!' }
+    }
+
+    const litBulb = bulbs.find(bulb => bulb.brightness >= 0.2)
+    if (!litBulb) {
+      return { success: false, message: 'Light bulb must be lit!' }
+    }
+
+    const chargedCap = capacitors.find(cap => cap.voltage >= 1.0)
+    if (!chargedCap) {
+      return { success: false, message: 'Capacitor should be charged!' }
+    }
+
+    // Return tracking: true for time-based challenge
+    return { success: false, tracking: true, message: 'The Grand Circuit is running! Keep it going...' }
   }
 }
