@@ -181,3 +181,17 @@
   background: linear-gradient(90deg, #16A34A, #22C55E);
   transition: width 0.3s ease;
 }
+
+kbd {
+  display: inline-block;
+  padding: 2px 6px;
+  font-size: 11px;
+  font-family: 'Courier New', monospace;
+  background: #4A4A4A;
+  color: white;
+  border-radius: 3px;
+  border: 1px solid #2A2A2A;
+  box-shadow: 0 2px 0 #2A2A2A;
+  margin-left: 6px;
+  font-weight: normal;
+}

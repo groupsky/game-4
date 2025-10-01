@@ -15,6 +15,27 @@ export function ChallengePanel({ challengeSystem, circuit }) {
     setActiveChallenge(challenge)
   }, [challengeSystem])
 
+  // Keyboard shortcuts
+  useEffect(() => {
+    const handleKeyPress = (e) => {
+      // Space: Check Solution (when not typing)
+      if (e.code === 'Space' && e.target === document.body) {
+        e.preventDefault()
+        if (activeChallenge && (!activeChallenge.requiresTime || (activeChallenge.requiresManualStart && !challengeSystem.getTimeTracker().running))) {
+          handleCheckSolution()
+        }
+      }
+      // H: Toggle Show All Challenges
+      if (e.code === 'KeyH' && e.target === document.body) {
+        e.preventDefault()
+        setShowAllChallenges(prev => !prev)
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyPress)
+    return () => window.removeEventListener('keydown', handleKeyPress)
+  }, [activeChallenge, challengeSystem, showAllChallenges])
+
   // Force re-render every 100ms to update timer display and check for challenge completion
   useEffect(() => {
     const interval = setInterval(() => {
@@ -79,8 +100,9 @@ export function ChallengePanel({ challengeSystem, circuit }) {
         <button
           className="toggle-all-btn"
           onClick={() => setShowAllChallenges(!showAllChallenges)}
+          title="Press H to toggle"
         >
-          {showAllChallenges ? 'Hide' : 'Show All'} ({completedCount}/{challenges.length})
+          {showAllChallenges ? 'Hide' : 'Show All'} ({completedCount}/{challenges.length}) <kbd>H</kbd>
         </button>
       </div>
 
@@ -105,8 +127,8 @@ export function ChallengePanel({ challengeSystem, circuit }) {
 
           {/* Show Check Solution button for non-time challenges OR time challenges requiring manual start (before timer running) */}
           {(!activeChallenge.requiresTime || (activeChallenge.requiresManualStart && !challengeSystem.getTimeTracker().running)) && (
-            <button className="check-solution-btn" onClick={handleCheckSolution}>
-              Check Solution
+            <button className="check-solution-btn" onClick={handleCheckSolution} title="Press Space to check">
+              Check Solution <kbd>Space</kbd>
             </button>
           )}
 
