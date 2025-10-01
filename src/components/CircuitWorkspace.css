@@ -48,6 +48,19 @@
   box-shadow: 1px 1px 0 #4A4A4A;
 }
 
+.toolbar button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  background: #E0E0D0;
+  transform: none;
+  box-shadow: 2px 2px 0 #4A4A4A;
+}
+
+.toolbar button:disabled:hover {
+  background: #E0E0D0;
+  transform: none;
+}
+
 .simulation-control-btn {
   font-weight: bold;
   font-size: 15px !important;

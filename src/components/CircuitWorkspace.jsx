@@ -135,6 +135,9 @@ export default function CircuitWorkspace() {
   // Keyboard handler for delete
   useEffect(() => {
     const handleKeyDown = (e) => {
+      // Disable editing when simulation is running
+      if (isRunning) return
+
       if (e.key === 'Delete' || e.key === 'Backspace') {
         if (selectedComponents.length > 0) {
           // Delete multiple components
@@ -194,6 +197,9 @@ export default function CircuitWorkspace() {
   }
 
   const handleMouseDown = (e) => {
+    // Disable editing when simulation is running
+    if (isRunning) return
+
     const canvas = canvasRef.current
     const rect = canvas.getBoundingClientRect()
     const x = e.clientX - rect.left
@@ -243,6 +249,10 @@ export default function CircuitWorkspace() {
 
   const handleContextMenu = (e) => {
     e.preventDefault()
+
+    // Disable editing when simulation is running
+    if (isRunning) return
+
     const canvas = canvasRef.current
     const rect = canvas.getBoundingClientRect()
     const x = e.clientX - rect.left
@@ -410,6 +420,7 @@ export default function CircuitWorkspace() {
             {isRunning ? '⏸️ Stop' : '▶️ Start'}
           </button>
           <button
+            disabled={isRunning}
             onClick={() => setComponents([...components, {
               id: Date.now(),
               type: 'battery',
@@ -422,6 +433,7 @@ export default function CircuitWorkspace() {
             Add 🥔 Potato
           </button>
           <button
+            disabled={isRunning}
             onClick={() => setComponents([...components, {
               id: Date.now(),
               type: 'led',
@@ -433,6 +445,7 @@ export default function CircuitWorkspace() {
             Add 💡 LED
           </button>
           <button
+            disabled={isRunning}
             onClick={() => setComponents([...components, {
               id: Date.now(),
               type: 'resistor',
@@ -445,6 +458,7 @@ export default function CircuitWorkspace() {
             Add ⚡ Resistor (100Ω)
           </button>
           <button
+            disabled={isRunning}
             onClick={() => setComponents([...components, {
               id: Date.now(),
               type: 'capacitor',
@@ -458,6 +472,7 @@ export default function CircuitWorkspace() {
             Add ⚡ Capacitor (100mF)
           </button>
           <button
+            disabled={isRunning}
             onClick={() => setComponents([...components, {
               id: Date.now(),
               type: 'lightbulb',
@@ -485,11 +500,15 @@ export default function CircuitWorkspace() {
       />
 
       <div className="info-panel">
-        <p>💬 Drag to move | Shift+Click to wire | Drag rectangle to multi-select | Ctrl+Click to add to selection</p>
+        {isRunning ? (
+          <p>🔬 <strong>SIMULATION RUNNING</strong> | Editing disabled | Press Stop to edit circuit</p>
+        ) : (
+          <p>✏️ <strong>EDIT MODE</strong> | Drag to move | Shift+Click to wire | Drag rectangle to multi-select | Ctrl+Click to add to selection</p>
+        )}
         <p>Components: {components.length} | Wires: {wires.length}</p>
-        {connecting && <p>🔌 Connecting... Click another component to finish wire.</p>}
-        {selectedComponents.length > 0 && <p>🎯 Selected: {selectedComponents.length} components (Press Delete to remove)</p>}
-        {selectedComponent !== null && selectedComponents.length === 0 && <p>🎯 Selected: {components[selectedComponent]?.type} (Press Delete to remove)</p>}
+        {!isRunning && connecting && <p>🔌 Connecting... Click another component to finish wire.</p>}
+        {!isRunning && selectedComponents.length > 0 && <p>🎯 Selected: {selectedComponents.length} components (Press Delete to remove)</p>}
+        {!isRunning && selectedComponent !== null && selectedComponents.length === 0 && <p>🎯 Selected: {components[selectedComponent]?.type} (Press Delete to remove)</p>}
       </div>
 
       <ChallengePanel
