@@ -4,7 +4,7 @@ import './ChallengePanel.css'
 /**
  * ChallengePanel - Displays active challenge and validation feedback
  */
-export function ChallengePanel({ challengeSystem, circuit }) {
+export function ChallengePanel({ challengeSystem, circuit, isRunning }) {
   const [activeChallenge, setActiveChallenge] = useState(null)
   const [validationResult, setValidationResult] = useState(null)
   const [showAllChallenges, setShowAllChallenges] = useState(false)
@@ -18,10 +18,10 @@ export function ChallengePanel({ challengeSystem, circuit }) {
   // Keyboard shortcuts
   useEffect(() => {
     const handleKeyPress = (e) => {
-      // Space: Check Solution (when not typing)
+      // Space: Check Solution (when not typing and simulation running)
       if (e.code === 'Space' && e.target === document.body) {
         e.preventDefault()
-        if (activeChallenge && (!activeChallenge.requiresTime || (activeChallenge.requiresManualStart && !challengeSystem.getTimeTracker().running))) {
+        if (isRunning && activeChallenge && (!activeChallenge.requiresTime || (activeChallenge.requiresManualStart && !challengeSystem.getTimeTracker().running))) {
           handleCheckSolution()
         }
       }
@@ -34,7 +34,7 @@ export function ChallengePanel({ challengeSystem, circuit }) {
 
     window.addEventListener('keydown', handleKeyPress)
     return () => window.removeEventListener('keydown', handleKeyPress)
-  }, [activeChallenge, challengeSystem, showAllChallenges])
+  }, [activeChallenge, challengeSystem, showAllChallenges, isRunning])
 
   // Force re-render every 100ms to update timer display and check for challenge completion
   useEffect(() => {
@@ -52,6 +52,8 @@ export function ChallengePanel({ challengeSystem, circuit }) {
 
   const handleCheckSolution = () => {
     if (!activeChallenge) return
+    // Only validate when simulation is running
+    if (!isRunning) return
 
     const result = challengeSystem.validate(activeChallenge.id, circuit)
     setValidationResult(result)
@@ -126,10 +128,19 @@ export function ChallengePanel({ challengeSystem, circuit }) {
           )}
 
           {/* Show Check Solution button for non-time challenges OR time challenges requiring manual start (before timer running) */}
-          {(!activeChallenge.requiresTime || (activeChallenge.requiresManualStart && !challengeSystem.getTimeTracker().running)) && (
+          {/* Only show when simulation is running */}
+          {isRunning && (!activeChallenge.requiresTime || (activeChallenge.requiresManualStart && !challengeSystem.getTimeTracker().running)) && (
             <button className="check-solution-btn" onClick={handleCheckSolution} title="Press Space to check">
               Check Solution <kbd>Space</kbd>
             </button>
+          )}
+
+          {/* Show message when simulation is stopped */}
+          {!isRunning && (
+            <div className="validation-result" style={{ background: '#FEF3C7', borderColor: '#F59E0B', color: '#92400E' }}>
+              <span className="result-icon">ℹ️</span>
+              <span className="result-message">Start the simulation to test your circuit</span>
+            </div>
           )}
 
           {validationResult && (

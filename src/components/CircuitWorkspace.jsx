@@ -514,6 +514,7 @@ export default function CircuitWorkspace() {
       <ChallengePanel
         challengeSystem={challengeSystem}
         circuit={{ components, wires }}
+        isRunning={isRunning}
       />
     </div>
   )
