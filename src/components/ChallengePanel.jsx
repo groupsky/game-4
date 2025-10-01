@@ -15,14 +15,19 @@ export function ChallengePanel({ challengeSystem, circuit }) {
     setActiveChallenge(challenge)
   }, [challengeSystem])
 
-  // Force re-render every 100ms to update timer display
+  // Force re-render every 100ms to update timer display and check for challenge completion
   useEffect(() => {
     const interval = setInterval(() => {
+      const currentChallenge = challengeSystem.getActiveChallenge()
+      if (currentChallenge?.id !== activeChallenge?.id) {
+        setActiveChallenge(currentChallenge)
+        setValidationResult(null) // Clear validation result on challenge change
+      }
       forceUpdate({})
     }, 100)
 
     return () => clearInterval(interval)
-  }, [])
+  }, [activeChallenge, challengeSystem])
 
   const handleCheckSolution = () => {
     if (!activeChallenge) return

@@ -11,6 +11,7 @@ export class ChallengeSystem {
   constructor() {
     this.challenges = this.loadChallenges()
     this.timeTracker = new TimeTracker()
+    this.lastActiveId = null
   }
 
   loadChallenges() {
@@ -75,7 +76,15 @@ export class ChallengeSystem {
 
   getActiveChallenge() {
     // Return first unlocked, incomplete challenge
-    return this.challenges.find(c => c.unlocked && !c.completed)
+    const active = this.challenges.find(c => c.unlocked && !c.completed)
+
+    // Reset time tracker if we switched to a new challenge
+    if (active && this.lastActiveId !== active.id) {
+      this.timeTracker.reset()
+      this.lastActiveId = active.id
+    }
+
+    return active
   }
 
   validate(challengeId, circuit) {
