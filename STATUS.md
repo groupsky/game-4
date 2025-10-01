@@ -269,7 +269,19 @@ Multi-level hint system:
 - Detect if player is stuck (same state, multiple hint requests)
 - Adjust hint level based on struggle
 
-### 7. UI Improvements Completed ✅
+### 7. Educational Content System (MEDIUM PRIORITY)
+**Status: PLANNED**
+
+Informational material for each level introducing new components/concepts:
+- Brief educational popups when new component unlocked
+- "Did you know?" facts about electrical engineering
+- Real-world context (e.g., "Potato batteries were first demonstrated in 1800")
+- Physics explanations (Ohm's Law, RC time constants, power dissipation)
+- Optional "Learn More" button (not forced tutorials)
+- Learning by doing approach - info available but not mandatory
+- Component tooltips with basic specs (voltage, resistance, capacitance)
+
+### 8. UI Improvements Completed ✅
 **Status: COMPLETE**
 
 Recent improvements:
@@ -277,8 +289,10 @@ Recent improvements:
 - ✅ Difficulty tiers with visual grouping
 - ✅ Styled kbd elements
 - ✅ Scrollable challenge list
+- ✅ Start/Stop simulation control
+- ✅ Circuit auto-reset on stop
 
-### 8. Additional UI Improvements (LOW PRIORITY)
+### 9. Additional UI Improvements (LOW PRIORITY)
 **Status: PLANNED**
 
 Future enhancements:
@@ -291,7 +305,7 @@ Future enhancements:
 - Audio feedback
 - Component crafting/discovery UI
 
-### 9. Additional Components (LOW PRIORITY)
+### 10. Additional Components (LOW PRIORITY)
 **Status: OPTIONAL**
 
 Act 1 MVP complete. Optional additions:
