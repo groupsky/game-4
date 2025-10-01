@@ -389,7 +389,7 @@ export default function CircuitWorkspace() {
               type: 'battery',
               x: 100 + Math.random() * 100,
               y: 100 + Math.random() * 100,
-              charge: 0.01,  // Reduced 100x for slower depletion
+              charge: 1.0,
               voltage: 0.9  // Single potato battery
             }])}
           >
