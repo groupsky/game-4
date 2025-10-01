@@ -28,27 +28,41 @@ export function drawBattery(ctx, component) {
   ctx.strokeRect(-barWidth/2, -barHeight/2, barWidth, barHeight)
 
   // Charge fill
-  const gradient = ctx.createLinearGradient(0, barHeight/2, 0, -barHeight/2)
-  if (charge > 0.75) {
-    gradient.addColorStop(0, '#16A34A')
-    gradient.addColorStop(1, '#22C55E')
-  } else if (charge > 0.25) {
-    gradient.addColorStop(0, '#F97316')
-    gradient.addColorStop(1, '#FBBF24')
-  } else {
-    gradient.addColorStop(0, '#DC2626')
-    gradient.addColorStop(1, '#EF4444')
-  }
+  if (charge > 0.01) {
+    const gradient = ctx.createLinearGradient(0, barHeight/2, 0, -barHeight/2)
+    if (charge > 0.75) {
+      gradient.addColorStop(0, '#16A34A')
+      gradient.addColorStop(1, '#22C55E')
+    } else if (charge > 0.25) {
+      gradient.addColorStop(0, '#F97316')
+      gradient.addColorStop(1, '#FBBF24')
+    } else {
+      gradient.addColorStop(0, '#DC2626')
+      gradient.addColorStop(1, '#EF4444')
+    }
 
-  ctx.fillStyle = gradient
-  ctx.fillRect(-barWidth/2, barHeight/2 - chargeHeight, barWidth, chargeHeight)
+    ctx.fillStyle = gradient
+    ctx.fillRect(-barWidth/2, barHeight/2 - chargeHeight, barWidth, chargeHeight)
+  } else {
+    // Battery is dead - show empty/grayed out
+    ctx.fillStyle = '#D1D5DB'
+    ctx.fillRect(-barWidth/2, -barHeight/2, barWidth, barHeight)
+
+    // Add "EMPTY" text
+    ctx.fillStyle = '#DC2626'
+    ctx.font = 'bold 12px Courier New'
+    ctx.textAlign = 'center'
+    ctx.textBaseline = 'middle'
+    ctx.fillText('EMPTY', 0, 0)
+  }
 
   // Charge percentage text
   ctx.fillStyle = '#4A4A4A'
   ctx.font = 'bold 14px Courier New'
   ctx.textAlign = 'center'
   ctx.textBaseline = 'middle'
-  ctx.fillText(`${Math.round(charge * 100)}%`, 0, barHeight/2 + 20)
+  const displayCharge = charge < 0.01 ? 0 : Math.round(charge * 100)
+  ctx.fillText(`${displayCharge}%`, 0, barHeight/2 + 20)
 
   // Label
   ctx.font = '12px Courier New'
