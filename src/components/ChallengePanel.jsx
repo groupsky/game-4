@@ -8,11 +8,21 @@ export function ChallengePanel({ challengeSystem, circuit }) {
   const [activeChallenge, setActiveChallenge] = useState(null)
   const [validationResult, setValidationResult] = useState(null)
   const [showAllChallenges, setShowAllChallenges] = useState(false)
+  const [, forceUpdate] = useState({})
 
   useEffect(() => {
     const challenge = challengeSystem.getActiveChallenge()
     setActiveChallenge(challenge)
   }, [challengeSystem])
+
+  // Force re-render every 100ms to update timer display
+  useEffect(() => {
+    const interval = setInterval(() => {
+      forceUpdate({})
+    }, 100)
+
+    return () => clearInterval(interval)
+  }, [])
 
   const handleCheckSolution = () => {
     if (!activeChallenge) return
