@@ -23,6 +23,7 @@ export class CircuitSimulator {
 
   simulate(deltaTime = 0.1) {
     // deltaTime in seconds (default 100ms)
+    this.deltaTime = deltaTime  // Store for use in other methods
 
     // Reset all component states
     this.components.forEach(comp => {
@@ -321,11 +322,10 @@ export class CircuitSimulator {
     if (capacitors.length > 0) {
       // Calculate energy drawn from capacitors: E = V * I * t
       // Voltage drop: dV = I * dt / C
-      const deltaTime = 0.1 // 100ms simulation step
       capacitors.forEach(capacitor => {
         const capacitance = capacitor.capacitance || 0.001
         const dischargeCurrent = current * parallelMultiplier / totalSources
-        const voltageDrop = (dischargeCurrent * deltaTime) / capacitance
+        const voltageDrop = (dischargeCurrent * this.deltaTime) / capacitance
         capacitor.voltage = Math.max(0, capacitor.voltage - voltageDrop)
       })
     }
@@ -427,11 +427,10 @@ export class CircuitSimulator {
 
     // Discharge capacitors when powering bulb
     if (capacitors.length > 0) {
-      const deltaTime = 0.1 // 100ms simulation step
       capacitors.forEach(capacitor => {
         const capacitance = capacitor.capacitance || 0.001
         const dischargeCurrent = current / totalSources
-        const voltageDrop = (dischargeCurrent * deltaTime) / capacitance
+        const voltageDrop = (dischargeCurrent * this.deltaTime) / capacitance
         capacitor.voltage = Math.max(0, capacitor.voltage - voltageDrop)
       })
     }

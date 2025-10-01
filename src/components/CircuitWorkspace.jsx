@@ -97,12 +97,12 @@ export default function CircuitWorkspace() {
     })
   }, [components, wires, connecting, mousePos, selectedComponent, selectedComponents, selectionBox])
 
-  // Run simulation every 100ms
+  // Run simulation every 100ms (with 10ms physics step for finer granularity)
   useEffect(() => {
     const interval = setInterval(() => {
       simulator.setComponents(components)
       simulator.setWires(wires)
-      const updated = simulator.simulate()
+      const updated = simulator.simulate(0.01)  // 10ms physics step (10x slower)
       setComponents([...updated])
 
       // Update time tracking for active challenge
@@ -389,7 +389,7 @@ export default function CircuitWorkspace() {
               type: 'battery',
               x: 100 + Math.random() * 100,
               y: 100 + Math.random() * 100,
-              charge: 1.0,
+              charge: 0.01,  // Reduced 100x for slower depletion
               voltage: 0.9  // Single potato battery
             }])}
           >
