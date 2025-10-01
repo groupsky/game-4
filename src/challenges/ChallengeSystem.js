@@ -26,25 +26,25 @@ export class ChallengeSystem {
         completed: false,
         validator: (circuit) => this.validateFirstLight(circuit)
       },
-      // 2. Introduce Resistor
-      {
-        id: 'current-control',
-        act: 1,
-        title: '2. Current Control',
-        description: 'Add a resistor to protect your LED. Without it, too much current can damage components!',
-        unlocked: false,
-        completed: false,
-        validator: (circuit) => this.validateCurrentControl(circuit)
-      },
-      // 3. Series Batteries
+      // 2. Series Batteries (Introduce voltage boost)
       {
         id: 'power-up',
         act: 1,
-        title: '3. Power Up',
+        title: '2. Power Up',
         description: 'One battery is too weak. Connect 2 or more batteries in series (end-to-end) to increase voltage and make your LED brighter!',
         unlocked: false,
         completed: false,
         validator: (circuit) => this.validatePowerUp(circuit)
+      },
+      // 3. Introduce Resistor (After seeing over-bright LED)
+      {
+        id: 'current-control',
+        act: 1,
+        title: '3. Current Control',
+        description: 'Your LED is TOO bright now! Add a resistor to control the current and protect your LED from burning out.',
+        unlocked: false,
+        completed: false,
+        validator: (circuit) => this.validateCurrentControl(circuit)
       },
       // 4. Introduce Light Bulb
       {
@@ -119,6 +119,7 @@ export class ChallengeSystem {
         unlocked: false,
         completed: false,
         requiresTime: true,
+        requiresManualStart: true,  // Must validate setup before timer starts
         goalTime: 45,
         validator: (circuit) => this.validateGrandCircuit(circuit)
       }
@@ -159,7 +160,8 @@ export class ChallengeSystem {
 
     const result = challenge.validator(circuit)
 
-    if (result.success) {
+    // For manual-start time challenges, success means "ready to start timer", not "completed"
+    if (result.success && !challenge.requiresManualStart) {
       challenge.completed = true
       this.unlockNextChallenge(challengeId)
     }
@@ -180,6 +182,11 @@ export class ChallengeSystem {
     const activeChallenge = this.getActiveChallenge()
 
     if (!activeChallenge || !activeChallenge.requiresTime) {
+      return
+    }
+
+    // For challenges requiring manual start, don't auto-start timer
+    if (activeChallenge.requiresManualStart && !this.timeTracker.running) {
       return
     }
 
@@ -234,13 +241,18 @@ export class ChallengeSystem {
     return { success: true, message: '✨ Success! Your first circuit works!' }
   }
 
-  // 2. Current Control - Add Resistor
+  // 3. Current Control - Add Resistor (After seeing over-bright LED)
   validateCurrentControl(circuit) {
+    const batteries = circuit.components.filter(c => c.type === 'battery')
     const leds = circuit.components.filter(c => c.type === 'led')
     const resistors = circuit.components.filter(c => c.type === 'resistor')
 
+    if (batteries.length < 2) {
+      return { success: false, message: 'Keep your 2 series batteries from the last challenge!' }
+    }
+
     if (resistors.length === 0) {
-      return { success: false, message: 'Add a resistor to protect your LED!' }
+      return { success: false, message: 'Add a resistor to protect your LED from burning out!' }
     }
 
     if (leds.length === 0) {
@@ -253,15 +265,15 @@ export class ChallengeSystem {
     }
 
     // Check if LED is overdriven (too bright = bad)
-    const overdriven = leds.find(led => led.brightness > 0.85)
+    const overdriven = leds.find(led => led.brightness > 0.7)
     if (overdriven) {
-      return { success: false, message: 'LED is too bright! Use a higher resistance resistor.' }
+      return { success: false, message: 'LED is still too bright! Use a higher resistance resistor (220Ω or 1kΩ).' }
     }
 
-    return { success: true, message: '⚡ Perfect! Your LED is safely protected.' }
+    return { success: true, message: '⚡ Perfect! LED is bright but safe. Current is controlled!' }
   }
 
-  // 3. Power Up - Series Batteries
+  // 2. Power Up - Series Batteries (Allow over-bright LED)
   validatePowerUp(circuit) {
     const batteries = circuit.components.filter(c => c.type === 'battery')
     const leds = circuit.components.filter(c => c.type === 'led')
@@ -274,12 +286,12 @@ export class ChallengeSystem {
       return { success: false, message: 'Add an LED to see the power boost!' }
     }
 
-    const brightLED = leds.find(led => led.brightness >= 0.3)
+    const brightLED = leds.find(led => led.brightness >= 0.5)
     if (!brightLED) {
-      return { success: false, message: 'LED should be brighter with more batteries. Check series connection!' }
+      return { success: false, message: 'LED should be much brighter with series batteries!' }
     }
 
-    return { success: true, message: '🔋 More voltage = More brightness!' }
+    return { success: true, message: '🔋 Whoa! That LED is VERY bright now!' }
   }
 
   // 4. The Warm Glow - Introduce Light Bulb
@@ -460,7 +472,8 @@ export class ChallengeSystem {
       return { success: false, message: 'Capacitor should be charged!' }
     }
 
-    // Return tracking: true for time-based challenge
-    return { success: false, tracking: true, message: 'The Grand Circuit is running! Keep it going...' }
+    // For manual-start time challenge: return success to indicate ready to start timer
+    // After timer starts, tracking continues via updateTimeTracking
+    return { success: true, tracking: true, message: '🎯 Grand Circuit validated! Timer starting...' }
   }
 }

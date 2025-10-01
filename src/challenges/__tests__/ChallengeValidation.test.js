@@ -45,59 +45,11 @@ describe('Challenge Validation - New Progression', () => {
     })
   })
 
-  describe('Challenge 2: Current Control', () => {
+  describe('Challenge 2: Power Up (Series Batteries)', () => {
     beforeEach(() => {
       // Unlock challenge 2 by completing challenge 1
       challengeSystem.getChallenge('first-light').completed = true
       challengeSystem.unlockNextChallenge('first-light')
-    })
-
-    it('should require resistor in circuit', () => {
-      const circuit = {
-        components: [
-          { id: 1, type: 'battery', voltage: 0.9 },
-          { id: 2, type: 'led', brightness: 0.95 }
-        ],
-        wires: [{ from: 1, to: 2 }]
-      }
-
-      const result = challengeSystem.validate('current-control', circuit)
-      expect(result.success).toBe(false)
-      expect(result.message).toContain('resistor')
-    })
-
-    it('should pass with resistor and safe LED brightness', () => {
-      const circuit = {
-        components: [
-          { id: 1, type: 'battery', voltage: 0.9 },
-          { id: 2, type: 'resistor', resistance: 100 },
-          { id: 3, type: 'led', brightness: 0.4 }
-        ],
-        wires: [{ from: 1, to: 2 }, { from: 2, to: 3 }]
-      }
-
-      const result = challengeSystem.validate('current-control', circuit)
-      expect(result.success).toBe(true)
-    })
-
-    it('should fail if LED is overdriven despite having resistor', () => {
-      const circuit = {
-        components: [
-          { id: 1, type: 'battery', voltage: 0.9 },
-          { id: 2, type: 'resistor', resistance: 1 }, // Too low resistance
-          { id: 3, type: 'led', brightness: 0.95 }
-        ],
-        wires: [{ from: 1, to: 2 }, { from: 2, to: 3 }]
-      }
-
-      const result = challengeSystem.validate('current-control', circuit)
-      expect(result.success).toBe(false)
-    })
-  })
-
-  describe('Challenge 3: Power Up (Series Batteries)', () => {
-    beforeEach(() => {
-      unlockUpTo('power-up')
     })
 
     it('should require at least 2 batteries', () => {
@@ -119,18 +71,67 @@ describe('Challenge Validation - New Progression', () => {
         components: [
           { id: 1, type: 'battery', voltage: 0.9 },
           { id: 2, type: 'battery', voltage: 0.9 },
-          { id: 3, type: 'resistor', resistance: 100 },
-          { id: 4, type: 'led', brightness: 0.5 }
+          { id: 3, type: 'led', brightness: 0.6 }
         ],
         wires: [
           { from: 1, to: 2 },
-          { from: 2, to: 3 },
-          { from: 3, to: 4 }
+          { from: 2, to: 3 }
         ]
       }
 
       const result = challengeSystem.validate('power-up', circuit)
       expect(result.success).toBe(true)
+    })
+  })
+
+  describe('Challenge 3: Current Control', () => {
+    beforeEach(() => {
+      unlockUpTo('current-control')
+    })
+
+    it('should require resistor in circuit', () => {
+      const circuit = {
+        components: [
+          { id: 1, type: 'battery', voltage: 0.9 },
+          { id: 2, type: 'battery', voltage: 0.9 },
+          { id: 3, type: 'led', brightness: 0.95 }
+        ],
+        wires: [{ from: 1, to: 2 }, { from: 2, to: 3 }]
+      }
+
+      const result = challengeSystem.validate('current-control', circuit)
+      expect(result.success).toBe(false)
+      expect(result.message).toContain('resistor')
+    })
+
+    it('should pass with resistor and safe LED brightness', () => {
+      const circuit = {
+        components: [
+          { id: 1, type: 'battery', voltage: 0.9 },
+          { id: 2, type: 'battery', voltage: 0.9 },
+          { id: 3, type: 'resistor', resistance: 100 },
+          { id: 4, type: 'led', brightness: 0.4 }
+        ],
+        wires: [{ from: 1, to: 2 }, { from: 2, to: 3 }, { from: 3, to: 4 }]
+      }
+
+      const result = challengeSystem.validate('current-control', circuit)
+      expect(result.success).toBe(true)
+    })
+
+    it('should fail if LED is overdriven despite having resistor', () => {
+      const circuit = {
+        components: [
+          { id: 1, type: 'battery', voltage: 0.9 },
+          { id: 2, type: 'battery', voltage: 0.9 },
+          { id: 3, type: 'resistor', resistance: 1 }, // Too low resistance
+          { id: 4, type: 'led', brightness: 0.95 }
+        ],
+        wires: [{ from: 1, to: 2 }, { from: 2, to: 3 }, { from: 3, to: 4 }]
+      }
+
+      const result = challengeSystem.validate('current-control', circuit)
+      expect(result.success).toBe(false)
     })
   })
 

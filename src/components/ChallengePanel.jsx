@@ -35,6 +35,11 @@ export function ChallengePanel({ challengeSystem, circuit }) {
     const result = challengeSystem.validate(activeChallenge.id, circuit)
     setValidationResult(result)
 
+    // For manual-start time challenges, start timer on successful validation
+    if (activeChallenge.requiresManualStart && result.success) {
+      challengeSystem.getTimeTracker().start()
+    }
+
     // Update active challenge after validation
     setTimeout(() => {
       setActiveChallenge(challengeSystem.getActiveChallenge())
@@ -43,6 +48,13 @@ export function ChallengePanel({ challengeSystem, circuit }) {
 
   const challenges = challengeSystem.getChallenges()
   const completedCount = challenges.filter(c => c.completed).length
+
+  // Format goal time as MM:SS
+  const formatGoalTime = (seconds) => {
+    const mins = Math.floor(seconds / 60)
+    const secs = seconds % 60
+    return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`
+  }
 
   if (!activeChallenge) {
     return (
@@ -80,7 +92,7 @@ export function ChallengePanel({ challengeSystem, circuit }) {
           {activeChallenge.requiresTime && (
             <div className="time-display">
               <div className="timer">
-                ⏱️ {challengeSystem.getTimeTracker().getFormattedTime()} / {Math.floor(activeChallenge.goalTime / 60)}:00
+                ⏱️ {challengeSystem.getTimeTracker().getFormattedTime()} / {formatGoalTime(activeChallenge.goalTime)}
               </div>
               <div className="progress-bar">
                 <div
@@ -91,7 +103,8 @@ export function ChallengePanel({ challengeSystem, circuit }) {
             </div>
           )}
 
-          {!activeChallenge.requiresTime && (
+          {/* Show Check Solution button for non-time challenges OR time challenges requiring manual start (before timer running) */}
+          {(!activeChallenge.requiresTime || (activeChallenge.requiresManualStart && !challengeSystem.getTimeTracker().running)) && (
             <button className="check-solution-btn" onClick={handleCheckSolution}>
               Check Solution
             </button>

@@ -424,12 +424,12 @@ export default function CircuitWorkspace() {
               type: 'capacitor',
               x: 550 + Math.random() * 100,
               y: 100 + Math.random() * 100,
-              capacitance: 0.001,  // 1mF foil capacitor
+              capacitance: 0.1,  // 100mF foil capacitor - larger for visible charging
               voltage: 0,
               maxVoltage: 5.0
             }])}
           >
-            Add ⚡ Capacitor (1mF)
+            Add ⚡ Capacitor (100mF)
           </button>
           <button
             onClick={() => setComponents([...components, {
@@ -438,7 +438,7 @@ export default function CircuitWorkspace() {
               x: 700 + Math.random() * 100,
               y: 100 + Math.random() * 100,
               brightness: 0,
-              resistance: 50,  // Lower resistance (draws more current)
+              resistance: 30,  // Lower resistance = draws much more current, drains batteries faster
               current: 0,
               power: 0
             }])}
