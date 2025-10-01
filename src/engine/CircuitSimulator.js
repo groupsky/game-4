@@ -63,26 +63,28 @@ export class CircuitSimulator {
     const leds = this.components.filter(c => c.type === 'led')
     const bulbs = this.components.filter(c => c.type === 'lightbulb')
 
-    // For each LED, find all batteries and other LEDs in the same circuit
+    // For each LED, find all voltage sources (batteries + charged capacitors) and other LEDs in the same circuit
     leds.forEach(led => {
       const connectedComponents = this.findConnectedComponents(led)
       const batteries = connectedComponents.filter(c => c.type === 'battery')
+      const capacitors = connectedComponents.filter(c => c.type === 'capacitor' && c.voltage > 0.1) // Treat charged capacitors as voltage sources
       const ledsInCircuit = connectedComponents.filter(c => c.type === 'led')
 
-      if (batteries.length > 0) {
+      if (batteries.length > 0 || capacitors.length > 0) {
         // Determine if this LED is in series or parallel with other LEDs
         const isParallel = this.isParallelConfiguration(led, batteries)
-        circuits.push({ batteries, led, totalLEDs: ledsInCircuit.length, isParallel, type: 'led' })
+        circuits.push({ batteries, capacitors, led, totalLEDs: ledsInCircuit.length, isParallel, type: 'led' })
       }
     })
 
-    // For each light bulb, find batteries
+    // For each light bulb, find voltage sources (batteries + charged capacitors)
     bulbs.forEach(bulb => {
       const connectedComponents = this.findConnectedComponents(bulb)
       const batteries = connectedComponents.filter(c => c.type === 'battery')
+      const capacitors = connectedComponents.filter(c => c.type === 'capacitor' && c.voltage > 0.1)
 
-      if (batteries.length > 0) {
-        circuits.push({ batteries, bulb, type: 'lightbulb' })
+      if (batteries.length > 0 || capacitors.length > 0) {
+        circuits.push({ batteries, capacitors, bulb, type: 'lightbulb' })
       }
     })
 
@@ -201,9 +203,9 @@ export class CircuitSimulator {
   }
 
   simulateCircuit(circuit) {
-    const { batteries, led, totalLEDs, isParallel } = circuit
+    const { batteries = [], capacitors = [], led, totalLEDs, isParallel } = circuit
 
-    // Calculate total voltage from series batteries
+    // Calculate total voltage from series batteries and charged capacitors
     let totalVoltage = 0
     let minCharge = 1.0
 
@@ -214,6 +216,11 @@ export class CircuitSimulator {
 
       // Track minimum charge (circuit is limited by weakest battery)
       minCharge = Math.min(minCharge, battery.charge)
+    })
+
+    // Add capacitor voltage (capacitors act as voltage sources)
+    capacitors.forEach(capacitor => {
+      totalVoltage += capacitor.voltage
     })
 
     // Find all resistors in the circuit
@@ -301,10 +308,27 @@ export class CircuitSimulator {
     // Drain all batteries based on current draw
     // For parallel LEDs, each LED draws current, so multiply by number of parallel LEDs
     const parallelMultiplier = isParallel ? totalLEDs : 1
-    const drainRate = current * 0.001 * parallelMultiplier / batteries.length // Distribute drain across batteries
-    batteries.forEach(battery => {
-      battery.charge = Math.max(0, battery.charge - drainRate)
-    })
+    const totalSources = batteries.length + capacitors.length
+
+    if (batteries.length > 0) {
+      const drainRate = current * 0.001 * parallelMultiplier / totalSources // Distribute drain across all sources
+      batteries.forEach(battery => {
+        battery.charge = Math.max(0, battery.charge - drainRate)
+      })
+    }
+
+    // Discharge capacitors when powering LED
+    if (capacitors.length > 0) {
+      // Calculate energy drawn from capacitors: E = V * I * t
+      // Voltage drop: dV = I * dt / C
+      const deltaTime = 0.1 // 100ms simulation step
+      capacitors.forEach(capacitor => {
+        const capacitance = capacitor.capacitance || 0.001
+        const dischargeCurrent = current * parallelMultiplier / totalSources
+        const voltageDrop = (dischargeCurrent * deltaTime) / capacitance
+        capacitor.voltage = Math.max(0, capacitor.voltage - voltageDrop)
+      })
+    }
   }
 
   // Visual state getters (delegated to VisualState module)
@@ -342,15 +366,20 @@ export class CircuitSimulator {
   }
 
   simulateLightBulb(circuit) {
-    const { batteries, bulb } = circuit
+    const { batteries = [], capacitors = [], bulb } = circuit
 
-    // Calculate total voltage from series batteries
+    // Calculate total voltage from series batteries and charged capacitors
     let totalVoltage = 0
     let minCharge = 1.0
 
     batteries.forEach(battery => {
       totalVoltage += battery.voltage * (battery.charge > 0 ? 1 : 0)
       minCharge = Math.min(minCharge, battery.charge)
+    })
+
+    // Add capacitor voltage
+    capacitors.forEach(capacitor => {
+      totalVoltage += capacitor.voltage
     })
 
     // Light bulb characteristics
@@ -387,9 +416,24 @@ export class CircuitSimulator {
     bulb.power = power
 
     // Drain batteries (bulbs draw more current than LEDs)
-    const drainRate = current * 0.001 / batteries.length
-    batteries.forEach(battery => {
-      battery.charge = Math.max(0, battery.charge - drainRate)
-    })
+    const totalSources = batteries.length + capacitors.length
+
+    if (batteries.length > 0) {
+      const drainRate = current * 0.001 / totalSources
+      batteries.forEach(battery => {
+        battery.charge = Math.max(0, battery.charge - drainRate)
+      })
+    }
+
+    // Discharge capacitors when powering bulb
+    if (capacitors.length > 0) {
+      const deltaTime = 0.1 // 100ms simulation step
+      capacitors.forEach(capacitor => {
+        const capacitance = capacitor.capacitance || 0.001
+        const dischargeCurrent = current / totalSources
+        const voltageDrop = (dischargeCurrent * deltaTime) / capacitance
+        capacitor.voltage = Math.max(0, capacitor.voltage - voltageDrop)
+      })
+    }
   }
 }

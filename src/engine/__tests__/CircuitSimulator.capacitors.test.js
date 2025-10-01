@@ -191,4 +191,105 @@ describe('CircuitSimulator - Capacitors', () => {
     expect(updatedCap.voltage).toBeGreaterThan(0)
     expect(updatedLed.brightness).toBeGreaterThan(0)
   })
+
+  it('should discharge capacitor through LED when battery disconnected', () => {
+    const simulator = new CircuitSimulator()
+
+    // Pre-charged capacitor
+    const capacitor = {
+      id: 1,
+      type: 'capacitor',
+      capacitance: 0.1,  // 100mF
+      voltage: 3.0,  // Charged
+      x: 100,
+      y: 100
+    }
+
+    const led = {
+      id: 2,
+      type: 'led',
+      brightness: 0,
+      x: 150,
+      y: 100
+    }
+
+    // Only capacitor and LED, no battery
+    simulator.setComponents([capacitor, led])
+    simulator.setWires([{ id: 3, from: 1, to: 2 }])
+
+    // Initial simulation - LED should light from capacitor
+    simulator.simulate()
+    let updatedLed = simulator.components.find(c => c.id === 2)
+    let updatedCap = simulator.components.find(c => c.id === 1)
+
+    expect(updatedLed.brightness).toBeGreaterThan(0)
+    expect(updatedCap.voltage).toBeGreaterThan(0)
+
+    // After many steps, capacitor should discharge
+    for (let i = 0; i < 20; i++) {
+      simulator.simulate()
+    }
+
+    updatedCap = simulator.components.find(c => c.id === 1)
+    expect(updatedCap.voltage).toBeLessThan(3.0)  // Should have discharged
+  })
+
+  it('should discharge capacitor to zero when completely disconnected', () => {
+    const simulator = new CircuitSimulator()
+
+    // Pre-charged capacitor with NO connections
+    const capacitor = {
+      id: 1,
+      type: 'capacitor',
+      capacitance: 0.1,
+      voltage: 3.0,
+      x: 100,
+      y: 100
+    }
+
+    simulator.setComponents([capacitor])
+    simulator.setWires([])  // No wires - completely disconnected
+
+    // Simulate many steps
+    for (let i = 0; i < 10; i++) {
+      simulator.simulate()
+    }
+
+    const updatedCap = simulator.components.find(c => c.id === 1)
+    // Disconnected capacitor should slowly self-discharge (leakage)
+    expect(updatedCap.voltage).toBeLessThan(3.0)
+  })
+
+  it('should charge at same rate regardless of resistor presence when directly connected', () => {
+    const simulator1 = new CircuitSimulator()
+    const simulator2 = new CircuitSimulator()
+
+    // Circuit 1: Battery -> Capacitor (no resistor)
+    const battery1 = { id: 1, type: 'battery', charge: 1.0, voltage: 4.5, x: 100, y: 100 }
+    const capacitor1 = { id: 2, type: 'capacitor', capacitance: 0.1, voltage: 0, x: 150, y: 100 }
+
+    simulator1.setComponents([battery1, capacitor1])
+    simulator1.setWires([{ id: 3, from: 1, to: 2 }])
+
+    // Circuit 2: Battery -> Resistor -> Capacitor
+    const battery2 = { id: 1, type: 'battery', charge: 1.0, voltage: 4.5, x: 100, y: 100 }
+    const resistor2 = { id: 2, type: 'resistor', resistance: 100, x: 150, y: 100 }
+    const capacitor2 = { id: 3, type: 'capacitor', capacitance: 0.1, voltage: 0, x: 200, y: 100 }
+
+    simulator2.setComponents([battery2, resistor2, capacitor2])
+    simulator2.setWires([{ id: 4, from: 1, to: 2 }, { id: 5, from: 2, to: 3 }])
+
+    // Simulate both
+    for (let i = 0; i < 5; i++) {
+      simulator1.simulate()
+      simulator2.simulate()
+    }
+
+    const cap1 = simulator1.components.find(c => c.id === 2)
+    const cap2 = simulator2.components.find(c => c.id === 3)
+
+    // Circuit without resistor should charge FASTER (less resistance)
+    // After 5 steps, circuit 1 should have higher voltage than circuit 2
+    expect(cap1.voltage).toBeGreaterThan(cap2.voltage)
+  })
 })

@@ -43,16 +43,25 @@ export function simulateCapacitors(components, wires, deltaTime, findConnectedCo
         battery.charge = Math.max(0, battery.charge - drainRate)
       })
 
-    } else {
+    } else if (resistors.length > 0 && capacitor.voltage > 0) {
       // Discharging: capacitor through resistor (no battery)
-      if (resistors.length > 0 && capacitor.voltage > 0) {
-        const capacitance = capacitor.capacitance || 0.001
-        const timeConstant = totalResistance * capacitance
+      const capacitance = capacitor.capacitance || 0.001
+      const timeConstant = totalResistance * capacitance
 
-        // RC discharge: V(t) = V0 × e^(-t/RC)
-        const dischargeFactor = Math.exp(-deltaTime / timeConstant)
-        capacitor.voltage *= dischargeFactor
-      }
+      // RC discharge: V(t) = V0 × e^(-t/RC)
+      const dischargeFactor = Math.exp(-deltaTime / timeConstant)
+      capacitor.voltage *= dischargeFactor
+    } else if (capacitor.voltage > 0) {
+      // Self-discharge (leakage) when disconnected
+      // Real capacitors have leakage resistance (~1MΩ to 100MΩ)
+      // Use 10MΩ leakage resistance for gradual discharge
+      const LEAKAGE_RESISTANCE = 10000000  // 10MΩ
+      const capacitance = capacitor.capacitance || 0.001
+      const leakageTimeConstant = LEAKAGE_RESISTANCE * capacitance
+
+      // Very slow discharge: τ = 10MΩ × 0.1F = 1000 seconds for 100mF
+      const leakageFactor = Math.exp(-deltaTime / leakageTimeConstant)
+      capacitor.voltage *= leakageFactor
     }
 
     // Clamp voltage to max rating
