@@ -244,6 +244,47 @@ export class CircuitSimulator {
     return batteries
   }
 
+  findResistorsInPath(led, batteries) {
+    // Find resistors that are in the direct path between LED and batteries
+    // This handles parallel branches correctly
+    if (batteries.length === 0) return []
+
+    const resistors = []
+    const visited = new Set()
+
+    // BFS from LED towards batteries, stopping when we hit them
+    const queue = [led.id]
+    visited.add(led.id)
+
+    while (queue.length > 0) {
+      const currentId = queue.shift()
+      const current = this.components.find(c => c.id === currentId)
+
+      if (!current) continue
+
+      // If we hit a battery, we've found a complete path
+      if (current.type === 'battery') {
+        continue // Don't traverse beyond batteries
+      }
+
+      // If it's a resistor, add it to the path
+      if (current.type === 'resistor') {
+        resistors.push(current)
+      }
+
+      // Continue traversing
+      const connected = this.getConnectedComponents(currentId)
+      for (const connId of connected) {
+        if (!visited.has(connId)) {
+          visited.add(connId)
+          queue.push(connId)
+        }
+      }
+    }
+
+    return resistors
+  }
+
   getConnectedComponents(compId) {
     const connected = []
     for (const wire of this.wires) {
@@ -290,15 +331,14 @@ export class CircuitSimulator {
       totalVoltage += capacitor.voltage
     })
 
-    // Find all resistors in the circuit
-    const connectedComponents = this.findConnectedComponents(led)
-    const resistors = connectedComponents.filter(c => c.type === 'resistor')
+    // Find resistors in THIS LED's branch (not all connected resistors)
+    const resistorsInPath = this.findResistorsInPath(led, batteries)
 
-    // Calculate total resistance in the circuit
+    // Calculate total resistance in THIS LED's branch
     const LED_RESISTANCE = 100  // Ohms
     let totalResistance = LED_RESISTANCE
 
-    resistors.forEach(resistor => {
+    resistorsInPath.forEach(resistor => {
       totalResistance += resistor.resistance
     })
 
@@ -335,15 +375,15 @@ export class CircuitSimulator {
     // Limit current to max LED current
     current = Math.min(current, MAX_LED_CURRENT)
 
-    // Calculate voltage drops
-    resistors.forEach(resistor => {
+    // Calculate voltage drops in THIS LED's branch
+    resistorsInPath.forEach(resistor => {
       resistor.voltageDrop = current * resistor.resistance
       resistor.current = current
     })
 
-    // Calculate voltage across LED (after resistor drops)
+    // Calculate voltage across LED (after resistor drops in this branch)
     let ledVoltage = totalVoltage
-    resistors.forEach(resistor => {
+    resistorsInPath.forEach(resistor => {
       ledVoltage -= resistor.voltageDrop
     })
 
