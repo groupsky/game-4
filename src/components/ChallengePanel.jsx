@@ -219,7 +219,7 @@ export function ChallengePanel({ challengeSystem, circuit, isRunning }) {
           </div>
         </div>
       )}
-      </div>
+    </div>
     </>
   )
 }
