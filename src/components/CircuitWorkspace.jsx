@@ -36,11 +36,13 @@ export default function CircuitWorkspace() {
     simulationState.onChange((running) => {
       setIsRunning(running)
 
-      // Reset circuit when simulation stops
+      // Reset circuit and timer when simulation stops
       if (!running) {
         setComponents(prevComponents => {
           return simulator.resetCircuit(prevComponents)
         })
+        // Reset time tracker
+        challengeSystem.getTimeTracker().reset()
       }
     })
   }, [])
