@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { WinEffect } from './WinEffect'
 import './ChallengePanel.css'
 
 /**
@@ -9,6 +10,8 @@ export function ChallengePanel({ challengeSystem, circuit, isRunning }) {
   const [validationResult, setValidationResult] = useState(null)
   const [showAllChallenges, setShowAllChallenges] = useState(false)
   const [, forceUpdate] = useState({})
+  const [showWinEffect, setShowWinEffect] = useState(false)
+  const [completedChallengeTitle, setCompletedChallengeTitle] = useState('')
 
   useEffect(() => {
     const challenge = challengeSystem.getActiveChallenge()
@@ -58,6 +61,12 @@ export function ChallengePanel({ challengeSystem, circuit, isRunning }) {
     const result = challengeSystem.validate(activeChallenge.id, circuit)
     setValidationResult(result)
 
+    // Show win effect if challenge completed
+    if (result.success) {
+      setCompletedChallengeTitle(activeChallenge.title)
+      setShowWinEffect(true)
+    }
+
     // For manual-start time challenges, start timer on successful validation
     if (activeChallenge.requiresManualStart && result.success) {
       challengeSystem.getTimeTracker().start()
@@ -96,9 +105,15 @@ export function ChallengePanel({ challengeSystem, circuit, isRunning }) {
   }
 
   return (
-    <div className="challenge-panel">
-      <div className="challenge-header">
-        <h2>🎯 Current Challenge</h2>
+    <>
+      <WinEffect
+        show={showWinEffect}
+        challengeTitle={completedChallengeTitle}
+        onComplete={() => setShowWinEffect(false)}
+      />
+      <div className="challenge-panel">
+        <div className="challenge-header">
+          <h2>🎯 Current Challenge</h2>
         <button
           className="toggle-all-btn"
           onClick={() => setShowAllChallenges(!showAllChallenges)}
@@ -204,6 +219,7 @@ export function ChallengePanel({ challengeSystem, circuit, isRunning }) {
           </div>
         </div>
       )}
-    </div>
+      </div>
+    </>
   )
 }
