@@ -5,6 +5,8 @@ describe('Challenge System - Strict Progression', () => {
   let challengeSystem
 
   beforeEach(() => {
+    // Clear localStorage to start fresh
+    localStorage.clear()
     challengeSystem = new ChallengeSystem()
   })
 
@@ -128,6 +130,9 @@ describe('Challenge System - Strict Progression', () => {
     }
 
     challengeSystem.validate('first-light', circuit)
+
+    // Clear lastActiveId to get next incomplete challenge
+    challengeSystem.lastActiveId = null
 
     // Active challenge should now be second
     activeChallenge = challengeSystem.getActiveChallenge()

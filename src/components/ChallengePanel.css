@@ -155,6 +155,19 @@
   background: #F0F0E0;
 }
 
+.challenge-item:not(.locked):hover {
+  background: #E8E8D8;
+  transform: translateX(4px);
+  transition: all 0.2s;
+}
+
+.challenge-item.active {
+  background: #FBBF24 !important;
+  border-color: #F59E0B;
+  border-width: 2px;
+  font-weight: bold;
+}
+
 .challenge-number {
   font-weight: bold;
   color: #4A4A4A;

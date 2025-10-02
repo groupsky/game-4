@@ -18,6 +18,16 @@ export function ChallengePanel({ challengeSystem, circuit, isRunning }) {
     setActiveChallenge(challenge)
   }, [challengeSystem])
 
+  const handleSelectChallenge = (challengeId) => {
+    const challenge = challengeSystem.getChallenges().find(c => c.id === challengeId)
+    if (challenge && challenge.unlocked) {
+      challengeSystem.setActiveChallenge(challengeId)
+      setActiveChallenge(challenge)
+      setValidationResult(null) // Clear previous validation
+      setShowAllChallenges(false) // Close challenge list
+    }
+  }
+
   // Keyboard shortcuts
   useEffect(() => {
     const handleKeyPress = (e) => {
@@ -173,7 +183,9 @@ export function ChallengePanel({ challengeSystem, circuit, isRunning }) {
             {challenges.slice(0, 10).map((challenge, index) => (
               <div
                 key={challenge.id}
-                className={`challenge-item ${challenge.completed ? 'completed' : ''} ${!challenge.unlocked ? 'locked' : ''}`}
+                className={`challenge-item ${challenge.completed ? 'completed' : ''} ${!challenge.unlocked ? 'locked' : ''} ${activeChallenge?.id === challenge.id ? 'active' : ''}`}
+                onClick={() => handleSelectChallenge(challenge.id)}
+                style={{ cursor: challenge.unlocked ? 'pointer' : 'not-allowed' }}
               >
                 <span className="challenge-number">{index + 1}.</span>
                 <span className="challenge-title">{challenge.title}</span>
@@ -190,7 +202,9 @@ export function ChallengePanel({ challengeSystem, circuit, isRunning }) {
             {challenges.slice(10, 20).map((challenge, index) => (
               <div
                 key={challenge.id}
-                className={`challenge-item ${challenge.completed ? 'completed' : ''} ${!challenge.unlocked ? 'locked' : ''}`}
+                className={`challenge-item ${challenge.completed ? 'completed' : ''} ${!challenge.unlocked ? 'locked' : ''} ${activeChallenge?.id === challenge.id ? 'active' : ''}`}
+                onClick={() => handleSelectChallenge(challenge.id)}
+                style={{ cursor: challenge.unlocked ? 'pointer' : 'not-allowed' }}
               >
                 <span className="challenge-number">{index + 11}.</span>
                 <span className="challenge-title">{challenge.title}</span>
@@ -207,7 +221,9 @@ export function ChallengePanel({ challengeSystem, circuit, isRunning }) {
             {challenges.slice(20, 30).map((challenge, index) => (
               <div
                 key={challenge.id}
-                className={`challenge-item ${challenge.completed ? 'completed' : ''} ${!challenge.unlocked ? 'locked' : ''}`}
+                className={`challenge-item ${challenge.completed ? 'completed' : ''} ${!challenge.unlocked ? 'locked' : ''} ${activeChallenge?.id === challenge.id ? 'active' : ''}`}
+                onClick={() => handleSelectChallenge(challenge.id)}
+                style={{ cursor: challenge.unlocked ? 'pointer' : 'not-allowed' }}
               >
                 <span className="challenge-number">{index + 21}.</span>
                 <span className="challenge-title">{challenge.title}</span>

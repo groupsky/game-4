@@ -5,6 +5,8 @@ describe('ChallengeSystem', () => {
   let challengeSystem
 
   beforeEach(() => {
+    // Clear localStorage to start fresh
+    localStorage.clear()
     challengeSystem = new ChallengeSystem()
   })
 

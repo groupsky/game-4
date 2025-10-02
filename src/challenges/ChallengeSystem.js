@@ -13,6 +13,7 @@ export class ChallengeSystem {
     this.challenges = this.loadChallenges()
     this.timeTracker = new TimeTracker()
     this.lastActiveId = null
+    this.loadProgress() // Load saved progress
   }
 
   loadChallenges() {
@@ -352,7 +353,15 @@ export class ChallengeSystem {
   }
 
   getActiveChallenge() {
-    // Return first unlocked, incomplete challenge
+    // If a specific challenge is selected, return that (if unlocked)
+    if (this.lastActiveId) {
+      const selected = this.challenges.find(c => c.id === this.lastActiveId)
+      if (selected && selected.unlocked) {
+        return selected
+      }
+    }
+
+    // Otherwise, return first unlocked, incomplete challenge
     const active = this.challenges.find(c => c.unlocked && !c.completed)
 
     // Reset time tracker if we switched to a new challenge
@@ -362,6 +371,15 @@ export class ChallengeSystem {
     }
 
     return active
+  }
+
+  setActiveChallenge(challengeId) {
+    const challenge = this.challenges.find(c => c.id === challengeId)
+    if (challenge && challenge.unlocked) {
+      this.lastActiveId = challengeId
+      this.timeTracker.reset() // Reset timer for new challenge
+      this.saveProgress() // Save selected challenge
+    }
   }
 
   validate(challengeId, circuit) {
@@ -381,6 +399,7 @@ export class ChallengeSystem {
     if (result.success && !challenge.requiresManualStart) {
       challenge.completed = true
       this.unlockNextChallenge(challengeId)
+      this.saveProgress() // Save to localStorage
     }
 
     return result
@@ -424,6 +443,7 @@ export class ChallengeSystem {
       activeChallenge.completed = true
       this.unlockNextChallenge(activeChallenge.id)
       this.timeTracker.stop()
+      this.saveProgress() // Save to localStorage
     }
   }
 
@@ -433,6 +453,51 @@ export class ChallengeSystem {
 
   resetTimeTracker() {
     this.timeTracker.reset()
+  }
+
+  // LocalStorage persistence
+  saveProgress() {
+    const progress = {
+      challenges: this.challenges.map(c => ({
+        id: c.id,
+        completed: c.completed,
+        unlocked: c.unlocked
+      })),
+      lastActiveId: this.lastActiveId
+    }
+    localStorage.setItem('circuitQuestProgress', JSON.stringify(progress))
+  }
+
+  loadProgress() {
+    try {
+      const saved = localStorage.getItem('circuitQuestProgress')
+      if (!saved) return
+
+      const progress = JSON.parse(saved)
+
+      // Restore challenge state
+      progress.challenges.forEach(savedChallenge => {
+        const challenge = this.challenges.find(c => c.id === savedChallenge.id)
+        if (challenge) {
+          challenge.completed = savedChallenge.completed
+          challenge.unlocked = savedChallenge.unlocked
+        }
+      })
+
+      this.lastActiveId = progress.lastActiveId
+    } catch (error) {
+      console.error('Failed to load progress:', error)
+    }
+  }
+
+  clearProgress() {
+    localStorage.removeItem('circuitQuestProgress')
+    // Reset all challenges
+    this.challenges.forEach((c, i) => {
+      c.completed = false
+      c.unlocked = i === 0 // Only first unlocked
+    })
+    this.lastActiveId = null
   }
 
 }
