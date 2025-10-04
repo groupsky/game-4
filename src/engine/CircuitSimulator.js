@@ -384,18 +384,33 @@ export class CircuitSimulator {
   simulateCircuit(circuit) {
     const { batteries = [], capacitors = [], led, totalLEDs, isParallel } = circuit
 
-    // Calculate total voltage from series batteries
+    // Analyze battery topology to find series chains in parallel
+    const batteryTopology = this.analyzeBatteryTopology(batteries, led)
+    const { seriesChains } = batteryTopology
+
+    // Calculate total voltage - for parallel chains, use the highest voltage
+    // (or a weighted combination based on current distribution)
     let batteryVoltage = 0
     let minCharge = 1.0
 
-    batteries.forEach(battery => {
-      // Voltage adds in series, regardless of charge level
-      // A battery maintains its voltage until nearly depleted
-      batteryVoltage += battery.voltage * (battery.charge > 0 ? 1 : 0)
-
-      // Track minimum charge (circuit is limited by weakest battery)
-      minCharge = Math.min(minCharge, battery.charge)
-    })
+    if (seriesChains.length === 1) {
+      // Simple case: all batteries in series
+      seriesChains[0].forEach(battery => {
+        batteryVoltage += battery.voltage * (battery.charge > 0 ? 1 : 0)
+        minCharge = Math.min(minCharge, battery.charge)
+      })
+    } else if (seriesChains.length > 1) {
+      // Parallel chains: use highest voltage chain (dominant voltage source)
+      // In reality, parallel voltage sources with different voltages create complex current flows
+      // For simplicity, we'll use the highest voltage and distribute current based on voltage
+      seriesChains.forEach(chain => {
+        const chainVoltage = chain.reduce((sum, bat) => sum + (bat.charge > 0 ? bat.voltage : 0), 0)
+        batteryVoltage = Math.max(batteryVoltage, chainVoltage)
+        chain.forEach(bat => {
+          minCharge = Math.min(minCharge, bat.charge)
+        })
+      })
+    }
 
     // Handle capacitors based on their configuration:
     // - Series with LED: oppose battery (blocks DC when charged)
@@ -503,15 +518,33 @@ export class CircuitSimulator {
     led.voltage = voltage
     led.current = current
 
-    // Drain all batteries based on current draw
+    // Drain batteries based on current draw, distributed by series chain voltage
     // For parallel LEDs, each LED draws current, so multiply by number of parallel LEDs
     const parallelMultiplier = isParallel ? totalLEDs : 1
-    const totalSources = batteries.length + capacitors.length
+    const totalCurrent = current * parallelMultiplier
 
     if (batteries.length > 0) {
-      const drainRate = current * 0.001 * parallelMultiplier / totalSources // Distribute drain across all sources
-      batteries.forEach(battery => {
-        battery.charge = Math.max(0, battery.charge - drainRate)
+      // Calculate voltage of each series chain
+      const chainVoltages = seriesChains.map(chain =>
+        chain.reduce((sum, bat) => sum + (bat.charge > 0 ? bat.voltage : 0), 0)
+      )
+      const totalChainVoltage = chainVoltages.reduce((sum, v) => sum + v, 0)
+
+      // Distribute current based on each chain's voltage contribution
+      // Higher voltage chains supply more current (parallel resistor network behavior)
+      seriesChains.forEach((chain, index) => {
+        const chainVoltage = chainVoltages[index]
+        if (totalChainVoltage === 0) return
+
+        // Current from this chain is proportional to its voltage
+        const chainCurrentFraction = chainVoltage / totalChainVoltage
+        const chainCurrent = totalCurrent * chainCurrentFraction
+
+        // All batteries in a series chain get the same current
+        const drainRate = chainCurrent * 0.001 / (capacitors.length + seriesChains.length)
+        chain.forEach(battery => {
+          battery.charge = Math.max(0, battery.charge - drainRate)
+        })
       })
     }
 
