@@ -59,7 +59,9 @@ export class TimeTracker {
   }
 
   hasReachedGoal(goalTime) {
-    return this.conditionTime >= goalTime
+    // Enforce 10-second minimum before success (prevents instant-win exploits)
+    const MIN_TIME = 10
+    return this.conditionTime >= goalTime && this.elapsedTime >= MIN_TIME
   }
 
   getProgress(goalTime) {

@@ -87,6 +87,12 @@ src/
 - Clear progression: learn → practice → combine
 - Each challenge unlocks ONLY when previous solved (strict progression)
 
+**Timed challenge constraints:**
+- MUST NOT exceed 60 seconds (1 minute max)
+- MUST run for minimum 10 seconds before validation
+- Validation checks every frame but success only after minimum time
+- Prevents instant-win exploits while keeping challenges fast-paced
+
 **Hint system guidelines:**
 - Multi-level hints (concept → guidance → solution)
 - Track circuit state between hint requests

@@ -108,10 +108,10 @@ describe('TimeTracker', () => {
       const condition = () => true
 
       timeTracker.start()
-      vi.advanceTimersByTime(5000)
+      vi.advanceTimersByTime(15000) // 15 seconds (must be >= 10s minimum)
       timeTracker.update(condition)
 
-      expect(timeTracker.hasReachedGoal(5.0)).toBe(true)
+      expect(timeTracker.hasReachedGoal(15.0)).toBe(true)
     })
 
     it('should not detect goal before time is reached', () => {

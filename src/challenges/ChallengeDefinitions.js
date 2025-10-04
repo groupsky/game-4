@@ -174,19 +174,18 @@ export function getChallengeDefinitions() {
     },
 
     // === BATTERIES: Longevity and Efficiency (15, 17, 19-20, 28-29) ===
-    // 15. Endurance Challenge (1 hour - manual start)
+    // 15. Endurance Challenge (60s)
     {
       id: 'endurance',
       act: 1,
       title: '15. Endurance',
-      description: 'The ultimate test! Keep 2 LEDs lit for 1 full hour using your battery engineering skills.',
+      description: 'Keep 2 LEDs lit for 60 seconds using efficient battery engineering!',
       unlocked: false,
       completed: false,
       requiresTime: true,
-      requiresManualStart: true,
-      goalTime: 3600,
+      goalTime: 60,
       validator: (circuit) => ChallengeValidators.validateEndurance(circuit),
-      stars: { optimalComponents: 15, optimalTime: 3600 }
+      stars: { optimalComponents: 10, optimalTime: 60 }
     },
     // 16. RC Timing
     {
@@ -232,19 +231,18 @@ export function getChallengeDefinitions() {
       validator: (circuit) => ChallengeValidators.validateBatteryBank(circuit),
       stars: { optimalComponents: 10 }
     },
-    // 20. Marathon Challenge (manual start)
+    // 20. Marathon Challenge
     {
       id: 'marathon',
       act: 1,
       title: '20. Marathon',
-      description: 'Keep a light bulb lit for 5 full minutes using your battery bank design!',
+      description: 'Keep a light bulb lit for 60 seconds using your battery bank design!',
       unlocked: false,
       completed: false,
       requiresTime: true,
-      requiresManualStart: true,
-      goalTime: 300,
+      goalTime: 60,
       validator: (circuit) => ChallengeValidators.validateMarathon(circuit),
-      stars: { optimalComponents: 7, optimalTime: 300 }
+      stars: { optimalComponents: 7, optimalTime: 60 }
     },
 
     // === MIXED: Complex Circuits (21, 25) ===
@@ -358,13 +356,13 @@ export function getChallengeDefinitions() {
       id: 'master-inventor',
       act: 1,
       title: '30. Master Inventor',
-      description: 'The final test: Build ANY circuit that lights 5+ components and runs for 90 seconds. Show your mastery!',
+      description: 'The final test: Build ANY circuit that lights 5+ components and runs for 60 seconds. Show your mastery!',
       unlocked: false,
       completed: false,
       requiresTime: true,
-      goalTime: 90,
+      goalTime: 60,
       validator: (circuit) => ChallengeValidators.validateMasterInventor(circuit),
-      stars: { optimalComponents: 15, optimalTime: 90 }
+      stars: { optimalComponents: 15, optimalTime: 60 }
     }
   ]
 }
