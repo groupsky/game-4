@@ -30,6 +30,7 @@ export default function CircuitWorkspace() {
   const [selectedComponents, setSelectedComponents] = useState([])
   const [selectionBox, setSelectionBox] = useState(null)
   const [isRunning, setIsRunning] = useState(false)
+  const [currentChallengeId, setCurrentChallengeId] = useState(null)
 
   // Listen to simulation state changes
   useEffect(() => {
@@ -46,6 +47,38 @@ export default function CircuitWorkspace() {
       }
     })
   }, [])
+
+  // Load circuit when challenge changes
+  useEffect(() => {
+    const activeChallenge = challengeSystem.getActiveChallenge()
+    if (!activeChallenge) return
+
+    // Save current circuit before switching
+    if (currentChallengeId && currentChallengeId !== activeChallenge.id) {
+      challengeSystem.saveCircuit(currentChallengeId, { components, wires })
+    }
+
+    // Load circuit for new challenge
+    if (activeChallenge.id !== currentChallengeId) {
+      const savedCircuit = challengeSystem.loadCircuit(activeChallenge.id)
+      if (savedCircuit) {
+        setComponents(savedCircuit.components || [])
+        setWires(savedCircuit.wires || [])
+      } else {
+        // Start fresh for new challenge
+        setComponents([])
+        setWires([])
+      }
+      setCurrentChallengeId(activeChallenge.id)
+    }
+  }, [challengeSystem.getActiveChallenge()?.id])
+
+  // Auto-save circuit when it changes
+  useEffect(() => {
+    if (currentChallengeId && !isRunning) {
+      challengeSystem.saveCircuit(currentChallengeId, { components, wires })
+    }
+  }, [components, wires, currentChallengeId, isRunning])
 
   useEffect(() => {
     const canvas = canvasRef.current

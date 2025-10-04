@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react'
 import { WinEffect } from './WinEffect'
+import { CompletionModal } from './CompletionModal'
+import { StarRating } from '../challenges/StarRating'
 import './ChallengePanel.css'
 
 /**
@@ -12,6 +14,8 @@ export function ChallengePanel({ challengeSystem, circuit, isRunning }) {
   const [, forceUpdate] = useState({})
   const [showWinEffect, setShowWinEffect] = useState(false)
   const [completedChallengeTitle, setCompletedChallengeTitle] = useState('')
+  const [showCompletionModal, setShowCompletionModal] = useState(false)
+  const [completionStars, setCompletionStars] = useState(0)
 
   useEffect(() => {
     const challenge = challengeSystem.getActiveChallenge()
@@ -71,10 +75,23 @@ export function ChallengePanel({ challengeSystem, circuit, isRunning }) {
     const result = challengeSystem.validate(activeChallenge.id, circuit)
     setValidationResult(result)
 
-    // Show win effect if challenge completed
+    // Show win effect and completion modal if challenge completed
     if (result.success) {
       setCompletedChallengeTitle(activeChallenge.title)
       setShowWinEffect(true)
+
+      // Calculate star rating
+      const timeElapsed = challengeSystem.getTimeTracker().getTime()
+      const stars = activeChallenge.stars
+        ? StarRating.calculate(activeChallenge, circuit, timeElapsed)
+        : 1 // Default to 1 star if no star criteria defined
+
+      setCompletionStars(stars)
+
+      // Show modal after win effect animation (3.5s)
+      setTimeout(() => {
+        setShowCompletionModal(true)
+      }, 3500)
     }
 
     // For manual-start time challenges, start timer on successful validation
@@ -96,6 +113,25 @@ export function ChallengePanel({ challengeSystem, circuit, isRunning }) {
     const mins = Math.floor(seconds / 60)
     const secs = seconds % 60
     return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`
+  }
+
+  const handleNextChallenge = () => {
+    setShowCompletionModal(false)
+    const nextChallenge = challengeSystem.getActiveChallenge()
+    if (nextChallenge) {
+      setActiveChallenge(nextChallenge)
+      setValidationResult(null)
+    }
+  }
+
+  const handleRetryChallenge = () => {
+    setShowCompletionModal(false)
+    // Clear the current circuit to start fresh
+    // This will be handled by parent component
+  }
+
+  const handleCloseModal = () => {
+    setShowCompletionModal(false)
   }
 
   if (!activeChallenge) {
@@ -120,6 +156,14 @@ export function ChallengePanel({ challengeSystem, circuit, isRunning }) {
         show={showWinEffect}
         challengeTitle={completedChallengeTitle}
         onComplete={() => setShowWinEffect(false)}
+      />
+      <CompletionModal
+        show={showCompletionModal}
+        challengeTitle={completedChallengeTitle}
+        stars={completionStars}
+        onNext={handleNextChallenge}
+        onRetry={completionStars < 3 ? handleRetryChallenge : null}
+        onClose={handleCloseModal}
       />
       <div className="challenge-panel">
         <div className="challenge-header">

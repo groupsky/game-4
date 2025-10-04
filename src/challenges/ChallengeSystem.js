@@ -27,7 +27,8 @@ export class ChallengeSystem {
         description: 'Connect an LED to a potato battery. Watch it glow! This is your first circuit.',
         unlocked: true,
         completed: false,
-        validator: (circuit) => ChallengeValidators.validateFirstLight(circuit)
+        validator: (circuit) => ChallengeValidators.validateFirstLight(circuit),
+        stars: { optimalComponents: 2 }
       },
       // 2. Series Batteries (Introduce voltage boost)
       {
@@ -37,7 +38,8 @@ export class ChallengeSystem {
         description: 'One battery is too weak. Connect 2 or more batteries in series (end-to-end) to increase voltage and make your LED brighter!',
         unlocked: false,
         completed: false,
-        validator: (circuit) => ChallengeValidators.validatePowerUp(circuit)
+        validator: (circuit) => ChallengeValidators.validatePowerUp(circuit),
+        stars: { optimalComponents: 3 }
       },
       // 3. Introduce Resistor (After seeing over-bright LED)
       {
@@ -47,7 +49,8 @@ export class ChallengeSystem {
         description: 'Your LED is TOO bright now! Add a resistor to control the current and protect your LED from burning out.',
         unlocked: false,
         completed: false,
-        validator: (circuit) => ChallengeValidators.validateCurrentControl(circuit)
+        validator: (circuit) => ChallengeValidators.validateCurrentControl(circuit),
+        stars: { optimalComponents: 4 }
       },
       // 4. Introduce Light Bulb
       {
@@ -399,6 +402,10 @@ export class ChallengeSystem {
     if (result.success && !challenge.requiresManualStart) {
       challenge.completed = true
       this.unlockNextChallenge(challengeId)
+      // Clear saved circuit for completed challenge
+      if (this.circuits && this.circuits[challengeId]) {
+        delete this.circuits[challengeId]
+      }
       this.saveProgress() // Save to localStorage
     }
 
@@ -443,6 +450,10 @@ export class ChallengeSystem {
       activeChallenge.completed = true
       this.unlockNextChallenge(activeChallenge.id)
       this.timeTracker.stop()
+      // Clear saved circuit for completed challenge
+      if (this.circuits && this.circuits[activeChallenge.id]) {
+        delete this.circuits[activeChallenge.id]
+      }
       this.saveProgress() // Save to localStorage
     }
   }
@@ -463,9 +474,25 @@ export class ChallengeSystem {
         completed: c.completed,
         unlocked: c.unlocked
       })),
-      lastActiveId: this.lastActiveId
+      lastActiveId: this.lastActiveId,
+      circuits: this.circuits || {}
     }
     localStorage.setItem('circuitQuestProgress', JSON.stringify(progress))
+  }
+
+  saveCircuit(challengeId, circuit) {
+    if (!this.circuits) {
+      this.circuits = {}
+    }
+    this.circuits[challengeId] = circuit
+    this.saveProgress()
+  }
+
+  loadCircuit(challengeId) {
+    if (!this.circuits || !this.circuits[challengeId]) {
+      return null
+    }
+    return this.circuits[challengeId]
   }
 
   loadProgress() {
@@ -485,6 +512,7 @@ export class ChallengeSystem {
       })
 
       this.lastActiveId = progress.lastActiveId
+      this.circuits = progress.circuits || {}
     } catch (error) {
       console.error('Failed to load progress:', error)
     }
