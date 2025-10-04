@@ -1,14 +1,24 @@
 /**
  * ComponentFactory - Creates components with same parameters as UI
  *
- * IMPORTANT: These are the ONLY valid component parameters.
- * Tests SHOULD use these factory functions to match UI behavior.
+ * USAGE GUIDELINES:
  *
- * NOTE: LED and LightBulb created by factory include extra properties (x, y, resistance, current, power)
- * that can interfere with circuit simulation physics in complex multi-component circuits.
- * For simple tests or when exact physics behavior is critical, use minimal inline objects instead:
- *   { id: X, type: 'led', brightness: 0 }
- *   { id: X, type: 'lightbulb', brightness: 0 }
+ * ✅ ALWAYS use factory for:
+ *   - Battery (standard 0.9V potato battery)
+ *   - Resistor (when using standard 100Ω value)
+ *
+ * ⚠️  USE WITH CAUTION:
+ *   - LED: Factory adds x/y/extra properties that can interfere with physics in complex circuits
+ *     → Use minimal { id, type, brightness } for critical physics tests
+ *   - LightBulb: Same issue as LED
+ *     → Use minimal { id, type, brightness } for critical physics tests
+ *   - Capacitor: Factory creates 100mF, but many tests need custom values (10mF, 50mF)
+ *     → Only use factory if you specifically need 100mF
+ *
+ * ❌ NEVER use factory when you need custom component values:
+ *   - Custom resistor values (22Ω, 47Ω, 220Ω, etc.)
+ *   - Custom capacitor values (10mF, 50mF, etc.)
+ *   - Use inline objects with exact values needed by the test
  */
 
 export class ComponentFactory {

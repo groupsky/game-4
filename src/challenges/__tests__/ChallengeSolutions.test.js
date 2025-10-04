@@ -229,6 +229,37 @@ describe('Challenge Solutions - Verify all challenges are solvable', () => {
     expect(result.success).toBe(true)
   })
 
+  // Challenge 11: Energy Storage Mastery
+  it('Challenge 11: Energy Storage Mastery - capacitor powers LED', () => {
+    const simulator = new CircuitSimulator()
+
+    // Same as Challenge 8, but demonstrates mastery
+    const battery1 = ComponentFactory.createBattery(1)
+    const battery2 = ComponentFactory.createBattery(2)
+    const capacitor = { id: 3, type: 'capacitor', capacitance: 0.01, voltage: 0 }  // 10mF
+    const led = { id: 4, type: 'led', brightness: 0 }
+
+    simulator.setComponents([battery1, battery2, capacitor, led])
+    simulator.setWires([
+      { id: 5, from: 1, to: 2 },  // Battery series
+      { id: 6, from: 2, to: 3 },  // Battery -> Capacitor
+      { id: 7, from: 2, to: 4 }   // Battery -> LED (parallel with capacitor)
+    ])
+
+    // Run simulation to charge capacitor and light LED
+    for (let i = 0; i < 10; i++) {
+      simulator.simulate(0.1)
+    }
+
+    const result = ChallengeValidators.validateEnergyBank({
+      components: simulator.components
+    })
+
+    expect(result.success).toBe(true)
+    expect(capacitor.voltage).toBeGreaterThanOrEqual(1.5)
+    expect(led.brightness).toBeGreaterThanOrEqual(0.1)
+  })
+
   // Challenge 12: Triple Chain
   it('Challenge 12: Triple Chain - 3 LEDs in series', () => {
     const simulator = new CircuitSimulator()
