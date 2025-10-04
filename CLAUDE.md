@@ -103,4 +103,9 @@ src/
 - Challenges MUST be auto-validated AND have solution tests proving solvability
 - NO lectures or forced tutorials - learning by doing only
 - Performance: <50MB download, runs on 5-year-old hardware
-- Simulation/Edit mode separation: edit when stopped, test when running
+
+**Circuit Editing Rules:**
+- NEVER allow circuit changes during simulation (no adding/removing components or wires while running)
+- MUST disable all edit controls when simulation is running
+- Build circuit → Start → Observe → Stop → Edit → Repeat
+- This forces intentional design instead of live-tweaking

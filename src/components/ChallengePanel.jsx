@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { WinEffect } from './WinEffect'
 import { CompletionModal } from './CompletionModal'
+import { FailureModal } from './FailureModal'
 import { StarRating } from '../challenges/StarRating'
 import './ChallengePanel.css'
 
@@ -16,7 +17,11 @@ export function ChallengePanel({ challengeSystem, circuit, isRunning, onChalleng
   const [completedChallengeTitle, setCompletedChallengeTitle] = useState('')
   const [showCompletionModal, setShowCompletionModal] = useState(false)
   const [completionStars, setCompletionStars] = useState(0)
+  const [showFailureModal, setShowFailureModal] = useState(false)
+  const [failureReason, setFailureReason] = useState('')
+  const [failureHint, setFailureHint] = useState('')
   const previousCompletedRef = useRef(new Set())
+  const previousFailedRef = useRef(false)
 
   useEffect(() => {
     const challenge = challengeSystem.getActiveChallenge()
@@ -54,10 +59,29 @@ export function ChallengePanel({ challengeSystem, circuit, isRunning, onChalleng
     return () => window.removeEventListener('keydown', handleKeyPress)
   }, [activeChallenge, challengeSystem, showAllChallenges, isRunning])
 
-  // Force re-render every 100ms to update timer display and check for challenge completion
+  // Force re-render every 100ms to update timer display and check for challenge completion/failure
   useEffect(() => {
     const interval = setInterval(() => {
       const currentChallenge = challengeSystem.getActiveChallenge()
+      const timeTracker = challengeSystem.getTimeTracker()
+
+      // Check if challenge just failed
+      if (timeTracker.failed && !previousFailedRef.current) {
+        previousFailedRef.current = true
+
+        // Determine failure reason and hint based on challenge
+        let reason = 'The challenge conditions were not maintained'
+        let hint = 'Try to keep the circuit stable throughout the duration'
+
+        if (currentChallenge?.id === 'sustained-glow') {
+          reason = 'Batteries depleted before reaching 60 seconds'
+          hint = 'You need more batteries to maintain power for the full duration. Try adding another battery in parallel.'
+        }
+
+        setFailureReason(reason)
+        setFailureHint(hint)
+        setShowFailureModal(true)
+      }
 
       // Check if challenge just became completed (using ref to track previous state)
       if (currentChallenge && currentChallenge.completed && !previousCompletedRef.current.has(currentChallenge.id)) {
@@ -79,13 +103,14 @@ export function ChallengePanel({ challengeSystem, circuit, isRunning, onChalleng
       } else if (currentChallenge?.id !== activeChallenge?.id) {
         setActiveChallenge(currentChallenge)
         setValidationResult(null) // Clear validation result on challenge change
+        previousFailedRef.current = false // Reset failure tracking on challenge change
       }
 
       forceUpdate({})
     }, 100)
 
     return () => clearInterval(interval)
-  }, [activeChallenge, challengeSystem])
+  }, [activeChallenge, challengeSystem, circuit])
 
   const handleCheckSolution = () => {
     if (!activeChallenge) return
@@ -168,6 +193,24 @@ export function ChallengePanel({ challengeSystem, circuit, isRunning, onChalleng
     setShowCompletionModal(false)
   }
 
+  const handleRetryAfterFailure = () => {
+    setShowFailureModal(false)
+    previousFailedRef.current = false
+    // Reset the time tracker
+    challengeSystem.getTimeTracker().reset()
+    challengeSystem.getTimeTracker().failed = false
+    // Notify parent to reload circuit
+    if (onChallengeChange) {
+      onChallengeChange()
+    }
+  }
+
+  const handleCloseFailureModal = () => {
+    setShowFailureModal(false)
+    previousFailedRef.current = false
+    challengeSystem.getTimeTracker().failed = false
+  }
+
   if (!activeChallenge) {
     return (
       <div className="challenge-panel">
@@ -198,6 +241,14 @@ export function ChallengePanel({ challengeSystem, circuit, isRunning, onChalleng
         onNext={handleNextChallenge}
         onRetry={completionStars < 3 ? handleRetryChallenge : null}
         onClose={handleCloseModal}
+      />
+      <FailureModal
+        show={showFailureModal}
+        challengeTitle={activeChallenge?.title}
+        reason={failureReason}
+        hint={failureHint}
+        onRetry={handleRetryAfterFailure}
+        onClose={handleCloseFailureModal}
       />
       <div className="challenge-panel">
         <div className="challenge-header">

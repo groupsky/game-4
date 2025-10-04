@@ -1,0 +1,49 @@
+.failure-modal {
+  border-color: #DC2626;
+}
+
+.failure-header {
+  border-bottom-color: #DC2626;
+}
+
+.failure-header h2 {
+  color: #DC2626;
+}
+
+.failure-reason {
+  margin: 16px 0;
+  padding: 12px;
+  background: #FEE2E2;
+  border: 2px solid #DC2626;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #991B1B;
+}
+
+.failure-reason p:first-child {
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+
+.failure-reason p:last-child {
+  margin: 0;
+}
+
+.failure-hint {
+  margin: 16px 0;
+  padding: 12px;
+  background: #FEF3C7;
+  border: 2px solid #F59E0B;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #92400E;
+}
+
+.failure-hint p:first-child {
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+
+.failure-hint p:last-child {
+  margin: 0;
+}

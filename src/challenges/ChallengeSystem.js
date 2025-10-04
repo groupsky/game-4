@@ -111,16 +111,16 @@ export class ChallengeSystem {
         validator: (circuit) => ChallengeValidators.validateEnergyBank(circuit),
         stars: { optimalComponents: 3 } // 1 battery + 1 capacitor + 1 LED
       },
-      // 9. Capacitor Burst
+      // 9. Capacitor Power
       {
-        id: 'flash-photo',
+        id: 'capacitor-power',
         act: 1,
-        title: '9. Flash Photography',
-        description: 'Charge a large capacitor to high voltage. Use its burst of energy to make a light bulb flash bright!',
+        title: '9. Capacitor Power',
+        description: 'Use a capacitor in parallel with LED and battery to smooth and stabilize the power delivery!',
         unlocked: false,
         completed: false,
-        validator: (circuit) => ChallengeValidators.validateFlashPhoto(circuit),
-        stars: { optimalComponents: 4 } // 2+ batteries + 1 capacitor + 1 bulb
+        validator: (circuit) => ChallengeValidators.validateCapacitorPower(circuit),
+        stars: { optimalComponents: 3 } // 1 battery + 1 capacitor + 1 LED
       },
       // 10. Parallel Capacitors
       {
@@ -444,10 +444,15 @@ export class ChallengeSystem {
     const validationResult = activeChallenge.validator(circuit)
     const conditionMet = validationResult.success || validationResult.tracking
 
+    const wasRunning = this.timeTracker.running
+
     if (!this.timeTracker.running && conditionMet) {
       this.timeTracker.start()
-    } else if (!conditionMet) {
-      this.timeTracker.reset()
+    } else if (!conditionMet && this.timeTracker.running) {
+      // Challenge failed - condition was met but is no longer met
+      this.timeTracker.failed = true
+      this.timeTracker.stop()
+      return
     }
 
     this.timeTracker.update(() => conditionMet)

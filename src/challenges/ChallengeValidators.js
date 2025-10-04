@@ -184,45 +184,37 @@ export const ChallengeValidators = {
     return { success: true, message: '🔋 Capacitor is storing energy!' }
   },
 
-  // 9. Flash Photography - Capacitor burst for bulb
-  validateFlashPhoto(circuit) {
+  // 9. Capacitor Power - Capacitor in parallel with LED and battery
+  validateCapacitorPower(circuit) {
     const capacitors = circuit.components.filter(c => c.type === 'capacitor')
-    const bulbs = circuit.components.filter(c => c.type === 'lightbulb')
+    const leds = circuit.components.filter(c => c.type === 'led')
     const batteries = circuit.components.filter(c => c.type === 'battery')
 
     if (capacitors.length === 0) {
-      return { success: false, message: 'Add a capacitor for the energy burst!' }
+      return { success: false, message: 'Add a capacitor to smooth the power!' }
     }
 
-    if (bulbs.length === 0) {
-      return { success: false, message: 'Add a light bulb to see the flash!' }
+    if (leds.length === 0) {
+      return { success: false, message: 'Add an LED to light up!' }
     }
 
-    // Need large capacitor (high capacitance) to provide burst of current
-    const largeCap = capacitors.find(cap => cap.capacitance >= 0.05)  // 50mF+
-    if (!largeCap) {
-      return { success: false, message: 'Use a larger capacitor (50mF+) for more burst energy!' }
+    if (batteries.length === 0) {
+      return { success: false, message: 'Add a battery as the power source!' }
     }
 
-    // Capacitor should have stored significant energy (voltage >= 2V)
-    const chargedCap = capacitors.find(cap => cap.voltage >= 2.0)
-    if (!chargedCap) {
-      return { success: false, message: 'Charge capacitor to at least 2V with batteries!' }
+    // Capacitor should be charging (voltage > 0)
+    const chargingCap = capacitors.find(cap => cap.voltage > 0.5)
+    if (!chargingCap) {
+      return { success: false, message: 'Connect capacitor in parallel with LED and battery!' }
     }
 
-    // Bulb should be lit (capacitor discharging into it)
-    // Very low threshold - bulb brightness from capacitor discharge is brief/dim
-    const litBulb = bulbs.find(bulb => bulb.brightness >= 0.05)
-    if (!litBulb) {
-      return { success: false, message: 'Connect bulb to capacitor to see the flash!' }
+    // LED should be lit
+    const litLed = leds.find(led => led.brightness > 0.3)
+    if (!litLed) {
+      return { success: false, message: 'LED should be lit! Check your parallel connections.' }
     }
 
-    // Check if using capacitor without battery (pure discharge mode)
-    if (batteries.length > 0 && batteries.some(b => b.charge > 0)) {
-      return { success: false, message: 'For a burst, use ONLY capacitor power (disconnect/deplete batteries)!' }
-    }
-
-    return { success: true, message: '📸 Flash! That\'s a capacitor discharge burst!' }
+    return { success: true, message: '⚡ Perfect! Capacitor stabilizes the power delivery!' }
   },
 
   // 12. Triple Chain - 3 LEDs in series

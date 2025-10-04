@@ -162,6 +162,10 @@ export default function CircuitWorkspace() {
   useEffect(() => {
     if (!isRunning) return
 
+    // Capture the active challenge at the start of simulation
+    // This prevents auto-validation from cascading through multiple challenges
+    const challengeAtStart = challengeSystem.getActiveChallenge()
+
     const interval = setInterval(() => {
       simulator.setComponents(components)
       simulator.setWires(wires)
@@ -172,9 +176,13 @@ export default function CircuitWorkspace() {
       challengeSystem.updateTimeTracking({ components: updated, wires })
 
       // Auto-validate challenge on each tick (for non-manual challenges)
-      const activeChallenge = challengeSystem.getActiveChallenge()
-      if (activeChallenge && !activeChallenge.requiresManualStart && !activeChallenge.requiresTime) {
-        challengeSystem.validate(activeChallenge.id, { components: updated, wires })
+      // ONLY validate the challenge that was active when simulation started
+      if (challengeAtStart && !challengeAtStart.requiresManualStart && !challengeAtStart.requiresTime) {
+        // Only validate if this is still the active challenge
+        const currentActive = challengeSystem.getActiveChallenge()
+        if (currentActive?.id === challengeAtStart.id) {
+          challengeSystem.validate(challengeAtStart.id, { components: updated, wires })
+        }
       }
     }, 100)
 
@@ -513,7 +521,7 @@ export default function CircuitWorkspace() {
               type: 'capacitor',
               x: 550 + Math.random() * 100,
               y: 100 + Math.random() * 100,
-              capacitance: 0.1,  // 100mF foil capacitor - larger for visible charging
+              capacitance: 0.1,  // 100mF capacitor
               voltage: 0,
               maxVoltage: 5.0
             }])}

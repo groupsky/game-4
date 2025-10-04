@@ -1,14 +1,15 @@
 import { describe, it, expect } from 'vitest'
 import { CircuitSimulator } from '../../engine/CircuitSimulator'
 import { ChallengeValidators } from '../ChallengeValidators'
+import { ComponentFactory } from '../../utils/ComponentFactory'
 
 describe('Challenge Solutions - Verify all challenges are solvable', () => {
   // Challenge 1: First Light
   it('Challenge 1: First Light - LED + battery', () => {
     const simulator = new CircuitSimulator()
 
-    const battery = { id: 1, type: 'battery', charge: 1.0, voltage: 0.9 }
-    const led = { id: 2, type: 'led', brightness: 0 }
+    const battery = ComponentFactory.createBattery(1)
+    const led = ComponentFactory.createLED(2)
 
     simulator.setComponents([battery, led])
     simulator.setWires([{ id: 3, from: 1, to: 2 }])
@@ -26,9 +27,9 @@ describe('Challenge Solutions - Verify all challenges are solvable', () => {
   it('Challenge 2: Power Up - series batteries boost voltage', () => {
     const simulator = new CircuitSimulator()
 
-    const battery1 = { id: 1, type: 'battery', charge: 1.0, voltage: 0.9 }
-    const battery2 = { id: 2, type: 'battery', charge: 1.0, voltage: 0.9 }
-    const led = { id: 3, type: 'led', brightness: 0 }
+    const battery1 = ComponentFactory.createBattery(1)
+    const battery2 = ComponentFactory.createBattery(2)
+    const led = ComponentFactory.createLED(3)
 
     simulator.setComponents([battery1, battery2, led])
     simulator.setWires([
@@ -49,11 +50,11 @@ describe('Challenge Solutions - Verify all challenges are solvable', () => {
   it('Challenge 3: Current Control - resistor protects LED', () => {
     const simulator = new CircuitSimulator()
 
-    const battery1 = { id: 1, type: 'battery', charge: 1.0, voltage: 0.9 }
-    const battery2 = { id: 2, type: 'battery', charge: 1.0, voltage: 0.9 }
-    const battery3 = { id: 3, type: 'battery', charge: 1.0, voltage: 0.9 }
+    const battery1 = ComponentFactory.createBattery(1)
+    const battery2 = ComponentFactory.createBattery(2)
+    const battery3 = ComponentFactory.createBattery(3)
     const resistor = { id: 4, type: 'resistor', resistance: 220 }
-    const led = { id: 5, type: 'led', brightness: 0 }
+    const led = ComponentFactory.createLED(5)
 
     simulator.setComponents([battery1, battery2, battery3, resistor, led])
     simulator.setWires([
@@ -84,7 +85,7 @@ describe('Challenge Solutions - Verify all challenges are solvable', () => {
       charge: 1.0,
       voltage: 0.9
     }))
-    const bulb = { id: 6, type: 'lightbulb', brightness: 0 }
+    const bulb = ComponentFactory.createLightBulb(6)
 
     simulator.setComponents([...batteries, bulb])
     const wires = batteries.slice(0, -1).map((b, i) => ({
@@ -108,13 +109,13 @@ describe('Challenge Solutions - Verify all challenges are solvable', () => {
   it('Challenge 7: Double Bright - parallel LEDs with resistors', () => {
     const simulator = new CircuitSimulator()
 
-    const battery1 = { id: 1, type: 'battery', charge: 1.0, voltage: 0.9 }
-    const battery2 = { id: 2, type: 'battery', charge: 1.0, voltage: 0.9 }
-    const battery3 = { id: 3, type: 'battery', charge: 1.0, voltage: 0.9 }
+    const battery1 = ComponentFactory.createBattery(1)
+    const battery2 = ComponentFactory.createBattery(2)
+    const battery3 = ComponentFactory.createBattery(3)
     const resistor1 = { id: 4, type: 'resistor', resistance: 220 }
-    const led1 = { id: 5, type: 'led', brightness: 0 }
+    const led1 = ComponentFactory.createLED(5)
     const resistor2 = { id: 6, type: 'resistor', resistance: 220 }
-    const led2 = { id: 7, type: 'led', brightness: 0 }
+    const led2 = ComponentFactory.createLED(7)
 
     simulator.setComponents([battery1, battery2, battery3, resistor1, led1, resistor2, led2])
     simulator.setWires([
@@ -142,10 +143,10 @@ describe('Challenge Solutions - Verify all challenges are solvable', () => {
 
     // Solution: Battery charges capacitor in parallel with LED
     // Capacitor stores energy and helps power the LED smoothly
-    const battery1 = { id: 1, type: 'battery', charge: 1.0, voltage: 0.9 }
-    const battery2 = { id: 2, type: 'battery', charge: 1.0, voltage: 0.9 }
+    const battery1 = ComponentFactory.createBattery(1)
+    const battery2 = ComponentFactory.createBattery(2)
     const capacitor = { id: 3, type: 'capacitor', capacitance: 0.01, voltage: 0 }  // 10mF large cap
-    const led = { id: 4, type: 'led', brightness: 0 }
+    const led = ComponentFactory.createLED(4)
 
     simulator.setComponents([battery1, battery2, capacitor, led])
     simulator.setWires([
@@ -170,60 +171,44 @@ describe('Challenge Solutions - Verify all challenges are solvable', () => {
     expect(led.brightness).toBeGreaterThanOrEqual(0.1)
   })
 
-  // Challenge 9: Flash Photography
-  it('Challenge 9: Flash Photography - capacitor discharges into bulb', () => {
+  // Challenge 9: Capacitor Power
+  it('Challenge 9: Capacitor Power - capacitor in parallel with LED and battery', () => {
     const simulator = new CircuitSimulator()
 
-    // Step 1: Charge capacitor with batteries
-    const battery1 = { id: 1, type: 'battery', charge: 1.0, voltage: 0.9 }
-    const battery2 = { id: 2, type: 'battery', charge: 1.0, voltage: 0.9 }
-    const battery3 = { id: 3, type: 'battery', charge: 1.0, voltage: 0.9 }
-    const capacitor = { id: 5, type: 'capacitor', capacitance: 0.05, voltage: 0 }  // 50mF large cap
-    const bulb = { id: 6, type: 'lightbulb', brightness: 0 }
+    const battery = ComponentFactory.createBattery(1)
+    const capacitor = ComponentFactory.createCapacitor(2)
+    const led = ComponentFactory.createLED(3)
 
-    simulator.setComponents([battery1, battery2, battery3, capacitor, bulb])
+    // Parallel topology: battery connects to both capacitor and LED
+    simulator.setComponents([battery, capacitor, led])
     simulator.setWires([
-      { id: 7, from: 1, to: 2 },  // Battery series
-      { id: 8, from: 2, to: 3 },
-      { id: 10, from: 3, to: 5 }  // Batteries -> Capacitor
+      { id: 4, from: 1, to: 2 },  // Battery -> Capacitor
+      { id: 5, from: 1, to: 3 }   // Battery -> LED (parallel)
     ])
 
-    // Charge capacitor (without bulb)
-    for (let i = 0; i < 20; i++) {
+    // Simulate to charge capacitor and light LED
+    for (let i = 0; i < 10; i++) {
       simulator.simulate(0.1)
     }
 
-
-    // Step 2: Connect bulb to discharge capacitor
-    // Remove batteries, add bulb connection
-    simulator.setComponents([capacitor, bulb])
-    simulator.setWires([
-      { id: 11, from: 5, to: 6 }  // Capacitor -> Bulb
-    ])
-
-    // Capacitor discharges into bulb (flash!)
-    simulator.simulate(0.1)
-
-
-    // Validate
-    const result = ChallengeValidators.validateFlashPhoto({
+    const result = ChallengeValidators.validateCapacitorPower({
       components: simulator.components
     })
 
     expect(result.success).toBe(true)
-    expect(capacitor.voltage).toBeGreaterThanOrEqual(2.0)
-    expect(bulb.brightness).toBeGreaterThanOrEqual(0.05)
+    expect(capacitor.voltage).toBeGreaterThan(0.5)
+    expect(led.brightness).toBeGreaterThan(0.3)
   })
 
   // Challenge 10: Capacitor Bank
   it('Challenge 10: Capacitor Bank - parallel capacitors', () => {
     const simulator = new CircuitSimulator()
 
-    const battery1 = { id: 1, type: 'battery', charge: 1.0, voltage: 0.9 }
-    const battery2 = { id: 2, type: 'battery', charge: 1.0, voltage: 0.9 }
+    const battery1 = ComponentFactory.createBattery(1)
+    const battery2 = ComponentFactory.createBattery(2)
     const cap1 = { id: 3, type: 'capacitor', capacitance: 0.01, voltage: 0 }
     const cap2 = { id: 4, type: 'capacitor', capacitance: 0.01, voltage: 0 }
-    const led = { id: 5, type: 'led', brightness: 0 }
+    const led = ComponentFactory.createLED(5)
 
     simulator.setComponents([battery1, battery2, cap1, cap2, led])
     simulator.setWires([
@@ -254,9 +239,9 @@ describe('Challenge Solutions - Verify all challenges are solvable', () => {
       charge: 1.0,
       voltage: 0.9
     }))
-    const led1 = { id: 10, type: 'led', brightness: 0 }
-    const led2 = { id: 11, type: 'led', brightness: 0 }
-    const led3 = { id: 12, type: 'led', brightness: 0 }
+    const led1 = ComponentFactory.createLED(10)
+    const led2 = ComponentFactory.createLED(11)
+    const led3 = ComponentFactory.createLED(12)
 
     simulator.setComponents([...batteries, led1, led2, led3])
     const wires = batteries.slice(0, -1).map((b, i) => ({
@@ -281,9 +266,9 @@ describe('Challenge Solutions - Verify all challenges are solvable', () => {
   it('Challenge 17: Power Efficiency - 1 battery with optimal resistance', () => {
     const simulator = new CircuitSimulator()
 
-    const battery = { id: 1, type: 'battery', charge: 1.0, voltage: 0.9 }
+    const battery = ComponentFactory.createBattery(1)
     const resistor = { id: 2, type: 'resistor', resistance: 22 } // 22Ω for 0.1+ brightness
-    const led = { id: 3, type: 'led', brightness: 0 }
+    const led = ComponentFactory.createLED(3)
 
     simulator.setComponents([battery, resistor, led])
     simulator.setWires([
@@ -312,7 +297,7 @@ describe('Challenge Solutions - Verify all challenges are solvable', () => {
       voltage: 0.9
     }))
     const resistor = { id: 10, type: 'resistor', resistance: 47 } // 47Ω to keep brightness in range
-    const led = { id: 11, type: 'led', brightness: 0 }
+    const led = ComponentFactory.createLED(11)
 
     simulator.setComponents([...batteries, resistor, led])
     const wires = batteries.slice(0, -1).map((b, i) => ({
@@ -344,7 +329,7 @@ describe('Challenge Solutions - Verify all challenges are solvable', () => {
       charge: 1.0,
       voltage: 0.9
     }))
-    const bulb = { id: 10, type: 'lightbulb', brightness: 0 }
+    const bulb = ComponentFactory.createLightBulb(10)
 
     simulator.setComponents([...batteries, bulb])
     const wires = batteries.slice(0, -1).map((b, i) => ({
@@ -376,7 +361,7 @@ describe('Challenge Solutions - Verify all challenges are solvable', () => {
       charge: 1.0,
       voltage: 0.9
     }))
-    const bulb = { id: 10, type: 'lightbulb', brightness: 0 }
+    const bulb = ComponentFactory.createLightBulb(10)
 
     simulator.setComponents([...batteries, bulb])
     const wires = batteries.slice(0, -1).map((b, i) => ({
@@ -452,7 +437,7 @@ describe('Challenge Solutions - Verify all challenges are solvable', () => {
     }))
     const resistor1 = { id: 10, type: 'resistor', resistance: 220 }
     const resistor2 = { id: 11, type: 'resistor', resistance: 220 }
-    const led = { id: 12, type: 'led', brightness: 0 }
+    const led = ComponentFactory.createLED(12)
 
     simulator.setComponents([...batteries, resistor1, resistor2, led])
     const wires = batteries.slice(0, -1).map((b, i) => ({
@@ -487,7 +472,7 @@ describe('Challenge Solutions - Verify all challenges are solvable', () => {
     }))
     const capacitor = { id: 10, type: 'capacitor', capacitance: 0.01, voltage: 0 }
     const resistor = { id: 11, type: 'resistor', resistance: 220 }
-    const led = { id: 12, type: 'led', brightness: 0 }
+    const led = ComponentFactory.createLED(12)
 
     simulator.setComponents([...batteries, capacitor, resistor, led])
     const wires = batteries.slice(0, -1).map((b, i) => ({
@@ -524,7 +509,7 @@ describe('Challenge Solutions - Verify all challenges are solvable', () => {
       charge: 1.0,
       voltage: 0.9
     }))
-    const led = { id: 20, type: 'led', brightness: 0 }
+    const led = ComponentFactory.createLED(20)
 
     simulator.setComponents([...batteries, led])
 
@@ -566,8 +551,8 @@ describe('Challenge Solutions - Verify all challenges are solvable', () => {
       charge: 1.0,
       voltage: 0.9
     }))
-    const led1 = { id: 10, type: 'led', brightness: 0 }
-    const led2 = { id: 11, type: 'led', brightness: 0 }
+    const led1 = ComponentFactory.createLED(10)
+    const led2 = ComponentFactory.createLED(11)
 
     simulator.setComponents([...batteries, led1, led2])
     const wires = batteries.slice(0, -1).map((b, i) => ({
@@ -599,7 +584,7 @@ describe('Challenge Solutions - Verify all challenges are solvable', () => {
       charge: 1.0,
       voltage: 0.9
     }))
-    const bulb = { id: 10, type: 'lightbulb', brightness: 0 }
+    const bulb = ComponentFactory.createLightBulb(10)
 
     simulator.setComponents([...batteries, bulb])
     const wires = batteries.slice(0, -1).map((b, i) => ({
@@ -629,8 +614,8 @@ describe('Challenge Solutions - Verify all challenges are solvable', () => {
       charge: 1.0,
       voltage: 0.9
     }))
-    const led = { id: 10, type: 'led', brightness: 0 }
-    const bulb = { id: 11, type: 'lightbulb', brightness: 0 }
+    const led = ComponentFactory.createLED(10)
+    const bulb = ComponentFactory.createLightBulb(11)
 
     simulator.setComponents([...batteries, led, bulb])
     const wires = batteries.slice(0, -1).map((b, i) => ({
@@ -656,8 +641,8 @@ describe('Challenge Solutions - Verify all challenges are solvable', () => {
   it('Challenge 22: Capacitor Network - parallel capacitors', () => {
     const simulator = new CircuitSimulator()
 
-    const battery1 = { id: 1, type: 'battery', charge: 1.0, voltage: 0.9 }
-    const battery2 = { id: 2, type: 'battery', charge: 1.0, voltage: 0.9 }
+    const battery1 = ComponentFactory.createBattery(1)
+    const battery2 = ComponentFactory.createBattery(2)
     const cap1 = { id: 3, type: 'capacitor', capacitance: 0.01, voltage: 0 }
     const cap2 = { id: 4, type: 'capacitor', capacitance: 0.01, voltage: 0 }
 
@@ -685,8 +670,8 @@ describe('Challenge Solutions - Verify all challenges are solvable', () => {
   it('Challenge 23: Series Capacitors - capacitors in series', () => {
     const simulator = new CircuitSimulator()
 
-    const battery1 = { id: 1, type: 'battery', charge: 1.0, voltage: 0.9 }
-    const battery2 = { id: 2, type: 'battery', charge: 1.0, voltage: 0.9 }
+    const battery1 = ComponentFactory.createBattery(1)
+    const battery2 = ComponentFactory.createBattery(2)
     const cap1 = { id: 3, type: 'capacitor', capacitance: 0.01, voltage: 0 }
     const cap2 = { id: 4, type: 'capacitor', capacitance: 0.01, voltage: 0 }
 
@@ -720,9 +705,9 @@ describe('Challenge Solutions - Verify all challenges are solvable', () => {
       charge: 1.0,
       voltage: 0.9
     }))
-    const led1 = { id: 10, type: 'led', brightness: 0 }
-    const led2 = { id: 11, type: 'led', brightness: 0 }
-    const led3 = { id: 12, type: 'led', brightness: 0 }
+    const led1 = ComponentFactory.createLED(10)
+    const led2 = ComponentFactory.createLED(11)
+    const led3 = ComponentFactory.createLED(12)
 
     simulator.setComponents([...batteries, led1, led2, led3])
     const wires = batteries.slice(0, -1).map((b, i) => ({
@@ -752,13 +737,13 @@ describe('Challenge Solutions - Verify all challenges are solvable', () => {
   it('Challenge 25: Resistor Ladder - 3 series resistors with LED', () => {
     const simulator = new CircuitSimulator()
 
-    const battery1 = { id: 1, type: 'battery', charge: 1.0, voltage: 0.9 }
-    const battery2 = { id: 2, type: 'battery', charge: 1.0, voltage: 0.9 }
-    const battery3 = { id: 3, type: 'battery', charge: 1.0, voltage: 0.9 }
-    const resistor1 = { id: 4, type: 'resistor', resistance: 100 }
-    const resistor2 = { id: 5, type: 'resistor', resistance: 100 }
-    const resistor3 = { id: 6, type: 'resistor', resistance: 100 }
-    const led = { id: 7, type: 'led', brightness: 0 }
+    const battery1 = ComponentFactory.createBattery(1)
+    const battery2 = ComponentFactory.createBattery(2)
+    const battery3 = ComponentFactory.createBattery(3)
+    const resistor1 = ComponentFactory.createResistor(4)
+    const resistor2 = ComponentFactory.createResistor(5)
+    const resistor3 = ComponentFactory.createResistor(6)
+    const led = ComponentFactory.createLED(7)
 
     simulator.setComponents([battery1, battery2, battery3, resistor1, resistor2, resistor3, led])
     simulator.setWires([
@@ -791,9 +776,9 @@ describe('Challenge Solutions - Verify all challenges are solvable', () => {
       charge: 1.0,
       voltage: 0.9
     }))
-    const led1 = { id: 10, type: 'led', brightness: 0 }
-    const led2 = { id: 11, type: 'led', brightness: 0 }
-    const led3 = { id: 12, type: 'led', brightness: 0 }
+    const led1 = ComponentFactory.createLED(10)
+    const led2 = ComponentFactory.createLED(11)
+    const led3 = ComponentFactory.createLED(12)
 
     simulator.setComponents([...batteries, led1, led2, led3])
     const wires = batteries.slice(0, -1).map((b, i) => ({
@@ -829,7 +814,7 @@ describe('Challenge Solutions - Verify all challenges are solvable', () => {
     }))
     const cap1 = { id: 10, type: 'capacitor', capacitance: 0.05, voltage: 0 }
     const cap2 = { id: 11, type: 'capacitor', capacitance: 0.05, voltage: 0 }
-    const bulb = { id: 12, type: 'lightbulb', brightness: 0 }
+    const bulb = ComponentFactory.createLightBulb(12)
 
     simulator.setComponents([...batteries, cap1, cap2, bulb])
     const wires = batteries.slice(0, -1).map((b, i) => ({
@@ -864,9 +849,9 @@ describe('Challenge Solutions - Verify all challenges are solvable', () => {
       charge: 1.0,
       voltage: 0.9
     }))
-    const led1 = { id: 10, type: 'led', brightness: 0 }
-    const led2 = { id: 11, type: 'led', brightness: 0 }
-    const led3 = { id: 12, type: 'led', brightness: 0 }
+    const led1 = ComponentFactory.createLED(10)
+    const led2 = ComponentFactory.createLED(11)
+    const led3 = ComponentFactory.createLED(12)
 
     simulator.setComponents([...batteries, led1, led2, led3])
     const wires = batteries.slice(0, -1).map((b, i) => ({

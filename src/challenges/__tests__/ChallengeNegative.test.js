@@ -1,13 +1,14 @@
 import { describe, it, expect } from 'vitest'
 import { CircuitSimulator } from '../../engine/CircuitSimulator'
 import { ChallengeValidators } from '../ChallengeValidators'
+import { ComponentFactory } from '../../utils/ComponentFactory'
 
 describe('Challenge Negative Tests - Ensure challenges cannot be cheesed', () => {
   // Challenge 2: Power Up - should require multiple batteries
   it('Challenge 2: Should FAIL with only 1 battery (not bright enough)', () => {
     const simulator = new CircuitSimulator()
 
-    const battery = { id: 1, type: 'battery', charge: 1.0, voltage: 0.9 }
+    const battery = ComponentFactory.createBattery(1)
     const led = { id: 2, type: 'led', brightness: 0 }
 
     simulator.setComponents([battery, led])
@@ -26,9 +27,9 @@ describe('Challenge Negative Tests - Ensure challenges cannot be cheesed', () =>
   it('Challenge 3: Should FAIL without resistor (LED too bright)', () => {
     const simulator = new CircuitSimulator()
 
-    const battery1 = { id: 1, type: 'battery', charge: 1.0, voltage: 0.9 }
-    const battery2 = { id: 2, type: 'battery', charge: 1.0, voltage: 0.9 }
-    const battery3 = { id: 3, type: 'battery', charge: 1.0, voltage: 0.9 }
+    const battery1 = ComponentFactory.createBattery(1)
+    const battery2 = ComponentFactory.createBattery(2)
+    const battery3 = ComponentFactory.createBattery(3)
     const led = { id: 4, type: 'led', brightness: 0 }
 
     simulator.setComponents([battery1, battery2, battery3, led])
@@ -83,7 +84,7 @@ describe('Challenge Negative Tests - Ensure challenges cannot be cheesed', () =>
   it('Challenge 4: Should FAIL with only 1 battery (not enough voltage)', () => {
     const simulator = new CircuitSimulator()
 
-    const battery = { id: 1, type: 'battery', charge: 1.0, voltage: 0.9 }
+    const battery = ComponentFactory.createBattery(1)
     const bulb = { id: 2, type: 'lightbulb', brightness: 0 }
 
     simulator.setComponents([battery, bulb])
@@ -131,9 +132,9 @@ describe('Challenge Negative Tests - Ensure challenges cannot be cheesed', () =>
   it('Challenge 7: Should FAIL with only 1 resistor for 2 LEDs', () => {
     const simulator = new CircuitSimulator()
 
-    const battery1 = { id: 1, type: 'battery', charge: 1.0, voltage: 0.9 }
-    const battery2 = { id: 2, type: 'battery', charge: 1.0, voltage: 0.9 }
-    const battery3 = { id: 3, type: 'battery', charge: 1.0, voltage: 0.9 }
+    const battery1 = ComponentFactory.createBattery(1)
+    const battery2 = ComponentFactory.createBattery(2)
+    const battery3 = ComponentFactory.createBattery(3)
     const resistor = { id: 4, type: 'resistor', resistance: 220 }
     const led1 = { id: 5, type: 'led', brightness: 0 }
     const led2 = { id: 6, type: 'led', brightness: 0 }
@@ -159,7 +160,7 @@ describe('Challenge Negative Tests - Ensure challenges cannot be cheesed', () =>
   it('Challenge 7: Should FAIL if only 1 LED is lit', () => {
     const simulator = new CircuitSimulator()
 
-    const battery = { id: 1, type: 'battery', charge: 1.0, voltage: 0.9 }
+    const battery = ComponentFactory.createBattery(1)
     const resistor1 = { id: 2, type: 'resistor', resistance: 220 }
     const led1 = { id: 3, type: 'led', brightness: 0 }
     const resistor2 = { id: 4, type: 'resistor', resistance: 220 }
@@ -186,8 +187,8 @@ describe('Challenge Negative Tests - Ensure challenges cannot be cheesed', () =>
   it('Challenge 8: Should FAIL without capacitor', () => {
     const simulator = new CircuitSimulator()
 
-    const battery1 = { id: 1, type: 'battery', charge: 1.0, voltage: 0.9 }
-    const battery2 = { id: 2, type: 'battery', charge: 1.0, voltage: 0.9 }
+    const battery1 = ComponentFactory.createBattery(1)
+    const battery2 = ComponentFactory.createBattery(2)
     const led = { id: 3, type: 'led', brightness: 0 }
 
     simulator.setComponents([battery1, battery2, led])
@@ -208,7 +209,7 @@ describe('Challenge Negative Tests - Ensure challenges cannot be cheesed', () =>
   it('Challenge 8: Should FAIL if capacitor not sufficiently charged', () => {
     const simulator = new CircuitSimulator()
 
-    const battery = { id: 1, type: 'battery', charge: 1.0, voltage: 0.9 }
+    const battery = ComponentFactory.createBattery(1)
     const capacitor = { id: 2, type: 'capacitor', capacitance: 0.001, voltage: 0 }
     const led = { id: 3, type: 'led', brightness: 0 }
 
@@ -229,63 +230,63 @@ describe('Challenge Negative Tests - Ensure challenges cannot be cheesed', () =>
     expect(result.message).toContain('Charge your capacitor to at least 1.5V')
   })
 
-  // Challenge 9: Flash Photo - should require large capacitor and no battery
-  it('Challenge 9: Should FAIL with small capacitor', () => {
+  // Challenge 9: Capacitor Power - should require capacitor, battery, and LED in parallel
+  it('Challenge 9: Should FAIL without capacitor', () => {
     const simulator = new CircuitSimulator()
 
-    const capacitor = { id: 1, type: 'capacitor', capacitance: 0.001, voltage: 2.5 } // Too small!
-    const bulb = { id: 2, type: 'lightbulb', brightness: 0 }
+    const battery = ComponentFactory.createBattery(1)
+    const led = { id: 2, type: 'led', brightness: 0 }
 
-    simulator.setComponents([capacitor, bulb])
+    simulator.setComponents([battery, led])
     simulator.setWires([{ id: 3, from: 1, to: 2 }])
     simulator.simulate(0.1)
 
-    const result = ChallengeValidators.validateFlashPhoto({
+    const result = ChallengeValidators.validateCapacitorPower({
       components: simulator.components
     })
 
     expect(result.success).toBe(false)
-    expect(result.message).toContain('larger capacitor')
-    expect(result.message).toContain('50mF')
+    expect(result.message).toContain('Add a capacitor')
   })
 
-  it('Challenge 9: Should FAIL if battery is still connected', () => {
+  it('Challenge 9: Should FAIL without battery', () => {
     const simulator = new CircuitSimulator()
 
-    const battery = { id: 1, type: 'battery', charge: 1.0, voltage: 0.9 }
-    const capacitor = { id: 2, type: 'capacitor', capacitance: 0.05, voltage: 2.5 }
-    const bulb = { id: 3, type: 'lightbulb', brightness: 0 }
+    const capacitor = { id: 1, type: 'capacitor', capacitance: 0.1, voltage: 0 }
+    const led = { id: 2, type: 'led', brightness: 0 }
 
-    simulator.setComponents([battery, capacitor, bulb])
+    simulator.setComponents([capacitor, led])
+    simulator.setWires([{ id: 3, from: 1, to: 2 }])
+    simulator.simulate(0.1)
+
+    const result = ChallengeValidators.validateCapacitorPower({
+      components: simulator.components
+    })
+
+    expect(result.success).toBe(false)
+    expect(result.message).toContain('Add a battery')
+  })
+
+  it('Challenge 9: Should FAIL if capacitor not charging (wrong topology)', () => {
+    const simulator = new CircuitSimulator()
+
+    const battery = ComponentFactory.createBattery(1)
+    const capacitor = { id: 2, type: 'capacitor', capacitance: 0.1, voltage: 0 }
+    const led = { id: 3, type: 'led', brightness: 0 }
+
+    // Series topology instead of parallel - capacitor won't charge properly
+    simulator.setComponents([battery, capacitor, led])
     simulator.setWires([
       { id: 4, from: 1, to: 2 },
       { id: 5, from: 2, to: 3 }
     ])
-    simulator.simulate(0.1)
+    simulator.simulate(0.01) // Very short time - won't charge enough
 
-    const result = ChallengeValidators.validateFlashPhoto({
+    const result = ChallengeValidators.validateCapacitorPower({
       components: simulator.components
     })
 
     expect(result.success).toBe(false)
-    expect(result.message).toContain('use ONLY capacitor power')
-  })
-
-  it('Challenge 9: Should FAIL if capacitor not charged enough', () => {
-    const simulator = new CircuitSimulator()
-
-    const capacitor = { id: 1, type: 'capacitor', capacitance: 0.05, voltage: 1.0 } // Too low!
-    const bulb = { id: 2, type: 'lightbulb', brightness: 0 }
-
-    simulator.setComponents([capacitor, bulb])
-    simulator.setWires([{ id: 3, from: 1, to: 2 }])
-    simulator.simulate(0.1)
-
-    const result = ChallengeValidators.validateFlashPhoto({
-      components: simulator.components
-    })
-
-    expect(result.success).toBe(false)
-    expect(result.message).toContain('Charge capacitor to at least 2V')
+    expect(result.message).toContain('Connect capacitor in parallel')
   })
 })

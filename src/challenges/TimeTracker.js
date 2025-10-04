@@ -11,6 +11,7 @@ export class TimeTracker {
     this.elapsedTime = 0
     this.conditionTime = 0
     this.lastUpdateTime = null
+    this.failed = false
   }
 
   start() {
