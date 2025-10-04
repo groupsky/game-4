@@ -335,7 +335,8 @@ export const ChallengeValidators = {
       return { success: false, message: 'Use a resistor to limit current!' }
     }
 
-    const brightLED = leds.find(led => led.brightness >= 0.1)
+    // Adjusted for 100Ω resistor (UI value): 1 battery + 100Ω gives ~0.04 brightness
+    const brightLED = leds.find(led => led.brightness >= 0.03)
     if (!brightLED) {
       return { success: false, message: 'LED should glow with minimal power!' }
     }
@@ -357,7 +358,8 @@ export const ChallengeValidators = {
     }
 
     const led = leds[0]
-    if (led.brightness < 0.6) {
+    // Adjusted for 100Ω resistor (UI value): 3 batteries + 100Ω gives ~0.36 brightness
+    if (led.brightness < 0.3) {
       return { success: false, message: 'LED can be brighter! Add more voltage!' }
     }
 
