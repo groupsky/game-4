@@ -68,7 +68,9 @@ export default function CircuitWorkspace() {
 
       const savedCircuit = challengeSystem.loadCircuit(activeChallenge.id)
       if (savedCircuit) {
-        setComponents(savedCircuit.components || [])
+        // Reset component states before loading
+        const resetComponents = simulator.resetCircuit(savedCircuit.components || [])
+        setComponents(resetComponents)
         setWires(savedCircuit.wires || [])
       } else {
         // Start fresh for new challenge

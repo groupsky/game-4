@@ -57,10 +57,27 @@ export function ChallengePanel({ challengeSystem, circuit, isRunning, onChalleng
   useEffect(() => {
     const interval = setInterval(() => {
       const currentChallenge = challengeSystem.getActiveChallenge()
-      if (currentChallenge?.id !== activeChallenge?.id) {
+
+      // Check if current challenge just became completed (time-based challenges)
+      if (activeChallenge && !activeChallenge.completed && currentChallenge?.completed && currentChallenge.id === activeChallenge.id) {
+        // Challenge just completed - show completion modal
+        setCompletedChallengeTitle(currentChallenge.title)
+        setShowWinEffect(true)
+
+        // Calculate star rating
+        const timeElapsed = challengeSystem.getTimeTracker().getConditionTime()
+        const stars = currentChallenge.stars
+          ? StarRating.calculate(currentChallenge, circuit, timeElapsed)
+          : 3
+
+        setCompletionStars(stars)
+        setShowCompletionModal(true)
+        setActiveChallenge(currentChallenge) // Update to completed state
+      } else if (currentChallenge?.id !== activeChallenge?.id) {
         setActiveChallenge(currentChallenge)
         setValidationResult(null) // Clear validation result on challenge change
       }
+
       forceUpdate({})
     }, 100)
 
