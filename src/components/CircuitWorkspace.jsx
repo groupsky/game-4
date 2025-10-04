@@ -170,6 +170,12 @@ export default function CircuitWorkspace() {
 
       // Update time tracking for active challenge
       challengeSystem.updateTimeTracking({ components: updated, wires })
+
+      // Auto-validate challenge on each tick (for non-manual challenges)
+      const activeChallenge = challengeSystem.getActiveChallenge()
+      if (activeChallenge && !activeChallenge.requiresManualStart && !activeChallenge.requiresTime) {
+        challengeSystem.validate(activeChallenge.id, { components: updated, wires })
+      }
     }, 100)
 
     return () => clearInterval(interval)

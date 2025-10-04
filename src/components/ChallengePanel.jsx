@@ -132,13 +132,20 @@ export function ChallengePanel({ challengeSystem, circuit, isRunning, onChalleng
 
   const handleNextChallenge = () => {
     setShowCompletionModal(false)
-    // Clear lastActiveId so getActiveChallenge returns next incomplete challenge
-    challengeSystem.lastActiveId = null
-    const nextChallenge = challengeSystem.getActiveChallenge()
-    if (nextChallenge) {
+
+    // Find the sequential next challenge (N → N+1)
+    const allChallenges = challengeSystem.getChallenges()
+    const currentIndex = allChallenges.findIndex(c => c.id === activeChallenge?.id)
+
+    if (currentIndex >= 0 && currentIndex < allChallenges.length - 1) {
+      const nextChallenge = allChallenges[currentIndex + 1]
+
+      // Set this as the active challenge
+      challengeSystem.setActiveChallenge(nextChallenge.id)
       setActiveChallenge(nextChallenge)
       setValidationResult(null)
-      // Notify parent to reload circuit
+
+      // Notify parent to reload circuit (will load saved or empty)
       if (onChallengeChange) {
         onChallengeChange()
       }
