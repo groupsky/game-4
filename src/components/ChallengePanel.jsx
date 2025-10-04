@@ -88,10 +88,8 @@ export function ChallengePanel({ challengeSystem, circuit, isRunning, onChalleng
 
       setCompletionStars(stars)
 
-      // Show modal after win effect animation (3.5s)
-      setTimeout(() => {
-        setShowCompletionModal(true)
-      }, 3500)
+      // Show modal immediately
+      setShowCompletionModal(true)
     }
 
     // For manual-start time challenges, start timer on successful validation
