@@ -147,28 +147,61 @@ export class GraphAnalyzer {
   /**
    * Check if capacitor is in series with LED (between battery and LED)
    * vs in parallel (both connected to same battery nodes)
+   *
+   * Series: Capacitor must be traversed to get from battery to LED (no bypass)
+   * Parallel: Battery connects directly to both capacitor and LED (bypass exists)
+   *
+   * Key insight: Check if battery has direct wire TO LED (parallel)
+   * vs only having wires through intermediate components (series)
    */
   isCapacitorInSeriesWithLED(capacitor, led, batteries) {
     if (batteries.length === 0) return false
 
-    // BFS from battery to LED, tracking if capacitor is in the path
+    const battery = batteries[0]
+
+    // Check if there's a direct wire from battery to LED
+    // In parallel circuits, battery connects to both cap and LED directly
+    // In series circuits, battery only connects to one component (the first in chain)
+    const hasDirectWireToLED = this.wires.some(wire =>
+      (wire.from === battery.id && wire.to === led.id)
+    )
+
+    if (hasDirectWireToLED) {
+      // Direct wire from battery to LED means parallel topology
+      return false
+    }
+
+    // No direct wire - check if capacitor is in the path using BFS
+    // Find path from battery to LED that goes through capacitor
     const visited = new Set()
-    const queue = [{ id: batteries[0].id, path: [] }]
-    visited.add(batteries[0].id)
+    const queue = [battery.id]
+    const parent = new Map()
+
+    visited.add(battery.id)
+    parent.set(battery.id, null)
 
     while (queue.length > 0) {
-      const { id, path } = queue.shift()
+      const currentId = queue.shift()
 
-      // If we reached the LED, check if capacitor was in the path
-      if (id === led.id) {
+      if (currentId === led.id) {
+        // Found LED - reconstruct path and check if capacitor is in it
+        const path = []
+        let node = led.id
+        while (parent.get(node) !== null) {
+          path.unshift(node)
+          node = parent.get(node)
+        }
+        path.unshift(battery.id)
+
         return path.includes(capacitor.id)
       }
 
-      const connected = this.getConnectedComponentIds(id)
-      for (const connId of connected) {
-        if (!visited.has(connId)) {
-          visited.add(connId)
-          queue.push({ id: connId, path: [...path, connId] })
+      const neighbors = this.getConnectedComponentIds(currentId)
+      for (const neighborId of neighbors) {
+        if (!visited.has(neighborId)) {
+          visited.add(neighborId)
+          parent.set(neighborId, currentId)
+          queue.push(neighborId)
         }
       }
     }
