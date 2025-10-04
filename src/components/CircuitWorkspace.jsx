@@ -61,6 +61,11 @@ export default function CircuitWorkspace() {
 
     // Load circuit for new challenge
     if (activeChallenge.id !== currentChallengeId) {
+      // Stop simulation when switching challenges
+      if (isRunning) {
+        simulationState.stop()
+      }
+
       const savedCircuit = challengeSystem.loadCircuit(activeChallenge.id)
       if (savedCircuit) {
         setComponents(savedCircuit.components || [])
