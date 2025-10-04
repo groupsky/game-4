@@ -81,7 +81,7 @@ export function ChallengePanel({ challengeSystem, circuit, isRunning }) {
       setShowWinEffect(true)
 
       // Calculate star rating
-      const timeElapsed = challengeSystem.getTimeTracker().getTime()
+      const timeElapsed = challengeSystem.getTimeTracker().getConditionTime()
       const stars = activeChallenge.stars
         ? StarRating.calculate(activeChallenge, circuit, timeElapsed)
         : 1 // Default to 1 star if no star criteria defined
