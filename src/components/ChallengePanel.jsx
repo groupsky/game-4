@@ -7,7 +7,7 @@ import './ChallengePanel.css'
 /**
  * ChallengePanel - Displays active challenge and validation feedback
  */
-export function ChallengePanel({ challengeSystem, circuit, isRunning }) {
+export function ChallengePanel({ challengeSystem, circuit, isRunning, onChallengeChange }) {
   const [activeChallenge, setActiveChallenge] = useState(null)
   const [validationResult, setValidationResult] = useState(null)
   const [showAllChallenges, setShowAllChallenges] = useState(false)
@@ -117,10 +117,16 @@ export function ChallengePanel({ challengeSystem, circuit, isRunning }) {
 
   const handleNextChallenge = () => {
     setShowCompletionModal(false)
+    // Clear lastActiveId so getActiveChallenge returns next incomplete challenge
+    challengeSystem.lastActiveId = null
     const nextChallenge = challengeSystem.getActiveChallenge()
     if (nextChallenge) {
       setActiveChallenge(nextChallenge)
       setValidationResult(null)
+      // Notify parent to reload circuit
+      if (onChallengeChange) {
+        onChallengeChange()
+      }
     }
   }
 

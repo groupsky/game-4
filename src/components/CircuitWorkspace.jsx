@@ -31,6 +31,7 @@ export default function CircuitWorkspace() {
   const [selectionBox, setSelectionBox] = useState(null)
   const [isRunning, setIsRunning] = useState(false)
   const [currentChallengeId, setCurrentChallengeId] = useState(null)
+  const [challengeChangeCounter, setChallengeChangeCounter] = useState(0)
 
   // Listen to simulation state changes
   useEffect(() => {
@@ -71,7 +72,7 @@ export default function CircuitWorkspace() {
       }
       setCurrentChallengeId(activeChallenge.id)
     }
-  }, [challengeSystem.getActiveChallenge()?.id])
+  }, [challengeSystem.getActiveChallenge()?.id, challengeChangeCounter])
 
   // Auto-save circuit when it changes
   useEffect(() => {
@@ -550,6 +551,7 @@ export default function CircuitWorkspace() {
         challengeSystem={challengeSystem}
         circuit={{ components, wires }}
         isRunning={isRunning}
+        onChallengeChange={() => setChallengeChangeCounter(c => c + 1)}
       />
     </div>
   )
