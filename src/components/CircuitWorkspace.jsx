@@ -3,6 +3,8 @@ import { CircuitSimulator } from '../engine/CircuitSimulator'
 import { SimulationState } from '../engine/SimulationState'
 import { ChallengeSystem } from '../challenges/ChallengeSystem'
 import { ChallengePanel } from './ChallengePanel'
+import { Toolbar } from './Toolbar'
+import { InfoPanel } from './InfoPanel'
 import {
   drawBattery,
   drawLED,
@@ -38,12 +40,10 @@ export default function CircuitWorkspace() {
     simulationState.onChange((running) => {
       setIsRunning(running)
 
-      // Reset circuit and timer when simulation stops
       if (!running) {
         setComponents(prevComponents => {
           return simulator.resetCircuit(prevComponents)
         })
-        // Reset time tracker
         challengeSystem.getTimeTracker().reset()
       }
     })
@@ -54,26 +54,21 @@ export default function CircuitWorkspace() {
     const activeChallenge = challengeSystem.getActiveChallenge()
     if (!activeChallenge) return
 
-    // Save current circuit before switching
     if (currentChallengeId && currentChallengeId !== activeChallenge.id) {
       challengeSystem.saveCircuit(currentChallengeId, { components, wires })
     }
 
-    // Load circuit for new challenge
     if (activeChallenge.id !== currentChallengeId) {
-      // Stop simulation when switching challenges
       if (isRunning) {
         simulationState.stop()
       }
 
       const savedCircuit = challengeSystem.loadCircuit(activeChallenge.id)
       if (savedCircuit) {
-        // Reset component states before loading
         const resetComponents = simulator.resetCircuit(savedCircuit.components || [])
         setComponents(resetComponents)
         setWires(savedCircuit.wires || [])
       } else {
-        // Start fresh for new challenge
         setComponents([])
         setWires([])
       }
@@ -237,8 +232,6 @@ export default function CircuitWorkspace() {
 
     ctx.restore()
   }
-
-
   const getComponentAt = (x, y) => {
     for (let i = components.length - 1; i >= 0; i--) {
       const comp = components[i]
@@ -469,81 +462,11 @@ export default function CircuitWorkspace() {
     <div className="circuit-workspace">
       <div className="workspace-header">
         <h1>📔 Circuit Quest - Inventor's Notebook</h1>
-        <div className="toolbar">
-          <button
-            className={`simulation-control-btn ${isRunning ? 'running' : 'stopped'}`}
-            onClick={() => simulationState.toggle()}
-          >
-            {isRunning ? '⏸️ Stop' : '▶️ Start'}
-          </button>
-          <button
-            disabled={isRunning}
-            onClick={() => setComponents([...components, {
-              id: Date.now(),
-              type: 'battery',
-              x: 100 + Math.random() * 100,
-              y: 100 + Math.random() * 100,
-              charge: 1.0,
-              voltage: 0.9  // Single potato battery
-            }])}
-          >
-            Add 🥔 Potato
-          </button>
-          <button
-            disabled={isRunning}
-            onClick={() => setComponents([...components, {
-              id: Date.now(),
-              type: 'led',
-              x: 250 + Math.random() * 100,
-              y: 100 + Math.random() * 100,
-              brightness: 0
-            }])}
-          >
-            Add 💡 LED
-          </button>
-          <button
-            disabled={isRunning}
-            onClick={() => setComponents([...components, {
-              id: Date.now(),
-              type: 'resistor',
-              x: 400 + Math.random() * 100,
-              y: 100 + Math.random() * 100,
-              resistance: 100,
-              current: 0
-            }])}
-          >
-            Add ⚡ Resistor (100Ω)
-          </button>
-          <button
-            disabled={isRunning}
-            onClick={() => setComponents([...components, {
-              id: Date.now(),
-              type: 'capacitor',
-              x: 550 + Math.random() * 100,
-              y: 100 + Math.random() * 100,
-              capacitance: 0.1,  // 100mF capacitor
-              voltage: 0,
-              maxVoltage: 5.0
-            }])}
-          >
-            Add ⚡ Capacitor (100mF)
-          </button>
-          <button
-            disabled={isRunning}
-            onClick={() => setComponents([...components, {
-              id: Date.now(),
-              type: 'lightbulb',
-              x: 700 + Math.random() * 100,
-              y: 100 + Math.random() * 100,
-              brightness: 0,
-              resistance: 0.36,  // Tuned to drain 3 batteries in ~40 seconds
-              current: 0,
-              power: 0
-            }])}
-          >
-            Add 💡 Light Bulb
-          </button>
-        </div>
+        <Toolbar
+          isRunning={isRunning}
+          onToggleSimulation={() => simulationState.toggle()}
+          onAddComponent={(component) => setComponents([...components, component])}
+        />
       </div>
 
       <canvas
@@ -556,17 +479,14 @@ export default function CircuitWorkspace() {
         onContextMenu={handleContextMenu}
       />
 
-      <div className="info-panel">
-        {isRunning ? (
-          <p>🔬 <strong>SIMULATION RUNNING</strong> | Editing disabled | Press Stop to edit circuit</p>
-        ) : (
-          <p>✏️ <strong>EDIT MODE</strong> | Drag to move | Shift+Click to wire | Drag rectangle to multi-select | Ctrl+Click to add to selection</p>
-        )}
-        <p>Components: {components.length} | Wires: {wires.length}</p>
-        {!isRunning && connecting && <p>🔌 Connecting... Click another component to finish wire.</p>}
-        {!isRunning && selectedComponents.length > 0 && <p>🎯 Selected: {selectedComponents.length} components (Press Delete to remove)</p>}
-        {!isRunning && selectedComponent !== null && selectedComponents.length === 0 && <p>🎯 Selected: {components[selectedComponent]?.type} (Press Delete to remove)</p>}
-      </div>
+      <InfoPanel
+        isRunning={isRunning}
+        components={components}
+        wires={wires}
+        connecting={connecting}
+        selectedComponents={selectedComponents}
+        selectedComponent={selectedComponent}
+      />
 
       <ChallengePanel
         challengeSystem={challengeSystem}
