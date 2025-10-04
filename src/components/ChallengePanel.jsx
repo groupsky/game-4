@@ -84,7 +84,7 @@ export function ChallengePanel({ challengeSystem, circuit, isRunning }) {
       const timeElapsed = challengeSystem.getTimeTracker().getConditionTime()
       const stars = activeChallenge.stars
         ? StarRating.calculate(activeChallenge, circuit, timeElapsed)
-        : 1 // Default to 1 star if no star criteria defined
+        : 3 // Default to 3 stars if no star criteria defined
 
       setCompletionStars(stars)
 
