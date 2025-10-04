@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { WinEffect } from './WinEffect'
 import { CompletionModal } from './CompletionModal'
 import { StarRating } from '../challenges/StarRating'
@@ -16,6 +16,7 @@ export function ChallengePanel({ challengeSystem, circuit, isRunning, onChalleng
   const [completedChallengeTitle, setCompletedChallengeTitle] = useState('')
   const [showCompletionModal, setShowCompletionModal] = useState(false)
   const [completionStars, setCompletionStars] = useState(0)
+  const previousCompletedRef = useRef(new Set())
 
   useEffect(() => {
     const challenge = challengeSystem.getActiveChallenge()
@@ -58,9 +59,11 @@ export function ChallengePanel({ challengeSystem, circuit, isRunning, onChalleng
     const interval = setInterval(() => {
       const currentChallenge = challengeSystem.getActiveChallenge()
 
-      // Check if current challenge just became completed (time-based challenges)
-      if (activeChallenge && !activeChallenge.completed && currentChallenge?.completed && currentChallenge.id === activeChallenge.id) {
+      // Check if challenge just became completed (using ref to track previous state)
+      if (currentChallenge && currentChallenge.completed && !previousCompletedRef.current.has(currentChallenge.id)) {
         // Challenge just completed - show completion modal
+        previousCompletedRef.current.add(currentChallenge.id)
+
         setCompletedChallengeTitle(currentChallenge.title)
         setShowWinEffect(true)
 
@@ -94,6 +97,9 @@ export function ChallengePanel({ challengeSystem, circuit, isRunning, onChalleng
 
     // Show win effect and completion modal if challenge completed
     if (result.success) {
+      // Mark as shown in ref
+      previousCompletedRef.current.add(activeChallenge.id)
+
       setCompletedChallengeTitle(activeChallenge.title)
       setShowWinEffect(true)
 
