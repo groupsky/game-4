@@ -60,7 +60,8 @@ export class ChallengeSystem {
         description: 'Light bulbs need more power than LEDs. Use series batteries to power a light bulb.',
         unlocked: false,
         completed: false,
-        validator: (circuit) => ChallengeValidators.validateWarmGlow(circuit)
+        validator: (circuit) => ChallengeValidators.validateWarmGlow(circuit),
+        stars: { optimalComponents: 3 } // 2 batteries + 1 bulb
       },
       // 5. Battery Drain (30s)
       {
@@ -72,7 +73,8 @@ export class ChallengeSystem {
         completed: false,
         requiresTime: true,
         goalTime: 30,
-        validator: (circuit) => ChallengeValidators.validateBatteryBlues(circuit)
+        validator: (circuit) => ChallengeValidators.validateBatteryBlues(circuit),
+        stars: { optimalComponents: 4, optimalTime: 30 } // 3 batteries + 1 bulb, ≤33s
       },
       // 6. Parallel Batteries
       {
@@ -84,7 +86,8 @@ export class ChallengeSystem {
         completed: false,
         requiresTime: true,
         goalTime: 60,
-        validator: (circuit) => ChallengeValidators.validateParallelPower(circuit)
+        validator: (circuit) => ChallengeValidators.validateParallelPower(circuit),
+        stars: { optimalComponents: 5, optimalTime: 60 } // 4 batteries + 1 bulb
       },
       // 7. Parallel LEDs
       {
@@ -94,7 +97,8 @@ export class ChallengeSystem {
         description: 'Light up 2 LEDs at once using parallel connections. Each LED needs its own resistor!',
         unlocked: false,
         completed: false,
-        validator: (circuit) => ChallengeValidators.validateDoubleBright(circuit)
+        validator: (circuit) => ChallengeValidators.validateDoubleBright(circuit),
+        stars: { optimalComponents: 5 } // 1 battery + 2 resistors + 2 LEDs
       },
       // 8. Capacitor Smoothing
       {
@@ -104,7 +108,8 @@ export class ChallengeSystem {
         description: 'Add a capacitor to store energy. Charge it up with batteries and watch it power your LED smoothly!',
         unlocked: false,
         completed: false,
-        validator: (circuit) => ChallengeValidators.validateEnergyBank(circuit)
+        validator: (circuit) => ChallengeValidators.validateEnergyBank(circuit),
+        stars: { optimalComponents: 3 } // 1 battery + 1 capacitor + 1 LED
       },
       // 9. Capacitor Burst
       {
@@ -114,7 +119,8 @@ export class ChallengeSystem {
         description: 'Charge a large capacitor to high voltage. Use its burst of energy to make a light bulb flash bright!',
         unlocked: false,
         completed: false,
-        validator: (circuit) => ChallengeValidators.validateFlashPhoto(circuit)
+        validator: (circuit) => ChallengeValidators.validateFlashPhoto(circuit),
+        stars: { optimalComponents: 4 } // 2+ batteries + 1 capacitor + 1 bulb
       },
       // 10. Parallel Capacitors
       {
@@ -124,7 +130,8 @@ export class ChallengeSystem {
         description: 'Connect 2 capacitors in parallel to double your energy storage! Charge them up and power an LED.',
         unlocked: false,
         completed: false,
-        validator: (circuit) => ChallengeValidators.validateCapNetwork(circuit)
+        validator: (circuit) => ChallengeValidators.validateCapNetwork(circuit),
+        stars: { optimalComponents: 4 } // 1 battery + 2 capacitors + 1 LED
       },
 
       // === INTERMEDIATE: Component Mastery (11-20) ===
