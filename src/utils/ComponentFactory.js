@@ -1,24 +1,26 @@
 /**
- * ComponentFactory - Creates components with same parameters as UI
+ * ComponentFactory - Creates components with EXACT same parameters as UI
  *
- * USAGE GUIDELINES:
+ * CRITICAL: These are the ONLY component values available to players in the UI.
+ * Tests MUST use ComponentFactory to ensure challenges are actually solvable by players.
  *
- * ✅ ALWAYS use factory for:
- *   - Battery (standard 0.9V potato battery)
- *   - Resistor (when using standard 100Ω value)
+ * USAGE RULES:
  *
- * ⚠️  USE WITH CAUTION:
- *   - LED: Factory adds x/y/extra properties that can interfere with physics in complex circuits
- *     → Use minimal { id, type, brightness } for critical physics tests
+ * ✅ ALWAYS use ComponentFactory.createX() for:
+ *   - Battery (0.9V potato battery) - ALWAYS use factory
+ *   - Resistor (100Ω) - ALWAYS use factory, this is the ONLY resistor value in UI
+ *   - Capacitor (100mF) - ALWAYS use factory, this is the ONLY capacitor value in UI
+ *
+ * ⚠️  USE WITH CAUTION (physics simulation issues):
+ *   - LED: Factory adds x/y/extra properties that interfere with physics in complex multi-component circuits
+ *     → Use minimal { id, type: 'led', brightness: 0 } for critical physics tests
  *   - LightBulb: Same issue as LED
- *     → Use minimal { id, type, brightness } for critical physics tests
- *   - Capacitor: Factory creates 100mF, but many tests need custom values (10mF, 50mF)
- *     → Only use factory if you specifically need 100mF
+ *     → Use minimal { id, type: 'lightbulb', brightness: 0 } for critical physics tests
  *
- * ❌ NEVER use factory when you need custom component values:
- *   - Custom resistor values (22Ω, 47Ω, 220Ω, etc.)
- *   - Custom capacitor values (10mF, 50mF, etc.)
- *   - Use inline objects with exact values needed by the test
+ * ❌ NEVER create custom resistor/capacitor values:
+ *   - If a test needs 220Ω resistor → challenge is unsolvable by players
+ *   - If a test needs 10mF capacitor → challenge is unsolvable by players
+ *   - Fix the challenge validator or design, not the test
  */
 
 export class ComponentFactory {
