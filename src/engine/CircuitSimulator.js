@@ -6,19 +6,23 @@ import {
   getCapacitorVisualState,
   getLightBulbVisualState
 } from './VisualState.js'
+import { GraphAnalyzer } from './GraphAnalyzer.js'
 
 export class CircuitSimulator {
   constructor() {
     this.components = []
     this.wires = []
+    this.graph = null
   }
 
   setComponents(components) {
     this.components = components
+    this.graph = new GraphAnalyzer(this.components, this.wires)
   }
 
   setWires(wires) {
     this.wires = wires
+    this.graph = new GraphAnalyzer(this.components, this.wires)
   }
 
   /**
@@ -220,165 +224,27 @@ export class CircuitSimulator {
   }
 
   findConnectedComponents(startComponent) {
-    // BFS to find all components connected to this one
-    const visited = new Set()
-    const queue = [startComponent.id]
-    const connected = []
-
-    visited.add(startComponent.id)
-
-    while (queue.length > 0) {
-      const currentId = queue.shift()
-      const current = this.components.find(c => c.id === currentId)
-
-      if (!current) continue
-
-      connected.push(current)
-
-      // Find all connected components
-      const neighbors = this.getConnectedComponents(currentId)
-      for (const connId of neighbors) {
-        if (!visited.has(connId)) {
-          visited.add(connId)
-          queue.push(connId)
-        }
-      }
-    }
-
-    return connected
+    return this.graph.findConnectedComponents(startComponent)
   }
 
   findConnectedBatteries(led) {
-    // BFS to find all batteries connected to this LED
-    const visited = new Set()
-    const queue = [led.id]
-    const batteries = []
-
-    visited.add(led.id)
-
-    while (queue.length > 0) {
-      const currentId = queue.shift()
-      const current = this.components.find(c => c.id === currentId)
-
-      if (!current) continue
-
-      // If it's a battery, add it to the list
-      if (current.type === 'battery') {
-        batteries.push(current)
-      }
-
-      // Find all connected components
-      const connected = this.getConnectedComponents(currentId)
-      for (const connId of connected) {
-        if (!visited.has(connId)) {
-          visited.add(connId)
-          queue.push(connId)
-        }
-      }
-    }
-
-    return batteries
+    return this.graph.findConnectedBatteries(led)
   }
 
   findResistorsInPath(led, batteries) {
-    // Find resistors that are in the direct path between LED and batteries
-    // This handles parallel branches correctly
-    if (batteries.length === 0) return []
-
-    const resistors = []
-    const visited = new Set()
-
-    // BFS from LED towards batteries, stopping when we hit them
-    const queue = [led.id]
-    visited.add(led.id)
-
-    while (queue.length > 0) {
-      const currentId = queue.shift()
-      const current = this.components.find(c => c.id === currentId)
-
-      if (!current) continue
-
-      // If we hit a battery, we've found a complete path
-      if (current.type === 'battery') {
-        continue // Don't traverse beyond batteries
-      }
-
-      // If it's a resistor, add it to the path
-      if (current.type === 'resistor') {
-        resistors.push(current)
-      }
-
-      // Continue traversing
-      const connected = this.getConnectedComponents(currentId)
-      for (const connId of connected) {
-        if (!visited.has(connId)) {
-          visited.add(connId)
-          queue.push(connId)
-        }
-      }
-    }
-
-    return resistors
+    return this.graph.findResistorsInPath(led, batteries)
   }
 
   isCapacitorInSeriesWithLED(capacitor, led, batteries) {
-    // Determine if capacitor is in series (between battery and LED)
-    // or in parallel (both connected to same battery nodes)
-
-    if (batteries.length === 0) return false
-
-    // Check if capacitor is between battery and LED using BFS
-    // Series: Battery -> ... -> Capacitor -> ... -> LED
-    // Parallel: Battery -> LED AND Battery -> Capacitor (separate paths)
-
-    // Find path from battery to LED that goes through capacitor
-    const visited = new Set()
-    const queue = [{ id: batteries[0].id, path: [] }]
-    visited.add(batteries[0].id)
-
-    while (queue.length > 0) {
-      const { id, path } = queue.shift()
-
-      // If we reached the LED, check if capacitor was in the path
-      if (id === led.id) {
-        return path.includes(capacitor.id)
-      }
-
-      const connected = this.getConnectedComponents(id)
-      for (const connId of connected) {
-        if (!visited.has(connId)) {
-          visited.add(connId)
-          queue.push({ id: connId, path: [...path, id] })
-        }
-      }
-    }
-
-    return false
+    return this.graph.isCapacitorInSeriesWithLED(capacitor, led, batteries)
   }
 
   getConnectedComponents(compId) {
-    const connected = []
-    for (const wire of this.wires) {
-      if (wire.from === compId) {
-        connected.push(wire.to)
-      } else if (wire.to === compId) {
-        connected.push(wire.from)
-      }
-    }
-    return connected
+    return this.graph.getConnectedComponentIds(compId)
   }
 
   isConnected(comp1, comp2) {
-    // Check if two components are connected via wires
-    for (const wire of this.wires) {
-      if (
-        (wire.from === comp1.id && wire.to === comp2.id) ||
-        (wire.from === comp2.id && wire.to === comp1.id)
-      ) {
-        return true
-      }
-    }
-    return false
+    return this.graph.isConnected(comp1, comp2)
   }
 
   simulateCircuit(circuit) {
