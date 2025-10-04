@@ -319,29 +319,33 @@ export function getChallengeDefinitions() {
       id: 'sustained-flash',
       act: 1,
       title: '27. Sustained Flash',
-      description: 'Use batteries and capacitors together to power a light bulb with sustained, steady power.',
+      description: 'Use batteries and capacitors together to power a bulb for 45 seconds!',
       unlocked: false,
       completed: false,
+      requiresTime: true,
+      goalTime: 45,
       validator: (circuit) => ChallengeValidators.validateSustainedFlash(circuit),
-      stars: { optimalComponents: 6 }
+      stars: { optimalComponents: 6, optimalTime: 45 }
     },
     // 28. Efficiency Master
     {
       id: 'efficiency-master',
       act: 1,
       title: '28. Efficiency Master',
-      description: 'The ultimate efficiency test! Power 3 LEDs using ONLY 3 batteries. Perfect balance required!',
+      description: 'Light 3 LEDs for 60 seconds using only 3 batteries. No waste!',
       unlocked: false,
       completed: false,
+      requiresTime: true,
+      goalTime: 60,
       validator: (circuit) => ChallengeValidators.validateEfficiencyMaster(circuit),
-      stars: { optimalComponents: 6 }
+      stars: { optimalComponents: 6, optimalTime: 60 }
     },
     // 29. Grand Circuit (60s timed challenge)
     {
       id: 'grand-circuit',
       act: 1,
-      title: '29. Grand Circuit',
-      description: 'The grand finale! Build a circuit using LEDs, light bulbs, resistors, AND capacitors. You have 60 seconds!',
+      title: '29. The Grand Circuit',
+      description: 'Build the ultimate circuit: series batteries for voltage, parallel banks for capacity, power both LED and bulb, use resistors for control, add a capacitor for smoothing. Keep it running for 60 seconds!',
       unlocked: false,
       completed: false,
       requiresTime: true,
@@ -354,11 +358,13 @@ export function getChallengeDefinitions() {
       id: 'master-inventor',
       act: 1,
       title: '30. Master Inventor',
-      description: 'You are now a Master Inventor! Light up 5 or more LEDs and bulbs in a creative circuit that shows everything you\'ve learned!',
+      description: 'The final test: Build ANY circuit that lights 5+ components and runs for 90 seconds. Show your mastery!',
       unlocked: false,
       completed: false,
+      requiresTime: true,
+      goalTime: 90,
       validator: (circuit) => ChallengeValidators.validateMasterInventor(circuit),
-      stars: { optimalComponents: 15 }
+      stars: { optimalComponents: 15, optimalTime: 90 }
     }
   ]
 }
