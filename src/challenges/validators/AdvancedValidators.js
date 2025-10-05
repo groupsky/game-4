@@ -128,7 +128,7 @@ export const AdvancedValidators = {
       return { success: false, message: 'Charge the series capacitors!' }
     }
 
-    return { success: true, message: '🔗 Series caps: voltage splits, capacity decreases!' }
+    return { success: true, message: '🔗 Series caps: voltage splits between them!' }
   },
 
   // 24. Mixed Load

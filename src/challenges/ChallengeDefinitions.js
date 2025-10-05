@@ -273,7 +273,7 @@ export function getChallengeDefinitions() {
       id: 'series-capacitors',
       act: 1,
       title: '23. Series Capacitors',
-      description: 'Connect capacitors in series. Notice how the total capacitance decreases but voltage rating increases!',
+      description: 'Connect 2 capacitors in series with a battery. The voltage splits between them - each capacitor gets less voltage than in parallel!',
       unlocked: false,
       completed: false,
       validator: (circuit) => ChallengeValidators.validateSeriesCaps(circuit),
