@@ -899,7 +899,7 @@ describe('BasicValidators', () => {
       const result = BasicValidators.validateVoltageDivide(circuit)
 
       expect(result.success).toBe(true)
-      expect(result.message).toContain('Voltage divider works')
+      expect(result.message).toContain('Resistor chain complete')
     })
 
     it('should succeed at exactly 0.05 brightness threshold', () => {

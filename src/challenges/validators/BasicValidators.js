@@ -256,25 +256,25 @@ export const BasicValidators = {
     return { success: true, message: '✨ LED array complete! Beautiful matrix!' }
   },
 
-  // 14. Voltage Divider
+  // 14. Resistor Chain
   validateVoltageDivide(circuit) {
     const resistors = circuit.components.filter(c => c.type === 'resistor')
     const leds = circuit.components.filter(c => c.type === 'led')
 
     if (resistors.length < 2) {
-      return { success: false, message: 'Need 2 resistors in series for voltage division!' }
+      return { success: false, message: 'Need 2 resistors in your circuit!' }
     }
 
     if (leds.length === 0) {
-      return { success: false, message: 'Add an LED to power from the divided voltage!' }
+      return { success: false, message: 'Add an LED!' }
     }
 
     const brightLED = leds.find(led => led.brightness >= 0.05)
     if (!brightLED) {
-      return { success: false, message: 'LED should glow from the divided voltage!' }
+      return { success: false, message: 'LED should glow! Check your connections.' }
     }
 
-    return { success: true, message: '⚡ Voltage divider works! V_out = V_in * R2/(R1+R2)' }
+    return { success: true, message: '⚡ Resistor chain complete! Total R = R1 + R2 + ...' }
   },
 
   // 15. Endurance - 2 LEDs for 90s

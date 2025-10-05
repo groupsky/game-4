@@ -161,12 +161,12 @@ export function getChallengeDefinitions() {
       validator: (circuit) => ChallengeValidators.validateLEDArray(circuit),
       stars: { optimalComponents: 12 } // 3 batteries + 9 LEDs
     },
-    // 14. Voltage Divider
+    // 14. Resistor Chain
     {
       id: 'voltage-divider',
       act: 1,
-      title: '14. Voltage Divider',
-      description: 'Build a voltage divider: 2 resistors in series, then tap the voltage by connecting an LED in parallel with the second resistor. The LED sees only part of the total voltage!',
+      title: '14. Resistor Chain',
+      description: 'Connect 2 resistors in series with batteries and an LED. More resistance = less current. See how multiple resistors work together!',
       unlocked: false,
       completed: false,
       validator: (circuit) => ChallengeValidators.validateVoltageDivide(circuit),
