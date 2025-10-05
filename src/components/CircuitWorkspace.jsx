@@ -201,6 +201,8 @@ export default function CircuitWorkspace() {
           setWires(prev => prev.filter(w => !compIds.includes(w.from) && !compIds.includes(w.to)))
           setSelectedComponents([])
           setSelectedComponent(null)
+          setDragging(null)
+          setConnecting(null)
         } else if (selectedComponent !== null) {
           // Delete single component
           setComponents(prev => prev.filter((_, i) => i !== selectedComponent))
@@ -209,6 +211,8 @@ export default function CircuitWorkspace() {
             setWires(prev => prev.filter(w => w.from !== compId && w.to !== compId))
           }
           setSelectedComponent(null)
+          setDragging(null)
+          setConnecting(null)
         }
       }
     }

@@ -330,7 +330,7 @@ export function getChallengeDefinitions() {
       id: 'efficiency-master',
       act: 1,
       title: '28. Efficiency Master',
-      description: 'Light 3 LEDs for 60 seconds using only 3 batteries. No waste!',
+      description: 'Keep 3 LEDs lit for 60 seconds using EXACTLY 3 batteries. Design the most efficient circuit topology!',
       unlocked: false,
       completed: false,
       requiresTime: true,
