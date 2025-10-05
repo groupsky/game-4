@@ -63,16 +63,19 @@ export default function CircuitWorkspace() {
         simulationState.stop()
       }
 
+      // Clear circuit FIRST to prevent auto-save race condition
+      setComponents([])
+      setWires([])
+
+      // Then update challenge ID and load saved circuit
+      setCurrentChallengeId(activeChallenge.id)
+
       const savedCircuit = challengeSystem.loadCircuit(activeChallenge.id)
       if (savedCircuit) {
         const resetComponents = simulator.resetCircuit(savedCircuit.components || [])
         setComponents(resetComponents)
         setWires(savedCircuit.wires || [])
-      } else {
-        setComponents([])
-        setWires([])
       }
-      setCurrentChallengeId(activeChallenge.id)
     }
   }, [challengeSystem.getActiveChallenge()?.id, challengeChangeCounter])
 
