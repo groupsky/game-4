@@ -500,8 +500,8 @@ Recent commits:
 ## Test Coverage Update (2025-10-05)
 
 ### 📊 Test Statistics
-- **Total Tests**: 455 (was 223, +104% increase)
-- **Total Test Files**: 34
+- **Total Tests**: 490 (was 223, +120% increase)
+- **Total Test Files**: 35
 - **All Tests Passing**: ✅ 100%
 
 ### 🧪 Comprehensive Test Coverage Achieved
@@ -559,13 +559,20 @@ Recent commits:
    - Bulb: 0.36Ω (battery drain tuning)
    - Ensures challenges are solvable
 
-#### UI/Rendering Layer (1 test file, 28 tests)
+#### UI/Rendering Layer (2 test files, 63 tests)
 1. **ComponentRendering.test.js** (28 tests)
    - drawGraphPaper: Grid background rendering
    - drawWire: Wire connection drawing
    - Canvas context mocking
    - Component position lookup
    - Edge cases: missing components, negative coords
+
+2. **BatteryRenderer.test.js** (35 tests)
+   - Potato shape ellipse rendering
+   - Charge indicator with gradient colors
+   - Empty state handling (<1% charge)
+   - Charge percentage and voltage display
+   - Boundary conditions and default values
 
 #### Challenges (11 test files, 195 tests) *(existing)*
 - Challenge validation
@@ -588,10 +595,11 @@ Recent commits:
 - ✅ CapacitorSimulation (RC circuits)
 - ✅ VisualState (component states)
 - ✅ CircuitSolver (LED/bulb physics)
-- ✅ ComponentRendering (UI utilities)
 - ✅ CircuitSimulator (orchestration)
 - ✅ ComponentFactory (component creation)
 - ✅ SimulationState (state management)
+- ✅ ComponentRendering (UI utilities)
+- ✅ BatteryRenderer (canvas rendering)
 
 **Optional untested (per CLAUDE.md):**
 - UI Layer: Renderer components (optional for engine tests)
