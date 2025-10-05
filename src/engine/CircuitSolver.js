@@ -255,14 +255,31 @@ export function simulateLightBulb(circuit, context) {
   bulb.power = power
 
   // Drain batteries (bulbs draw more current than LEDs)
-  // For parallel chains: current is divided, so each battery drains slower
+  // For parallel chains: current is divided among chains
   // For series chains: all batteries in chain drain at same rate
   const totalSources = batteries.length + capacitors.length
 
-  if (batteries.length > 0) {
-    // Divide current by number of parallel chains
+  if (batteries.length > 0 && batteryTopology && batteryTopology.seriesChains) {
+    // Use topology analysis to drain batteries correctly per chain
+    const { seriesChains } = batteryTopology
+
+    // Each parallel chain carries its share of the total current
     const currentPerChain = current / parallelCount
-    const drainRate = currentPerChain * 0.001 / totalSources
+
+    seriesChains.forEach(chain => {
+      // All batteries in a series chain carry the same current
+      // Each battery in the chain drains based on the chain's current
+      // Factor of 0.001 converts from current to charge drain rate per timestep
+      const drainRate = currentPerChain * 0.001
+
+      chain.forEach(battery => {
+        battery.charge = Math.max(0, battery.charge - drainRate)
+      })
+    })
+  } else if (batteries.length > 0) {
+    // Fallback for circuits without topology analysis
+    // Assume all batteries in series (old behavior for compatibility)
+    const drainRate = current * 0.001 / totalSources
 
     batteries.forEach(battery => {
       battery.charge = Math.max(0, battery.charge - drainRate)
