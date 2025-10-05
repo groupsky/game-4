@@ -8,7 +8,7 @@ import './ChallengePanel.css'
 /**
  * ChallengePanel - Displays active challenge and validation feedback
  */
-export function ChallengePanel({ challengeSystem, circuit, isRunning, onChallengeChange }) {
+export function ChallengePanel({ challengeSystem, circuit, isRunning, onChallengeChange, onStopSimulation }) {
   const [activeChallenge, setActiveChallenge] = useState(null)
   const [validationResult, setValidationResult] = useState(null)
   const [showAllChallenges, setShowAllChallenges] = useState(false)
@@ -185,8 +185,10 @@ export function ChallengePanel({ challengeSystem, circuit, isRunning, onChalleng
 
   const handleRetryChallenge = () => {
     setShowCompletionModal(false)
-    // Clear the current circuit to start fresh
-    // This will be handled by parent component
+    // Stop the simulation to allow circuit modifications
+    if (onStopSimulation) {
+      onStopSimulation()
+    }
   }
 
   const handleCloseModal = () => {

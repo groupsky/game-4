@@ -496,6 +496,7 @@ export default function CircuitWorkspace() {
         circuit={{ components, wires }}
         isRunning={isRunning}
         onChallengeChange={() => setChallengeChangeCounter(c => c + 1)}
+        onStopSimulation={() => simulationState.stop()}
       />
     </div>
   )
