@@ -1,0 +1,191 @@
+import { describe, it, expect } from 'vitest'
+import { StarRating } from '../StarRating'
+import { getChallengeDefinitions } from '../ChallengeDefinitions'
+import { CircuitSimulator } from '../../engine/CircuitSimulator'
+import { ComponentFactory } from '../../utils/ComponentFactory'
+import { ChallengeValidators } from '../ChallengeValidators'
+
+/**
+ * Star Rating Validation Tests
+ *
+ * Verifies that optimal solutions for each challenge achieve 3 stars:
+ * - Solution uses ≤ optimalComponents
+ * - Solution passes validator
+ * - StarRating.calculate returns 3 stars
+ *
+ * This ensures optimalComponents values are realistic and achievable.
+ */
+describe('Star Rating Validation - All Challenges', () => {
+  // Helper to create optimal circuits for each challenge
+  const createOptimalCircuit = (challengeId) => {
+    const simulator = new CircuitSimulator()
+
+    switch (challengeId) {
+      case 'first-light': // Challenge 1: 2 components (1 battery + 1 LED)
+        {
+          const battery = ComponentFactory.createBattery(1)
+          const led = ComponentFactory.createLED(2)
+          simulator.setComponents([battery, led])
+          simulator.setWires([{ id: 3, from: 1, to: 2 }])
+        }
+        break
+
+      case 'power-up': // Challenge 2: 3 components (2 batteries + 1 LED)
+        {
+          const b1 = ComponentFactory.createBattery(1)
+          const b2 = ComponentFactory.createBattery(2)
+          const led = ComponentFactory.createLED(3)
+          simulator.setComponents([b1, b2, led])
+          simulator.setWires([
+            { id: 4, from: 1, to: 2 },
+            { id: 5, from: 2, to: 3 }
+          ])
+        }
+        break
+
+      case 'current-control': // Challenge 3: 4 components (2 batteries + 1 resistor + 1 LED)
+        {
+          const b1 = ComponentFactory.createBattery(1)
+          const b2 = ComponentFactory.createBattery(2)
+          const resistor = ComponentFactory.createResistor(3)
+          const led = ComponentFactory.createLED(4)
+          simulator.setComponents([b1, b2, resistor, led])
+          simulator.setWires([
+            { id: 5, from: 1, to: 2 },
+            { id: 6, from: 2, to: 3 },
+            { id: 7, from: 3, to: 4 }
+          ])
+        }
+        break
+
+      case 'warm-glow': // Challenge 4: 4 components (3 batteries + 1 bulb)
+        {
+          const batteries = Array.from({ length: 3 }, (_, i) =>
+            ComponentFactory.createBattery(i + 1)
+          )
+          const bulb = ComponentFactory.createLightBulb(4)
+          simulator.setComponents([...batteries, bulb])
+          const wires = batteries.slice(0, -1).map((b, i) => ({
+            id: 10 + i,
+            from: b.id,
+            to: batteries[i + 1].id
+          }))
+          wires.push({ id: 20, from: batteries[batteries.length - 1].id, to: bulb.id })
+          simulator.setWires(wires)
+        }
+        break
+
+      case 'double-bright': // Challenge 7: 5 components (1 battery + 2 LEDs + 2 resistors)
+        {
+          const battery = ComponentFactory.createBattery(1)
+          const r1 = ComponentFactory.createResistor(2)
+          const r2 = ComponentFactory.createResistor(3)
+          const led1 = ComponentFactory.createLED(4)
+          const led2 = ComponentFactory.createLED(5)
+          simulator.setComponents([battery, r1, r2, led1, led2])
+          simulator.setWires([
+            { id: 10, from: 1, to: 2 },
+            { id: 11, from: 2, to: 4 },
+            { id: 12, from: 1, to: 3 },
+            { id: 13, from: 3, to: 5 }
+          ])
+        }
+        break
+
+      case 'energy-bank': // Challenge 8: 4 components (2 batteries + 1 capacitor + 1 LED)
+        {
+          const b1 = ComponentFactory.createBattery(1)
+          const b2 = ComponentFactory.createBattery(2)
+          const capacitor = ComponentFactory.createCapacitor(3)
+          const led = ComponentFactory.createLED(4)
+          simulator.setComponents([b1, b2, capacitor, led])
+          simulator.setWires([
+            { id: 10, from: 1, to: 2 },
+            { id: 11, from: 2, to: 3 },
+            { id: 12, from: 3, to: 4 },
+            { id: 13, from: 2, to: 4 }
+          ])
+        }
+        break
+
+      default:
+        return null
+    }
+
+    simulator.simulate(0.1)
+    return simulator
+  }
+
+  // Test a subset of challenges to verify star rating system
+  // These challenges have verified optimal circuits that achieve 3 stars
+  const testCases = [
+    { id: 'first-light', name: 'Challenge 1: First Light', optimal: 2 },
+    { id: 'power-up', name: 'Challenge 2: Power Up', optimal: 3 },
+    { id: 'current-control', name: 'Challenge 3: Current Control', optimal: 4 },
+    { id: 'warm-glow', name: 'Challenge 4: The Warm Glow', optimal: 4 }
+    // TODO: Add optimal circuits for remaining challenges (7, 8, etc.)
+  ]
+
+  testCases.forEach(({ id, name, optimal }) => {
+    it(`${name} - optimal solution achieves 3 stars`, () => {
+      const challenges = getChallengeDefinitions()
+      const challenge = challenges.flat().find(c => c.id === id)
+      expect(challenge, `Challenge ${id} not found`).toBeDefined()
+
+      const circuit = createOptimalCircuit(id)
+      if (!circuit) {
+        console.warn(`No optimal circuit defined for ${id} - skipping`)
+        return
+      }
+
+      // Verify solution is actually optimal
+      expect(circuit.components.length).toBeLessThanOrEqual(optimal)
+
+      // Verify solution passes validator
+      const result = challenge.validator({ components: circuit.components, wires: circuit.wires })
+      expect(result.success, `${name} validator should pass with optimal circuit`).toBe(true)
+
+      // Verify 3-star rating
+      const stars = StarRating.calculate(challenge, { components: circuit.components })
+      expect(stars, `${name} should achieve 3 stars with ${circuit.components.length} components`).toBe(3)
+
+      console.log(`✓ ${name}: ${circuit.components.length} components → 3 stars`)
+    })
+  })
+
+  it('should give 2 stars for near-optimal solutions', () => {
+    const challenges = getChallengeDefinitions()
+    const challenge = challenges.flat().find(c => c.id === 'first-light')
+
+    // Optimal is 2, so 3-4 components should give 2 stars
+    const stars = StarRating.calculate(challenge, { components: [1, 2, 3, 4] })
+    expect(stars).toBe(2)
+  })
+
+  it('should give 1 star for inefficient solutions', () => {
+    const challenges = getChallengeDefinitions()
+    const challenge = challenges.flat().find(c => c.id === 'first-light')
+
+    // Optimal is 2, so 5+ components should give 1 star
+    const stars = StarRating.calculate(challenge, { components: [1, 2, 3, 4, 5] })
+    expect(stars).toBe(1)
+  })
+
+  it('should require both optimal components AND time for 3 stars on timed challenges', () => {
+    const challenge = {
+      stars: { optimalComponents: 5, optimalTime: 60 }
+    }
+
+    // Optimal components but too slow
+    let stars = StarRating.calculate(challenge, { components: [1, 2, 3, 4, 5] }, 70)
+    expect(stars).toBe(2) // Can't get 3 stars if time exceeded
+
+    // Optimal components and time
+    stars = StarRating.calculate(challenge, { components: [1, 2, 3, 4, 5] }, 55)
+    expect(stars).toBe(3)
+
+    // Optimal time but too many components
+    stars = StarRating.calculate(challenge, { components: [1, 2, 3, 4, 5, 6, 7, 8] }, 55)
+    expect(stars).toBe(1)
+  })
+})
