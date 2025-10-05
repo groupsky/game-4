@@ -316,7 +316,7 @@ export const BasicValidators = {
       return { success: false, message: 'Charge the capacitor first!' }
     }
 
-    return { success: true, message: '⏱️ RC time constant = R × C. Watch it fade!' }
+    return { success: true, message: '⏱️ RC time constant = R × C. Charging complete!' }
   },
 
   // 17. Efficiency - 1 battery only

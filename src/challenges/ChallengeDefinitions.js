@@ -192,7 +192,7 @@ export function getChallengeDefinitions() {
       id: 'rc-timing',
       act: 1,
       title: '16. RC Timing',
-      description: 'Create an RC circuit! Use a resistor and capacitor together to control timing. The LED will fade as the capacitor discharges.',
+      description: 'Create an RC circuit! Connect a battery, resistor, and capacitor with an LED. Learn how resistance and capacitance work together - the RC time constant determines charging speed!',
       unlocked: false,
       completed: false,
       validator: (circuit) => ChallengeValidators.validateRCTiming(circuit),
