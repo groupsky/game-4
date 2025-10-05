@@ -166,7 +166,7 @@ export function getChallengeDefinitions() {
       id: 'voltage-divider',
       act: 1,
       title: '14. Voltage Divider',
-      description: 'Use 2 resistors to reduce voltage for an LED. Connect resistors in series - the LED gets a fraction of the total voltage!',
+      description: 'Build a voltage divider: 2 resistors in series, then tap the voltage by connecting an LED in parallel with the second resistor. The LED sees only part of the total voltage!',
       unlocked: false,
       completed: false,
       validator: (circuit) => ChallengeValidators.validateVoltageDivide(circuit),
