@@ -166,6 +166,64 @@ describe('Star Rating Validation - All Challenges', () => {
         }
         break
 
+      case 'energy-storage-mastery': // Challenge 11: 4 components (same as Challenge 8)
+        {
+          const b1 = ComponentFactory.createBattery(1)
+          const b2 = ComponentFactory.createBattery(2)
+          const capacitor = ComponentFactory.createCapacitor(3)
+          const led = ComponentFactory.createLED(4)
+          simulator.setComponents([b1, b2, capacitor, led])
+          simulator.setWires([
+            { id: 5, from: 1, to: 2 },   // b1 -> b2 (series)
+            { id: 6, from: 2, to: 3 },   // b2 -> capacitor
+            { id: 7, from: 2, to: 4 }    // b2 -> LED (parallel)
+          ])
+        }
+        break
+
+      case 'led-array': // Challenge 13: 12 components (3 batteries + 9 LEDs)
+        {
+          const batteries = Array.from({ length: 3 }, (_, i) =>
+            ComponentFactory.createBattery(i + 1)
+          )
+          const leds = Array.from({ length: 9 }, (_, i) =>
+            ComponentFactory.createLED(i + 4)
+          )
+          simulator.setComponents([...batteries, ...leds])
+          // Wire batteries in series
+          const wires = []
+          for (let i = 0; i < batteries.length - 1; i++) {
+            wires.push({ id: 20 + i, from: batteries[i].id, to: batteries[i + 1].id })
+          }
+          // Wire all 9 LEDs in parallel from last battery
+          leds.forEach((led, i) => {
+            wires.push({ id: 30 + i, from: batteries[batteries.length - 1].id, to: led.id })
+          })
+          simulator.setWires(wires)
+        }
+        break
+
+      case 'voltage-divider': // Challenge 14: 5 components (3 batteries + 2 resistors + 1 LED)
+        {
+          const batteries = Array.from({ length: 3 }, (_, i) =>
+            ComponentFactory.createBattery(i + 1)
+          )
+          const r1 = ComponentFactory.createResistor(4)
+          const r2 = ComponentFactory.createResistor(5)
+          const led = ComponentFactory.createLED(6)
+          simulator.setComponents([...batteries, r1, r2, led])
+          // Series: b1 -> b2 -> b3 -> r1 -> r2 -> LED
+          const wires = []
+          for (let i = 0; i < batteries.length - 1; i++) {
+            wires.push({ id: 10 + i, from: batteries[i].id, to: batteries[i + 1].id })
+          }
+          wires.push({ id: 20, from: batteries[batteries.length - 1].id, to: r1.id })
+          wires.push({ id: 21, from: r1.id, to: r2.id })
+          wires.push({ id: 22, from: r2.id, to: led.id })
+          simulator.setWires(wires)
+        }
+        break
+
       case 'power-efficiency': // Challenge 17: 3 components (1 battery + 1 resistor + 1 LED)
         {
           const battery = ComponentFactory.createBattery(1)
@@ -184,7 +242,7 @@ describe('Star Rating Validation - All Challenges', () => {
     }
 
     // Most circuits need one step to stabilize, but capacitors need longer to charge
-    const capacitorChallenges = ['energy-bank', 'capacitor-power', 'capacitor-bank']
+    const capacitorChallenges = ['energy-bank', 'capacitor-power', 'capacitor-bank', 'energy-storage-mastery']
     if (capacitorChallenges.includes(challengeId)) {
       // Capacitors need time to charge to required voltage
       for (let i = 0; i < 20; i++) {
@@ -208,9 +266,12 @@ describe('Star Rating Validation - All Challenges', () => {
     { id: 'energy-bank', name: 'Challenge 8: Energy Bank', optimal: 4 },
     { id: 'capacitor-power', name: 'Challenge 9: Capacitor Power', optimal: 3 },
     { id: 'capacitor-bank', name: 'Challenge 10: Capacitor Bank', optimal: 5 },
+    { id: 'energy-storage-mastery', name: 'Challenge 11: Energy Storage Mastery', optimal: 4 },
     { id: 'triple-chain', name: 'Challenge 12: Triple Chain', optimal: 6 },
+    { id: 'led-array', name: 'Challenge 13: LED Array', optimal: 12 },
+    { id: 'voltage-divider', name: 'Challenge 14: Voltage Divider', optimal: 6 },
     { id: 'power-efficiency', name: 'Challenge 17: Power Efficiency', optimal: 3 }
-    // TODO: Add optimal circuits for remaining challenges (11, 13-16, 18-30)
+    // TODO: Add optimal circuits for remaining challenges (16, 18-30)
   ]
 
   testCases.forEach(({ id, name, optimal }) => {

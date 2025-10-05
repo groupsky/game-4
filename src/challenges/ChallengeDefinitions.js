@@ -170,7 +170,7 @@ export function getChallengeDefinitions() {
       unlocked: false,
       completed: false,
       validator: (circuit) => ChallengeValidators.validateVoltageDivide(circuit),
-      stars: { optimalComponents: 5 }
+      stars: { optimalComponents: 6 }
     },
 
     // === BATTERIES: Longevity and Efficiency (15, 17, 19-20, 28-29) ===
