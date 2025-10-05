@@ -500,8 +500,8 @@ Recent commits:
 ## Test Coverage Update (2025-10-05)
 
 ### 📊 Test Statistics
-- **Total Tests**: 691 (was 223, +210% increase)
-- **Total Test Files**: 39
+- **Total Tests**: 926 (was 223, +315% increase)
+- **Total Test Files**: 44
 - **All Tests Passing**: ✅ 100%
 
 ### 🧪 Comprehensive Test Coverage Achieved
@@ -606,12 +606,45 @@ Recent commits:
    - Light rays for bright bulbs
    - Status text and power display
 
-#### Challenges (11 test files, 195 tests) *(existing)*
-- Challenge validation
-- Star rating system
-- Time tracking
-- Progression system
-- Circuit persistence
+#### Challenges (14 test files, 326 tests)
+1. **BasicValidators.test.js** (80 tests)
+   - All 15 basic challenge validators (challenges 1-17)
+   - Component requirement validation
+   - Brightness/voltage threshold checks
+   - Timed challenge tracking flags
+   - Boundary condition testing
+
+2. **AdvancedValidators.test.js** (76 tests)
+   - All 13 advanced challenge validators (challenges 18-30)
+   - Complex multi-component circuits
+   - Battery banks and capacitor networks
+   - Efficiency and endurance challenges
+   - Grand circuit validation
+
+3. **ChallengeValidators.test.js** (35 tests)
+   - Re-export aggregation validation
+   - All 28 validators properly exported
+   - Functional smoke tests
+
+4. **Existing challenge tests** (135 tests)
+   - Challenge validation, star rating
+   - Time tracking, progression system
+   - Circuit persistence
+
+#### React Components (2 test files, 44 tests)
+1. **InfoPanel.test.jsx** (23 tests)
+   - Mode display (simulation vs edit)
+   - Component/wire count display
+   - Connecting state messaging
+   - Selection state feedback
+   - State priority handling
+
+2. **Toolbar.test.jsx** (21 tests)
+   - Simulation control (start/stop)
+   - Component addition functions
+   - Button state management
+   - Position randomization
+   - Data structure validation
 
 ### ✅ Test Quality Standards Met
 - All tests < 1ms execution time
@@ -637,12 +670,13 @@ Recent commits:
 - ✅ Engine Layer: All core modules (100% coverage)
 - ✅ Utilities: ComponentFactory (100% coverage)
 - ✅ UI/Rendering Layer: All 5 component renderers + utilities (100% coverage)
-- ✅ Challenges: Validation, progression, time tracking (100% coverage)
+- ✅ Challenges: All 28 validators + validation system (100% coverage)
+- ✅ React Components: InfoPanel, Toolbar (core UI components)
 
 **Optional untested (per CLAUDE.md):**
-- Validators: Covered via integration tests
 - ChallengeDefinitions: Data file (no logic)
-- React components: CircuitWorkspace.jsx, Toolbar.jsx (UI layer, optional)
+- Complex React components: CircuitWorkspace.jsx (large component, optional)
+- Modal components: CompletionModal, FailureModal, WinEffect (UI layer, optional)
 
 ### 🔬 Physics Validation
 All electrical engineering formulas verified:
