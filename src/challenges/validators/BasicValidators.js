@@ -204,6 +204,11 @@ export const BasicValidators = {
       return { success: false, message: 'Add a battery as the power source!' }
     }
 
+    // Challenge 9 is about efficiency - use only 1 battery (unlike Challenge 8 which needs 2+)
+    if (batteries.length > 1) {
+      return { success: false, message: 'Use only 1 battery! Show that a capacitor works with minimal power.' }
+    }
+
     // Capacitor should be charging (voltage > 0)
     const chargingCap = capacitors.find(cap => cap.voltage > 0.5)
     if (!chargingCap) {
