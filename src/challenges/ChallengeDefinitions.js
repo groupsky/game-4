@@ -166,7 +166,7 @@ export function getChallengeDefinitions() {
       id: 'voltage-divider',
       act: 1,
       title: '14. Voltage Divider',
-      description: 'Use resistors to create a voltage divider and control LED brightness precisely.',
+      description: 'Use 2 resistors to reduce voltage for an LED. Connect resistors in series - the LED gets a fraction of the total voltage!',
       unlocked: false,
       completed: false,
       validator: (circuit) => ChallengeValidators.validateVoltageDivide(circuit),
