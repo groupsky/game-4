@@ -113,13 +113,80 @@ describe('Star Rating Validation - All Challenges', () => {
         }
         break
 
+      case 'capacitor-power': // Challenge 9: 3 components (1 battery + 1 capacitor + 1 LED)
+        {
+          const battery = ComponentFactory.createBattery(1)
+          const capacitor = ComponentFactory.createCapacitor(2)
+          const led = ComponentFactory.createLED(3)
+          simulator.setComponents([battery, capacitor, led])
+          // Parallel topology: battery -> capacitor AND battery -> LED
+          simulator.setWires([
+            { id: 4, from: 1, to: 2 },   // battery -> capacitor
+            { id: 5, from: 1, to: 3 }    // battery -> LED (parallel)
+          ])
+        }
+        break
+
+      case 'capacitor-bank': // Challenge 10: 5 components (2 batteries + 2 capacitors + 1 LED)
+        {
+          const b1 = ComponentFactory.createBattery(1)
+          const b2 = ComponentFactory.createBattery(2)
+          const cap1 = ComponentFactory.createCapacitor(3)
+          const cap2 = ComponentFactory.createCapacitor(4)
+          const led = ComponentFactory.createLED(5)
+          simulator.setComponents([b1, b2, cap1, cap2, led])
+          simulator.setWires([
+            { id: 6, from: 1, to: 2 },   // b1 -> b2 (series)
+            { id: 7, from: 2, to: 3 },   // b2 -> cap1
+            { id: 8, from: 2, to: 4 },   // b2 -> cap2 (parallel with cap1)
+            { id: 9, from: 2, to: 5 }    // b2 -> LED
+          ])
+        }
+        break
+
+      case 'triple-chain': // Challenge 12: 6 components (3 batteries + 3 LEDs)
+        {
+          const batteries = Array.from({ length: 3 }, (_, i) =>
+            ComponentFactory.createBattery(i + 1)
+          )
+          const leds = Array.from({ length: 3 }, (_, i) =>
+            ComponentFactory.createLED(i + 4)
+          )
+          simulator.setComponents([...batteries, ...leds])
+          // Series: b1 -> b2 -> b3 -> led1 -> led2 -> led3
+          const wires = []
+          for (let i = 0; i < batteries.length - 1; i++) {
+            wires.push({ id: 10 + i, from: batteries[i].id, to: batteries[i + 1].id })
+          }
+          wires.push({ id: 20, from: batteries[2].id, to: leds[0].id })
+          for (let i = 0; i < leds.length - 1; i++) {
+            wires.push({ id: 21 + i, from: leds[i].id, to: leds[i + 1].id })
+          }
+          simulator.setWires(wires)
+        }
+        break
+
+      case 'power-efficiency': // Challenge 17: 3 components (1 battery + 1 resistor + 1 LED)
+        {
+          const battery = ComponentFactory.createBattery(1)
+          const resistor = ComponentFactory.createResistor(2)
+          const led = ComponentFactory.createLED(3)
+          simulator.setComponents([battery, resistor, led])
+          simulator.setWires([
+            { id: 4, from: 1, to: 2 },   // battery -> resistor
+            { id: 5, from: 2, to: 3 }    // resistor -> LED
+          ])
+        }
+        break
+
       default:
         return null
     }
 
     // Most circuits need one step to stabilize, but capacitors need longer to charge
-    if (challengeId === 'energy-bank') {
-      // Capacitor needs ~2 seconds to charge to 1.5V
+    const capacitorChallenges = ['energy-bank', 'capacitor-power', 'capacitor-bank']
+    if (capacitorChallenges.includes(challengeId)) {
+      // Capacitors need time to charge to required voltage
       for (let i = 0; i < 20; i++) {
         simulator.simulate(0.1)
       }
@@ -138,8 +205,12 @@ describe('Star Rating Validation - All Challenges', () => {
     { id: 'current-control', name: 'Challenge 3: Current Control', optimal: 4 },
     { id: 'warm-glow', name: 'Challenge 4: The Warm Glow', optimal: 4 },
     { id: 'double-bright', name: 'Challenge 7: Double Bright', optimal: 6 },
-    { id: 'energy-bank', name: 'Challenge 8: Energy Bank', optimal: 4 }
-    // TODO: Add optimal circuits for remaining challenges (9-30)
+    { id: 'energy-bank', name: 'Challenge 8: Energy Bank', optimal: 4 },
+    { id: 'capacitor-power', name: 'Challenge 9: Capacitor Power', optimal: 3 },
+    { id: 'capacitor-bank', name: 'Challenge 10: Capacitor Bank', optimal: 5 },
+    { id: 'triple-chain', name: 'Challenge 12: Triple Chain', optimal: 6 },
+    { id: 'power-efficiency', name: 'Challenge 17: Power Efficiency', optimal: 3 }
+    // TODO: Add optimal circuits for remaining challenges (11, 13-16, 18-30)
   ]
 
   testCases.forEach(({ id, name, optimal }) => {
