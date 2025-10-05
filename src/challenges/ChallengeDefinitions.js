@@ -89,7 +89,7 @@ export function getChallengeDefinitions() {
       unlocked: false,
       completed: false,
       validator: (circuit) => ChallengeValidators.validateDoubleBright(circuit),
-      stars: { optimalComponents: 5 } // 2 batteries + 2 LEDs + 2 resistors (1 per LED)
+      stars: { optimalComponents: 6 } // 2 batteries + 2 resistors + 2 LEDs
     },
 
     // === CAPACITORS: Energy Storage (8-11, 16, 22-23, 27) ===

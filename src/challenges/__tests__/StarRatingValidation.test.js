@@ -75,35 +75,40 @@ describe('Star Rating Validation - All Challenges', () => {
         }
         break
 
-      case 'double-bright': // Challenge 7: 5 components (1 battery + 2 LEDs + 2 resistors)
+      case 'double-bright': // Challenge 7: 6 components (2 batteries + 2 resistors + 2 LEDs)
         {
-          const battery = ComponentFactory.createBattery(1)
-          const r1 = ComponentFactory.createResistor(2)
-          const r2 = ComponentFactory.createResistor(3)
-          const led1 = ComponentFactory.createLED(4)
-          const led2 = ComponentFactory.createLED(5)
-          simulator.setComponents([battery, r1, r2, led1, led2])
+          // Need 2 batteries in series for enough voltage (1.8V)
+          const b1 = ComponentFactory.createBattery(1)
+          const b2 = ComponentFactory.createBattery(2)
+          const r1 = ComponentFactory.createResistor(3)
+          const r2 = ComponentFactory.createResistor(4)
+          const led1 = ComponentFactory.createLED(5)
+          const led2 = ComponentFactory.createLED(6)
+          simulator.setComponents([b1, b2, r1, r2, led1, led2])
+          // Series batteries, then parallel branches
           simulator.setWires([
-            { id: 10, from: 1, to: 2 },
-            { id: 11, from: 2, to: 4 },
-            { id: 12, from: 1, to: 3 },
-            { id: 13, from: 3, to: 5 }
+            { id: 10, from: 1, to: 2 },   // b1 -> b2 (series)
+            { id: 11, from: 2, to: 3 },   // b2 -> r1
+            { id: 12, from: 3, to: 5 },   // r1 -> led1
+            { id: 13, from: 2, to: 4 },   // b2 -> r2 (parallel)
+            { id: 14, from: 4, to: 6 }    // r2 -> led2
           ])
         }
         break
 
       case 'energy-bank': // Challenge 8: 4 components (2 batteries + 1 capacitor + 1 LED)
         {
+          // Need capacitor charged to 1.5V and LED lit
           const b1 = ComponentFactory.createBattery(1)
           const b2 = ComponentFactory.createBattery(2)
           const capacitor = ComponentFactory.createCapacitor(3)
           const led = ComponentFactory.createLED(4)
           simulator.setComponents([b1, b2, capacitor, led])
+          // Series batteries -> capacitor (parallel) -> LED
           simulator.setWires([
-            { id: 10, from: 1, to: 2 },
-            { id: 11, from: 2, to: 3 },
-            { id: 12, from: 3, to: 4 },
-            { id: 13, from: 2, to: 4 }
+            { id: 10, from: 1, to: 2 },   // b1 -> b2 (series)
+            { id: 11, from: 2, to: 3 },   // b2 -> capacitor
+            { id: 12, from: 2, to: 4 }    // b2 -> LED (parallel with capacitor)
           ])
         }
         break
@@ -112,7 +117,16 @@ describe('Star Rating Validation - All Challenges', () => {
         return null
     }
 
-    simulator.simulate(0.1)
+    // Most circuits need one step to stabilize, but capacitors need longer to charge
+    if (challengeId === 'energy-bank') {
+      // Capacitor needs ~2 seconds to charge to 1.5V
+      for (let i = 0; i < 20; i++) {
+        simulator.simulate(0.1)
+      }
+    } else {
+      simulator.simulate(0.1)
+    }
+
     return simulator
   }
 
@@ -122,8 +136,10 @@ describe('Star Rating Validation - All Challenges', () => {
     { id: 'first-light', name: 'Challenge 1: First Light', optimal: 2 },
     { id: 'power-up', name: 'Challenge 2: Power Up', optimal: 3 },
     { id: 'current-control', name: 'Challenge 3: Current Control', optimal: 4 },
-    { id: 'warm-glow', name: 'Challenge 4: The Warm Glow', optimal: 4 }
-    // TODO: Add optimal circuits for remaining challenges (7, 8, etc.)
+    { id: 'warm-glow', name: 'Challenge 4: The Warm Glow', optimal: 4 },
+    { id: 'double-bright', name: 'Challenge 7: Double Bright', optimal: 6 },
+    { id: 'energy-bank', name: 'Challenge 8: Energy Bank', optimal: 4 }
+    // TODO: Add optimal circuits for remaining challenges (9-30)
   ]
 
   testCases.forEach(({ id, name, optimal }) => {

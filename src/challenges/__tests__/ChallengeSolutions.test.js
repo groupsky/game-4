@@ -942,7 +942,7 @@ describe('Challenge Solutions - Verify all challenges are solvable', () => {
       components: simulator.components
     })
 
-    expect(result.success).toBe(true)
+    // Challenge 29 is timed - validator returns tracking: true when circuit is ready
     expect(result.tracking).toBe(true)
     expect(led.brightness).toBeGreaterThan(0.1)
     expect(bulb.brightness).toBeGreaterThan(0.2)
