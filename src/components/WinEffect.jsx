@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import './WinEffect.css'
 
 /**
@@ -8,6 +8,12 @@ import './WinEffect.css'
 export function WinEffect({ show, challengeTitle, onComplete }) {
   const [confetti, setConfetti] = useState([])
   const [showBanner, setShowBanner] = useState(false)
+  const onCompleteRef = useRef(onComplete)
+
+  // Keep onComplete ref updated without triggering effect
+  useEffect(() => {
+    onCompleteRef.current = onComplete
+  }, [onComplete])
 
   useEffect(() => {
     if (!show) {
@@ -42,14 +48,14 @@ export function WinEffect({ show, challengeTitle, onComplete }) {
 
     // Call onComplete after animation finishes
     const completeTimer = setTimeout(() => {
-      if (onComplete) onComplete()
+      if (onCompleteRef.current) onCompleteRef.current()
     }, 3500)
 
     return () => {
       clearTimeout(bannerTimer)
       clearTimeout(completeTimer)
     }
-  }, [show, onComplete])
+  }, [show])
 
   if (!show) return null
 

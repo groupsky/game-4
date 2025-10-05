@@ -1007,9 +1007,9 @@ describe('AdvancedValidators', () => {
 
       const result = AdvancedValidators.validateGrandCircuit(circuit)
 
-      expect(result.success).toBe(true) // Note: This one returns success=true with tracking
+      expect(result.success).toBe(false) // Timer runs while maintaining conditions
       expect(result.tracking).toBe(true)
-      expect(result.message).toContain('Grand Circuit validated')
+      expect(result.message).toContain('Grand Circuit running')
     })
   })
 

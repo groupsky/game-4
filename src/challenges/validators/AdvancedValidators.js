@@ -269,7 +269,7 @@ export const AdvancedValidators = {
       return { success: false, message: 'Capacitor should be charged!' }
     }
 
-    return { success: true, tracking: true, message: '🎯 Grand Circuit validated! Timer starting...' }
+    return { success: false, tracking: true, message: '🎯 Grand Circuit running! Keep everything lit for 60 seconds...' }
   },
 
   // 30. Master Inventor - Final challenge
