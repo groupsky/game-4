@@ -224,6 +224,23 @@ describe('Star Rating Validation - All Challenges', () => {
         }
         break
 
+      case 'rc-timing': // Challenge 16: 5 components (2 batteries + 1 capacitor + 1 resistor + 1 LED)
+        {
+          const b1 = ComponentFactory.createBattery(1)
+          const b2 = ComponentFactory.createBattery(2)
+          const capacitor = ComponentFactory.createCapacitor(3)
+          const resistor = ComponentFactory.createResistor(4)
+          const led = ComponentFactory.createLED(5)
+          simulator.setComponents([b1, b2, capacitor, resistor, led])
+          simulator.setWires([
+            { id: 10, from: 1, to: 2 },   // b1 -> b2 (series)
+            { id: 11, from: 2, to: 3 },   // b2 -> capacitor
+            { id: 12, from: 2, to: 4 },   // b2 -> resistor (parallel)
+            { id: 13, from: 4, to: 5 }    // resistor -> LED
+          ])
+        }
+        break
+
       case 'power-efficiency': // Challenge 17: 3 components (1 battery + 1 resistor + 1 LED)
         {
           const battery = ComponentFactory.createBattery(1)
@@ -237,14 +254,85 @@ describe('Star Rating Validation - All Challenges', () => {
         }
         break
 
+      case 'max-brightness': // Challenge 18: 5 components (3 batteries + 1 resistor + 1 LED)
+        {
+          const batteries = Array.from({ length: 3 }, (_, i) =>
+            ComponentFactory.createBattery(i + 1)
+          )
+          const resistor = ComponentFactory.createResistor(4)
+          const led = ComponentFactory.createLED(5)
+          simulator.setComponents([...batteries, resistor, led])
+          // Series: b1 -> b2 -> b3 -> resistor -> LED
+          const wires = []
+          for (let i = 0; i < batteries.length - 1; i++) {
+            wires.push({ id: 10 + i, from: batteries[i].id, to: batteries[i + 1].id })
+          }
+          wires.push({ id: 20, from: batteries[batteries.length - 1].id, to: resistor.id })
+          wires.push({ id: 21, from: resistor.id, to: led.id })
+          simulator.setWires(wires)
+        }
+        break
+
+      case 'battery-bank': // Challenge 19: 10 components (9 batteries + 1 LED)
+        {
+          const batteries = Array.from({ length: 9 }, (_, i) =>
+            ComponentFactory.createBattery(i + 1)
+          )
+          const led = ComponentFactory.createLED(10)
+          simulator.setComponents([...batteries, led])
+          // 3x3 battery bank: 3 series chains in parallel
+          const wires = []
+          // Chain 1: b1 -> b2 -> b3
+          wires.push({ id: 20, from: 1, to: 2 })
+          wires.push({ id: 21, from: 2, to: 3 })
+          // Chain 2: b4 -> b5 -> b6
+          wires.push({ id: 22, from: 4, to: 5 })
+          wires.push({ id: 23, from: 5, to: 6 })
+          // Chain 3: b7 -> b8 -> b9
+          wires.push({ id: 24, from: 7, to: 8 })
+          wires.push({ id: 25, from: 8, to: 9 })
+          // Connect all chains to LED
+          wires.push({ id: 30, from: 3, to: 10 })
+          wires.push({ id: 31, from: 6, to: 10 })
+          wires.push({ id: 32, from: 9, to: 10 })
+          simulator.setWires(wires)
+        }
+        break
+
+      case 'dual-power': // Challenge 21: 5 components (3 batteries + 1 LED + 1 bulb)
+        {
+          const batteries = Array.from({ length: 3 }, (_, i) =>
+            ComponentFactory.createBattery(i + 1)
+          )
+          const led = ComponentFactory.createLED(4)
+          const bulb = ComponentFactory.createLightBulb(5)
+          simulator.setComponents([...batteries, led, bulb])
+          // Series batteries, then parallel branches to LED and bulb
+          const wires = []
+          for (let i = 0; i < batteries.length - 1; i++) {
+            wires.push({ id: 10 + i, from: batteries[i].id, to: batteries[i + 1].id })
+          }
+          wires.push({ id: 20, from: batteries[batteries.length - 1].id, to: led.id })
+          wires.push({ id: 21, from: batteries[batteries.length - 1].id, to: bulb.id })
+          simulator.setWires(wires)
+        }
+        break
+
       default:
         return null
     }
 
     // Most circuits need one step to stabilize, but capacitors need longer to charge
     const capacitorChallenges = ['energy-bank', 'capacitor-power', 'capacitor-bank', 'energy-storage-mastery']
-    if (capacitorChallenges.includes(challengeId)) {
-      // Capacitors need time to charge to required voltage
+    const rcTimingChallenges = ['rc-timing']
+
+    if (rcTimingChallenges.includes(challengeId)) {
+      // RC timing needs much longer to charge (100mF capacitors)
+      for (let i = 0; i < 100; i++) {
+        simulator.simulate(0.1)
+      }
+    } else if (capacitorChallenges.includes(challengeId)) {
+      // Regular capacitors need time to charge to required voltage
       for (let i = 0; i < 20; i++) {
         simulator.simulate(0.1)
       }
@@ -270,8 +358,12 @@ describe('Star Rating Validation - All Challenges', () => {
     { id: 'triple-chain', name: 'Challenge 12: Triple Chain', optimal: 6 },
     { id: 'led-array', name: 'Challenge 13: LED Array', optimal: 12 },
     { id: 'voltage-divider', name: 'Challenge 14: Voltage Divider', optimal: 6 },
-    { id: 'power-efficiency', name: 'Challenge 17: Power Efficiency', optimal: 3 }
-    // TODO: Add optimal circuits for remaining challenges (16, 18-30)
+    { id: 'rc-timing', name: 'Challenge 16: RC Timing', optimal: 5 },
+    { id: 'power-efficiency', name: 'Challenge 17: Power Efficiency', optimal: 3 },
+    { id: 'max-brightness', name: 'Challenge 18: Maximum Brightness', optimal: 5 },
+    { id: 'battery-bank', name: 'Challenge 19: Battery Bank', optimal: 10 },
+    { id: 'dual-power', name: 'Challenge 21: Dual Power', optimal: 5 }
+    // TODO: Add optimal circuits for remaining challenges (5, 6, 15, 20, 22-30)
   ]
 
   testCases.forEach(({ id, name, optimal }) => {
