@@ -52,7 +52,7 @@ export function getChallengeDefinitions() {
       unlocked: false,
       completed: false,
       validator: (circuit) => ChallengeValidators.validateWarmGlow(circuit),
-      stars: { optimalComponents: 3 } // 2 batteries + 1 bulb
+      stars: { optimalComponents: 4 } // 3 batteries + 1 bulb (minimum for 2.5V threshold)
     },
     // 5. Battery Drain (30s)
     {

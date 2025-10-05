@@ -78,14 +78,14 @@ describe('Challenge Solutions - Verify all challenges are solvable', () => {
   it('Challenge 4: Warm Glow - power a light bulb', () => {
     const simulator = new CircuitSimulator()
 
-    // Need 5 batteries (4.5V) to get bulb to 0.2+ brightness
-    const batteries = Array.from({ length: 5 }, (_, i) => ({
+    // Need 3 batteries (2.7V) minimum to exceed 2.5V threshold
+    const batteries = Array.from({ length: 3 }, (_, i) => ({
       id: i + 1,
       type: 'battery',
       charge: 1.0,
       voltage: 0.9
     }))
-    const bulb = ComponentFactory.createLightBulb(6)
+    const bulb = ComponentFactory.createLightBulb(4)
 
     simulator.setComponents([...batteries, bulb])
     const wires = batteries.slice(0, -1).map((b, i) => ({
