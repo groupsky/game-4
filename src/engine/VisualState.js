@@ -1,6 +1,20 @@
-// Visual state getters for component rendering
-// Provides non-anthropomorphic visual feedback
+/**
+ * VisualState - Component rendering state calculations
+ *
+ * Provides non-anthropomorphic visual feedback through:
+ * - Charge bars and voltage levels
+ * - Glow intensity and radius
+ * - Heat visualization
+ * - State classifications (full/medium/low, on/off/dim/bright)
+ *
+ * NO facial expressions or anthropomorphism - only physical state indicators
+ */
 
+/**
+ * Calculate visual rendering state for battery
+ * @param {Object} battery - Battery component with charge property
+ * @returns {Object} Visual state { chargePercent, chargeBarFill, state, glowIntensity }
+ */
 export function getBatteryVisualState(battery) {
   const chargePercent = Math.round(battery.charge * 100)
   const chargeBarFill = battery.charge
@@ -20,6 +34,11 @@ export function getBatteryVisualState(battery) {
   }
 }
 
+/**
+ * Calculate visual rendering state for LED
+ * @param {Object} led - LED component with brightness property
+ * @returns {Object} Visual state { brightness, brightnessPercent, glowIntensity, glowRadius, state }
+ */
 export function getLEDVisualState(led) {
   const brightness = led.brightness || 0
   const brightnessPercent = Math.round(brightness * 100)
@@ -41,6 +60,11 @@ export function getLEDVisualState(led) {
   }
 }
 
+/**
+ * Calculate visual rendering state for resistor
+ * @param {Object} resistor - Resistor component with current and resistance properties
+ * @returns {Object} Visual state { powerDissipated, heatLevel, state, voltageDrop, current }
+ */
 export function getResistorVisualState(resistor) {
   const current = resistor.current || 0
   const resistance = resistor.resistance || 0
@@ -67,6 +91,11 @@ export function getResistorVisualState(resistor) {
   }
 }
 
+/**
+ * Calculate visual rendering state for capacitor
+ * @param {Object} capacitor - Capacitor component with voltage and maxVoltage properties
+ * @returns {Object} Visual state { chargePercent, chargeFill, state, voltage, maxVoltage }
+ */
 export function getCapacitorVisualState(capacitor) {
   const voltage = capacitor.voltage || 0
   const maxVoltage = capacitor.maxVoltage || 5.0
@@ -88,6 +117,11 @@ export function getCapacitorVisualState(capacitor) {
   }
 }
 
+/**
+ * Calculate visual rendering state for light bulb
+ * @param {Object} bulb - Light bulb component with brightness and power properties
+ * @returns {Object} Visual state { brightness, brightnessPercent, glowIntensity, filamentHeat, state, power }
+ */
 export function getLightBulbVisualState(bulb) {
   const brightness = bulb.brightness || 0
   const brightnessPercent = Math.round(brightness * 100)

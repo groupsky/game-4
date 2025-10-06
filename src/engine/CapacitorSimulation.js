@@ -1,5 +1,21 @@
-// Capacitor simulation with RC time constants
+/**
+ * CapacitorSimulation - RC time constant modeling
+ *
+ * Simulates capacitor charging/discharging with proper RC time constants.
+ * Handles three modes:
+ * 1. Charging: Battery connected (V(t) = Vs × (1 - e^(-t/RC)))
+ * 2. Discharging: Through resistor (V(t) = V0 × e^(-t/RC))
+ * 3. Leakage: Self-discharge when disconnected
+ */
 
+/**
+ * Simulate all capacitors in the circuit
+ * Updates capacitor voltages based on connected components and RC time constants
+ * @param {Array} components - All circuit components
+ * @param {Array} wires - All circuit wires
+ * @param {number} deltaTime - Time step in seconds
+ * @param {Function} findConnectedComponents - Function to find connected components
+ */
 export function simulateCapacitors(components, wires, deltaTime, findConnectedComponents) {
   const capacitors = components.filter(c => c.type === 'capacitor')
 
