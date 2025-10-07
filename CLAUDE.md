@@ -115,3 +115,42 @@ src/
 - MUST disable all edit controls when simulation is running
 - Build circuit → Start → Observe → Stop → Edit → Repeat
 - This forces intentional design instead of live-tweaking
+
+## Responsive UX Rules
+
+**NEVER assume device type = capabilities:**
+- WRONG: "mobile vs desktop" or "touch vs mouse"
+- RIGHT: Detect orthogonal capabilities that can combine in any way
+- Capabilities: pointer precision (coarse/fine), viewport size (small/medium/large), multi-touch, hover, keyboard
+- Example: Touchscreen laptop = fine pointer + large viewport + multi-touch + hover + keyboard
+
+**Capability-based adaptation MUST be used:**
+- Touch target sizing: 60px for coarse pointers, 32px for fine pointers
+- Component scale: 1.5x for coarse pointers, 1.0x for fine pointers
+- Toolbar position: bottom for small viewports, top for medium/large
+- Interaction methods: Support BOTH click-sequence AND Shift+drag (don't remove old methods)
+
+**NEVER use long-press for common actions:**
+- Long-press = high friction, slow workflow
+- Use explicit mode toggles with visual feedback instead
+- Mode-based interactions: Component placement mode, wire mode, selection mode
+- Clear exit paths: Escape key, click mode button again, click empty space to finish
+
+**Click-sequence > drag for complex operations:**
+- Wiring: Click A → B → C creates chain of wires (can zoom/pan between clicks)
+- More precise than dragging
+- Works equally well for touch and mouse
+- Preview with dotted lines + component highlighting
+
+**Multi-level undo MUST be available:**
+- 20-action history minimum
+- Toast notifications with inline [UNDO] button (3s auto-dismiss)
+- Keyboard shortcut (Ctrl+Z)
+- Track: add/delete components, create/delete wires, move components
+- Clear undo history when simulation starts (prevents inconsistent state)
+
+**Progressive enhancement approach:**
+- Base functionality MUST work on all devices
+- Enhanced features when capabilities available
+- NEVER break base experience when adding enhancements
+- All old interaction methods MUST still work (backward compatibility)
