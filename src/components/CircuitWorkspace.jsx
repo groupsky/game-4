@@ -5,6 +5,8 @@ import { ChallengeSystem } from '../challenges/ChallengeSystem'
 import { ChallengePanel } from './ChallengePanel'
 import { Toolbar } from './Toolbar'
 import { InfoPanel } from './InfoPanel'
+import { MobileToolbar } from './MobileToolbar'
+import { Toast } from './Toast'
 import {
   drawBattery,
   drawLED,
@@ -14,11 +16,16 @@ import {
   drawGraphPaper,
   drawWire
 } from './ComponentRendering'
+import { getDeviceCapabilities } from '../utils/DeviceCapabilities'
+import { UndoStack, UndoActions } from '../utils/UndoStack'
+import { CanvasZoom } from '../utils/CanvasZoom'
 import './CircuitWorkspace.css'
 
 const simulator = new CircuitSimulator()
 const simulationState = new SimulationState()
 const challengeSystem = new ChallengeSystem()
+const undoStack = new UndoStack()
+const canvasZoom = new CanvasZoom()
 
 export default function CircuitWorkspace() {
   const canvasRef = useRef(null)
@@ -34,6 +41,49 @@ export default function CircuitWorkspace() {
   const [isRunning, setIsRunning] = useState(false)
   const [currentChallengeId, setCurrentChallengeId] = useState(null)
   const [challengeChangeCounter, setChallengeChangeCounter] = useState(0)
+
+  // Capability-based UX state
+  const [capabilities, setCapabilities] = useState(getDeviceCapabilities())
+  const [activeMode, setActiveMode] = useState(null) // null | 'battery' | 'led' | 'wire' | etc
+  const [wireChain, setWireChain] = useState([]) // For click-sequence wiring
+  const [canUndo, setCanUndo] = useState(false)
+  const [toast, setToast] = useState(null) // { message, show }
+
+  // Capability detection
+  useEffect(() => {
+    const caps = getDeviceCapabilities()
+    caps.onChange((newCaps) => {
+      setCapabilities({ ...newCaps })
+    })
+
+    // Keyboard detection
+    const handleKeyEvent = () => {
+      caps.onKeyboardEvent()
+    }
+    window.addEventListener('keydown', handleKeyEvent)
+    window.addEventListener('keyup', handleKeyEvent)
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyEvent)
+      window.removeEventListener('keyup', handleKeyEvent)
+    }
+  }, [])
+
+  // Undo stack notifications
+  useEffect(() => {
+    undoStack.onChange((stack) => {
+      setCanUndo(stack.canUndo())
+    })
+  }, [])
+
+  // Clear undo when simulation starts
+  useEffect(() => {
+    if (isRunning) {
+      undoStack.clear()
+      setWireChain([])
+      setActiveMode(null)
+    }
+  }, [isRunning])
 
   // Listen to simulation state changes
   useEffect(() => {
