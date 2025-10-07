@@ -19,6 +19,14 @@ import {
 import { getDeviceCapabilities } from '../utils/DeviceCapabilities'
 import { UndoStack, UndoActions } from '../utils/UndoStack'
 import { CanvasZoom } from '../utils/CanvasZoom'
+import {
+  placeComponent,
+  createWiresFromChain,
+  deleteComponent,
+  performUndo,
+  getComponentAt as getComponentAtHelper,
+  hideToast
+} from './CircuitWorkspaceHelpers'
 import './CircuitWorkspace.css'
 
 const simulator = new CircuitSimulator()
@@ -51,6 +59,8 @@ export default function CircuitWorkspace() {
   // Capability detection
   useEffect(() => {
     const caps = getDeviceCapabilities()
+
+    // Listen for capability changes (including resize)
     caps.onChange((newCaps) => {
       setCapabilities({ ...newCaps })
     })
@@ -61,6 +71,9 @@ export default function CircuitWorkspace() {
     }
     window.addEventListener('keydown', handleKeyEvent)
     window.addEventListener('keyup', handleKeyEvent)
+
+    // Initial detection
+    setCapabilities({ ...caps })
 
     return () => {
       window.removeEventListener('keydown', handleKeyEvent)
@@ -267,12 +280,10 @@ export default function CircuitWorkspace() {
           // Redo
           const action = undoStack.redo()
           if (action) {
-            const { performUndo } = require('./CircuitWorkspaceHelpers')
             // TODO: Implement redo logic
           }
         } else {
           // Undo
-          const { performUndo, hideToast } = require('./CircuitWorkspaceHelpers')
           performUndo(undoStack, setComponents, setWires, setToast, UndoActions)
         }
         return
@@ -292,8 +303,6 @@ export default function CircuitWorkspace() {
 
       // Delete key
       if (e.key === 'Delete' || e.key === 'Backspace') {
-        const { deleteComponent } = require('./CircuitWorkspaceHelpers')
-
         if (selectedComponents.length > 0) {
           // Delete multiple components
           selectedComponents.forEach(index => {
@@ -360,14 +369,12 @@ export default function CircuitWorkspace() {
     // Check if we're in component placement mode
     if (activeMode && activeMode !== 'wire') {
       // Place component at click location
-      const { placeComponent } = require('./CircuitWorkspaceHelpers')
       placeComponent(activeMode, x, y, components, setComponents, undoStack, UndoActions, setToast, capabilities)
       return
     }
 
     // Check if we're in wire mode (click-sequence)
     if (activeMode === 'wire') {
-      const { getComponentAt: getComponentAtHelper } = require('./CircuitWorkspaceHelpers')
       const hit = getComponentAtHelper(x, y, components, capabilities)
 
       if (hit) {
@@ -375,7 +382,6 @@ export default function CircuitWorkspace() {
         setWireChain(prev => [...prev, hit.component.id])
       } else if (wireChain.length >= 2) {
         // Clicked empty space - finalize wire chain
-        const { createWiresFromChain } = require('./CircuitWorkspaceHelpers')
         createWiresFromChain(wireChain, wires, setWires, undoStack, UndoActions, setToast)
         setWireChain([])
         setActiveMode(null)
@@ -562,7 +568,6 @@ export default function CircuitWorkspace() {
   }
 
   const handleUndo = () => {
-    const { performUndo } = require('./CircuitWorkspaceHelpers')
     performUndo(undoStack, setComponents, setWires, setToast, UndoActions)
   }
 

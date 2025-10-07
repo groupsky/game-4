@@ -131,6 +131,10 @@
 
 /* Mobile Responsive Styles */
 @media (max-width: 768px) {
+  .circuit-workspace {
+    padding-bottom: 80px;
+  }
+
   .workspace-header {
     padding: 10px 12px;
   }
@@ -141,7 +145,11 @@
   }
 
   .toolbar {
-    gap: 6px;
+    display: none !important;
+  }
+
+  .workspace-header {
+    padding-bottom: 0;
   }
 
   .toolbar button {

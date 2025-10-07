@@ -107,14 +107,4 @@
     background: #16A34A;
     border-color: #065F46;
   }
-
-  /* Hide desktop toolbar on mobile */
-  .toolbar {
-    display: none;
-  }
-
-  /* Adjust workspace for mobile toolbar */
-  .circuit-workspace {
-    padding-bottom: 80px;
-  }
 }
