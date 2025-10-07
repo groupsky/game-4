@@ -157,7 +157,7 @@ export default function CircuitWorkspace() {
       drawWire(ctx, wire, components)
     })
 
-    // Draw wire being created
+    // Draw wire being created (legacy Shift+drag mode)
     if (connecting) {
       const comp = components.find(c => c.id === connecting)
       if (comp) {
@@ -170,6 +170,42 @@ export default function CircuitWorkspace() {
         ctx.stroke()
         ctx.setLineDash([])
       }
+    }
+
+    // Draw wire chain preview (click-sequence mode)
+    if (wireChain.length > 0) {
+      ctx.strokeStyle = '#F97316'
+      ctx.lineWidth = 3
+      ctx.setLineDash([5, 5])
+
+      // Draw existing chain segments
+      for (let i = 0; i < wireChain.length - 1; i++) {
+        const fromComp = components.find(c => c.id === wireChain[i])
+        const toComp = components.find(c => c.id === wireChain[i + 1])
+        if (fromComp && toComp) {
+          ctx.beginPath()
+          ctx.moveTo(fromComp.x, fromComp.y)
+          ctx.lineTo(toComp.x, toComp.y)
+          ctx.stroke()
+        }
+      }
+
+      // Draw line to cursor from last component
+      const lastComp = components.find(c => c.id === wireChain[wireChain.length - 1])
+      if (lastComp) {
+        ctx.beginPath()
+        ctx.moveTo(lastComp.x, lastComp.y)
+        ctx.lineTo(mousePos.x, mousePos.y)
+        ctx.stroke()
+
+        // Highlight last component
+        ctx.fillStyle = 'rgba(249, 115, 22, 0.3)'
+        ctx.beginPath()
+        ctx.arc(lastComp.x, lastComp.y, 40, 0, Math.PI * 2)
+        ctx.fill()
+      }
+
+      ctx.setLineDash([])
     }
 
     // Draw selection box
@@ -203,7 +239,7 @@ export default function CircuitWorkspace() {
         ctx.restore()
       }
     })
-  }, [components, wires, connecting, mousePos, selectedComponent, selectedComponents, selectionBox])
+  }, [components, wires, connecting, mousePos, selectedComponent, selectedComponents, selectionBox, wireChain])
 
   // Run simulation every 100ms (with 10ms physics step for finer granularity)
   // ONLY when simulation is running
@@ -237,39 +273,63 @@ export default function CircuitWorkspace() {
     return () => clearInterval(interval)
   }, [components, wires, isRunning])
 
-  // Keyboard handler for delete
+  // Keyboard handler for shortcuts
   useEffect(() => {
     const handleKeyDown = (e) => {
+      // Undo/Redo
+      if ((e.ctrlKey || e.metaKey) && e.key === 'z') {
+        e.preventDefault()
+        if (e.shiftKey) {
+          // Redo
+          const action = undoStack.redo()
+          if (action) {
+            const { performUndo } = require('./CircuitWorkspaceHelpers')
+            // TODO: Implement redo logic
+          }
+        } else {
+          // Undo
+          const { performUndo, hideToast } = require('./CircuitWorkspaceHelpers')
+          performUndo(undoStack, setComponents, setWires, setToast, UndoActions)
+        }
+        return
+      }
+
+      // Escape - exit mode
+      if (e.key === 'Escape') {
+        setActiveMode(null)
+        setWireChain([])
+        setSelectedComponent(null)
+        setSelectedComponents([])
+        return
+      }
+
       // Disable editing when simulation is running
       if (isRunning) return
 
+      // Delete key
       if (e.key === 'Delete' || e.key === 'Backspace') {
+        const { deleteComponent } = require('./CircuitWorkspaceHelpers')
+
         if (selectedComponents.length > 0) {
           // Delete multiple components
-          const compIds = selectedComponents.map(i => components[i]?.id).filter(Boolean)
-          setComponents(prev => prev.filter((_, i) => !selectedComponents.includes(i)))
-          setWires(prev => prev.filter(w => !compIds.includes(w.from) && !compIds.includes(w.to)))
+          selectedComponents.forEach(index => {
+            deleteComponent(index, components, setComponents, wires, setWires, undoStack, UndoActions, setToast)
+          })
           setSelectedComponents([])
           setSelectedComponent(null)
-          setDragging(null)
-          setConnecting(null)
         } else if (selectedComponent !== null) {
           // Delete single component
-          setComponents(prev => prev.filter((_, i) => i !== selectedComponent))
-          const compId = components[selectedComponent]?.id
-          if (compId) {
-            setWires(prev => prev.filter(w => w.from !== compId && w.to !== compId))
-          }
+          deleteComponent(selectedComponent, components, setComponents, wires, setWires, undoStack, UndoActions, setToast)
           setSelectedComponent(null)
-          setDragging(null)
-          setConnecting(null)
         }
+        setDragging(null)
+        setConnecting(null)
       }
     }
 
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [selectedComponent, selectedComponents, components])
+  }, [selectedComponent, selectedComponents, components, wires, activeMode, wireChain, isRunning])
 
   const drawComponent = (ctx, component) => {
     ctx.save()
@@ -312,8 +372,35 @@ export default function CircuitWorkspace() {
     const x = e.clientX - rect.left
     const y = e.clientY - rect.top
 
-    if (e.shiftKey) {
-      // Shift+click to start wire connection
+    // MODE-BASED INTERACTIONS
+    // Check if we're in component placement mode
+    if (activeMode && activeMode !== 'wire') {
+      // Place component at click location
+      const { placeComponent } = require('./CircuitWorkspaceHelpers')
+      placeComponent(activeMode, x, y, components, setComponents, undoStack, UndoActions, setToast, capabilities)
+      return
+    }
+
+    // Check if we're in wire mode (click-sequence)
+    if (activeMode === 'wire') {
+      const { getComponentAt: getComponentAtHelper } = require('./CircuitWorkspaceHelpers')
+      const hit = getComponentAtHelper(x, y, components, capabilities)
+
+      if (hit) {
+        // Add to wire chain
+        setWireChain(prev => [...prev, hit.component.id])
+      } else if (wireChain.length >= 2) {
+        // Clicked empty space - finalize wire chain
+        const { createWiresFromChain } = require('./CircuitWorkspaceHelpers')
+        createWiresFromChain(wireChain, wires, setWires, undoStack, UndoActions, setToast)
+        setWireChain([])
+        setActiveMode(null)
+      }
+      return
+    }
+
+    // LEGACY SHIFT+DRAG WIRING (keep for desktop compatibility)
+    if (e.shiftKey && capabilities.supportsShiftDrag()) {
       const hit = getComponentAt(x, y)
       if (hit) {
         setConnecting(hit.component.id)
@@ -321,11 +408,12 @@ export default function CircuitWorkspace() {
       return
     }
 
+    // SELECTION MODE (default when no active mode)
     const hit = getComponentAt(x, y)
 
     if (hit) {
       // Clicking on a component
-      if (e.ctrlKey || e.metaKey) {
+      if ((e.ctrlKey || e.metaKey) && capabilities.supportsCtrlClick()) {
         // Ctrl/Cmd+click to add to selection
         if (selectedComponents.includes(hit.index)) {
           setSelectedComponents(prev => prev.filter(i => i !== hit.index))
@@ -347,8 +435,10 @@ export default function CircuitWorkspace() {
         }
       }
     } else {
-      // Clicking on empty space - start rectangle selection
-      setSelectionBox({ x, y, width: 0, height: 0, startX: x, startY: y })
+      // Clicking on empty space - start rectangle selection (if supported)
+      if (capabilities.supportsDragBox()) {
+        setSelectionBox({ x, y, width: 0, height: 0, startX: x, startY: y })
+      }
       setSelectedComponent(null)
       setSelectedComponents([])
     }
@@ -515,8 +605,36 @@ export default function CircuitWorkspace() {
     setDragging(null)
   }
 
+  const handleUndo = () => {
+    const { performUndo } = require('./CircuitWorkspaceHelpers')
+    performUndo(undoStack, setComponents, setWires, setToast, UndoActions)
+  }
+
   return (
     <div className="circuit-workspace">
+      {canUndo && (
+        <button
+          className="undo-btn"
+          onClick={handleUndo}
+          title="Undo (Ctrl+Z)"
+          style={{
+            position: 'fixed',
+            top: '10px',
+            left: '10px',
+            zIndex: 1000,
+            background: 'white',
+            border: '2px solid #4A4A4A',
+            padding: '8px 12px',
+            borderRadius: '4px',
+            cursor: 'pointer',
+            fontFamily: 'Courier New, monospace',
+            fontSize: '14px'
+          }}
+        >
+          ↶ {undoStack.getUndoCount() > 1 && `×${undoStack.getUndoCount()}`}
+        </button>
+      )}
+
       <div className="workspace-header">
         <h1>📔 Circuit Quest - Inventor's Notebook</h1>
         <Toolbar
@@ -551,6 +669,21 @@ export default function CircuitWorkspace() {
         isRunning={isRunning}
         onChallengeChange={() => setChallengeChangeCounter(c => c + 1)}
         onStopSimulation={() => simulationState.stop()}
+      />
+
+      <MobileToolbar
+        activeMode={activeMode}
+        onModeChange={setActiveMode}
+        isRunning={isRunning}
+        onToggleSimulation={() => simulationState.toggle()}
+        isMobile={capabilities.viewportSize === 'small'}
+      />
+
+      <Toast
+        message={toast?.message}
+        show={toast?.show}
+        onUndo={toast?.onUndo}
+        onDismiss={() => setToast(null)}
       />
     </div>
   )
