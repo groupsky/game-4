@@ -1,0 +1,51 @@
+.toast {
+  position: fixed;
+  bottom: 100px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #4A4A4A;
+  color: white;
+  padding: 12px 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font-family: 'Courier New', monospace;
+  font-size: 14px;
+  z-index: 2000;
+  animation: toast-slide-up 0.3s ease-out;
+  max-width: 80%;
+}
+
+@keyframes toast-slide-up {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+.toast-message {
+  flex: 1;
+}
+
+.toast-undo-btn {
+  background: #FBBF24;
+  color: #4A4A4A;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  font-weight: bold;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.toast-undo-btn:active {
+  transform: scale(0.95);
+}

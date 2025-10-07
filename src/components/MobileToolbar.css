@@ -1,0 +1,120 @@
+.mobile-toolbar {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .mobile-toolbar {
+    display: flex;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(to top, #E8E8D8, #F5F5DC);
+    border-top: 3px solid #4A4A4A;
+    padding: 8px;
+    gap: 8px;
+    z-index: 100;
+    box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+  }
+
+  .mobile-toolbar-tools {
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    flex: 1;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .mobile-toolbar-tools::-webkit-scrollbar {
+    display: none;
+  }
+
+  .mobile-tool-btn {
+    background: white;
+    border: 2px solid #4A4A4A;
+    border-radius: 8px;
+    padding: 8px 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    min-width: 60px;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 2px 2px 0 #4A4A4A;
+    touch-action: manipulation;
+    flex-shrink: 0;
+  }
+
+  .mobile-tool-btn:active {
+    transform: translate(1px, 1px);
+    box-shadow: 1px 1px 0 #4A4A4A;
+  }
+
+  .mobile-tool-btn.active {
+    background: #FBBF24;
+    border-color: #F97316;
+    border-width: 3px;
+    transform: translateY(-2px);
+    box-shadow: 3px 3px 0 #4A4A4A;
+  }
+
+  .mobile-tool-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    background: #E0E0D0;
+  }
+
+  .tool-icon {
+    font-size: 24px;
+    line-height: 1;
+  }
+
+  .tool-label {
+    font-size: 10px;
+    font-family: 'Courier New', monospace;
+    color: #4A4A4A;
+    font-weight: bold;
+  }
+
+  .mobile-run-btn {
+    background: #16A34A;
+    color: white;
+    border: 2px solid #4A4A4A;
+    border-radius: 8px;
+    padding: 12px;
+    font-size: 28px;
+    min-width: 64px;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 2px 2px 0 #4A4A4A;
+    touch-action: manipulation;
+    flex-shrink: 0;
+  }
+
+  .mobile-run-btn:active {
+    transform: translate(1px, 1px);
+    box-shadow: 1px 1px 0 #4A4A4A;
+  }
+
+  .mobile-run-btn.running {
+    background: #DC2626;
+    border-color: #991B1B;
+  }
+
+  .mobile-run-btn.stopped {
+    background: #16A34A;
+    border-color: #065F46;
+  }
+
+  /* Hide desktop toolbar on mobile */
+  .toolbar {
+    display: none;
+  }
+
+  /* Adjust workspace for mobile toolbar */
+  .circuit-workspace {
+    padding-bottom: 80px;
+  }
+}

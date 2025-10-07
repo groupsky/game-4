@@ -14,7 +14,7 @@
 }
 
 .workspace-header h1 {
-  font-size: 24px;
+  font-size: clamp(18px, 4vw, 24px);
   color: #4A4A4A;
   margin-bottom: 10px;
   font-weight: normal;
@@ -24,6 +24,8 @@
 .toolbar {
   display: flex;
   gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
 }
 
 .toolbar button {
@@ -35,6 +37,8 @@
   cursor: pointer;
   transition: all 0.2s;
   box-shadow: 2px 2px 0 #4A4A4A;
+  min-height: 44px;
+  touch-action: manipulation;
 }
 
 .toolbar button:hover {
@@ -104,9 +108,57 @@
   display: flex;
   gap: 20px;
   align-items: center;
+  overflow-x: auto;
+  flex-wrap: wrap;
 }
 
 .info-panel p {
   margin: 0;
   color: #4A4A4A;
+  white-space: nowrap;
+}
+
+/* Mobile Responsive Styles */
+@media (max-width: 768px) {
+  .workspace-header {
+    padding: 10px 12px;
+  }
+
+  .workspace-header h1 {
+    font-size: clamp(16px, 5vw, 20px);
+    margin-bottom: 8px;
+  }
+
+  .toolbar {
+    gap: 6px;
+  }
+
+  .toolbar button {
+    padding: 10px 12px;
+    font-size: 12px;
+    flex: 1 1 auto;
+    min-width: 120px;
+  }
+
+  .info-panel {
+    padding: 8px 12px;
+    font-size: 12px;
+    gap: 12px;
+  }
+
+  .circuit-canvas {
+    touch-action: none;
+  }
+}
+
+/* Tablet Responsive Styles */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .workspace-header h1 {
+    font-size: 20px;
+  }
+
+  .toolbar button {
+    padding: 8px 14px;
+    font-size: 13px;
+  }
 }

@@ -1,0 +1,120 @@
+.mobile-controls {
+  display: none;
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  z-index: 1000;
+}
+
+.mobile-fab {
+  background: #1E3A8A;
+  color: white;
+  border: 2px solid #4A4A4A;
+  border-radius: 28px;
+  padding: 12px 20px;
+  font-family: 'Courier New', monospace;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 2px 2px 12px rgba(0, 0, 0, 0.3);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  touch-action: manipulation;
+  min-height: 56px;
+  transition: transform 0.2s;
+}
+
+.mobile-fab:active {
+  transform: scale(0.95);
+}
+
+.fab-icon {
+  font-size: 24px;
+  line-height: 1;
+}
+
+.fab-label {
+  font-size: 14px;
+}
+
+.mobile-controls-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.3);
+  z-index: 999;
+}
+
+.mobile-controls-menu {
+  position: fixed;
+  bottom: 90px;
+  left: 20px;
+  background: #F5F5DC;
+  border: 2px solid #4A4A4A;
+  border-radius: 12px;
+  padding: 8px;
+  box-shadow: 4px 4px 16px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  z-index: 1001;
+  min-width: 200px;
+}
+
+.mode-btn {
+  background: white;
+  border: 2px solid #4A4A4A;
+  border-radius: 8px;
+  padding: 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: 'Courier New', monospace;
+  text-align: left;
+  touch-action: manipulation;
+}
+
+.mode-btn:active {
+  transform: scale(0.98);
+}
+
+.mode-btn.active {
+  background: #FBBF24;
+  border-color: #F97316;
+  border-width: 3px;
+}
+
+.mode-icon {
+  font-size: 24px;
+  line-height: 1;
+}
+
+.mode-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+}
+
+.mode-label {
+  font-size: 14px;
+  font-weight: bold;
+  color: #4A4A4A;
+}
+
+.mode-description {
+  font-size: 11px;
+  color: #666;
+}
+
+/* Show on mobile only */
+@media (max-width: 768px) {
+  .mobile-controls {
+    display: block;
+  }
+}
