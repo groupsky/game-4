@@ -50,7 +50,8 @@ export default function CircuitWorkspace() {
   const [challengeChangeCounter, setChallengeChangeCounter] = useState(0)
 
   // Capability-based UX state
-  const [capabilities, setCapabilities] = useState(getDeviceCapabilities())
+  const capabilities = getDeviceCapabilities() // Use singleton instance directly
+  const [capabilitiesVersion, setCapabilitiesVersion] = useState(0) // For re-rendering on changes
   const [activeMode, setActiveMode] = useState(null) // null | 'battery' | 'led' | 'wire' | etc
   const [wireChain, setWireChain] = useState([]) // For click-sequence wiring
   const [canUndo, setCanUndo] = useState(false)
@@ -58,22 +59,17 @@ export default function CircuitWorkspace() {
 
   // Capability detection
   useEffect(() => {
-    const caps = getDeviceCapabilities()
-
     // Listen for capability changes (including resize)
-    caps.onChange((newCaps) => {
-      setCapabilities({ ...newCaps })
+    capabilities.onChange(() => {
+      setCapabilitiesVersion(v => v + 1) // Trigger re-render
     })
 
     // Keyboard detection
     const handleKeyEvent = () => {
-      caps.onKeyboardEvent()
+      capabilities.onKeyboardEvent()
     }
     window.addEventListener('keydown', handleKeyEvent)
     window.addEventListener('keyup', handleKeyEvent)
-
-    // Initial detection
-    setCapabilities({ ...caps })
 
     return () => {
       window.removeEventListener('keydown', handleKeyEvent)
