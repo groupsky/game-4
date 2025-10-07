@@ -10,19 +10,14 @@ Circuit Quest now features a fully responsive, capability-based UX that adapts t
 
 ### Component Placement
 
-**New Way (Recommended):**
 1. Click a component button (e.g., 🥔 Battery)
 2. Click anywhere on the canvas to place
 3. Click multiple times to place multiple components
 4. Click the button again or press Escape to exit mode
 
-**Old Way (Still Works):**
-1. Click "Add Battery" button → Component appears randomly
-2. Drag to desired position
-
 ### Wire Creation
 
-**Click-Sequence Mode (New, Recommended):**
+**Click-Sequence Mode:**
 1. Click the 🔌 Wire button
 2. Click components in sequence: A → B → C → D
 3. Orange dotted lines show the wire chain preview
@@ -34,12 +29,6 @@ Circuit Quest now features a fully responsive, capability-based UX that adapts t
 - Can pan to reach distant components
 - More precise than dragging
 - Works great for complex circuits
-
-**Shift+Drag Mode (Legacy, Still Works):**
-1. Hold Shift
-2. Click first component
-3. Drag to second component
-4. Release to create wire
 
 ### Selection
 
@@ -145,7 +134,7 @@ The app automatically detects your device capabilities:
 Touchscreen laptops get **best of both worlds**:
 - Mouse precision when using trackpad
 - Large touch targets when touching screen
-- Both Shift+drag and click-sequence wiring work
+- Click-sequence wiring works with both touch and mouse
 - Keyboard shortcuts always available
 
 ---
@@ -241,37 +230,12 @@ When a mode is active:
 
 ---
 
-## What's New vs Old UX
-
-### Old Way
-- Click "Add Battery" → random spawn → drag to position (3 actions per component)
-- Shift+drag for wires → can't zoom during wire creation
-- No undo
-- Desktop-only UX
-
-### New Way
-- Click button → click exact position → done (2 actions per component)
-- Click-sequence wiring → can zoom/pan between clicks
-- Multi-level undo (20 actions)
-- Works on desktop, mobile, tablets, touchscreen laptops
-
-### Backward Compatibility
-
-**All old interactions still work:**
-- "Add Battery" button still exists (uses old random placement)
-- Shift+drag wiring still works on desktop
-- Right-click delete still works
-- Everything you knew before still works!
-
----
-
 ## Feedback
 
-The new UX is designed to be:
+The UX is designed to be:
 - ✅ Faster (fewer actions needed)
 - ✅ More precise (exact placement)
 - ✅ More forgiving (undo everything)
 - ✅ Device-aware (adapts to your input method)
-- ✅ Backward compatible (old way still works)
 
 Enjoy building circuits!

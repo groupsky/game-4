@@ -88,14 +88,6 @@ export class DeviceCapabilities {
   }
 
   /**
-   * Check if Shift+drag wiring is supported
-   * Requires fine pointer and keyboard
-   */
-  supportsShiftDrag() {
-    return this.hasFinePointer && this.hasKeyboard
-  }
-
-  /**
    * Click-sequence wiring is always available
    */
   supportsClickSequence() {

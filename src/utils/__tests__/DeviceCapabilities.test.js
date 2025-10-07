@@ -195,30 +195,6 @@ describe('DeviceCapabilities', () => {
   })
 
   describe('feature support detection', () => {
-    it('should support shift+drag for fine pointer with keyboard', () => {
-      matchMediaMock.mockImplementation((query) => {
-        if (query === '(pointer: fine)') return { matches: true }
-        return { matches: false }
-      })
-
-      const caps = new DeviceCapabilities()
-      caps.hasKeyboard = true
-
-      expect(caps.supportsShiftDrag()).toBe(true)
-    })
-
-    it('should not support shift+drag for coarse pointer', () => {
-      matchMediaMock.mockImplementation((query) => {
-        if (query === '(pointer: coarse)') return { matches: true }
-        return { matches: false }
-      })
-
-      const caps = new DeviceCapabilities()
-      caps.hasKeyboard = true
-
-      expect(caps.supportsShiftDrag()).toBe(false)
-    })
-
     it('should always support click-sequence wiring', () => {
       matchMediaMock.mockReturnValue({ matches: false })
 

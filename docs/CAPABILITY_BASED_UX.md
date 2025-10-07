@@ -77,10 +77,6 @@ class DeviceCapabilities {
   }
 
   // Feature availability
-  supportsShiftDrag() {
-    return this.hasFinePointer && this.hasKeyboard
-  }
-
   supportsClickSequence() {
     return true // Always available
   }
@@ -218,20 +214,14 @@ handlePlacementClick(e) {
 - Click empty space to finish chain
 - Benefits: Can zoom/pan between clicks, works while zoomed
 
-**Fine Pointer + Keyboard: Shift+Drag Mode (Secondary)**
-- Shift+drag from A to B → wire created
-- Classic desktop UX for short distances
-- Faster for adjacent components
-- Doesn't work well zoomed in
-
 **Coarse Pointer:**
-- Click-sequence ONLY (drag is imprecise)
+- Click-sequence mode (drag is imprecise)
 - 60px snap radius to nearest component
 - Large pulse highlights (80px circles)
 - Banner: "Tap next component (3 wires so far)"
 
 **Fine Pointer:**
-- Click-sequence OR Shift+drag
+- Click-sequence mode
 - 30px snap radius
 - Small highlights (40px circles)
 - Hover preview of target component
@@ -239,14 +229,7 @@ handlePlacementClick(e) {
 **Implementation:**
 ```javascript
 handleWireStart(e) {
-  const isTouch = e.type.startsWith('touch')
-  const isShiftKey = e.shiftKey && capabilities.hasKeyboard
-
-  if (isShiftKey && capabilities.hasFinePointer) {
-    // Mouse + Shift: Classic drag mode
-    this.wireDragMode = true
-    this.wireChain = [hitComponent.id]
-  } else {
+  if (activeMode === 'wire') {
     // Touch OR click-sequence: Click mode
     this.wireClickMode = true
     this.wireChain.push(hitComponent.id)

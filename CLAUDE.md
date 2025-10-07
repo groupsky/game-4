@@ -128,7 +128,6 @@ src/
 - Touch target sizing: 60px for coarse pointers, 32px for fine pointers
 - Component scale: 1.5x for coarse pointers, 1.0x for fine pointers
 - Toolbar position: bottom for small viewports, top for medium/large
-- Interaction methods: Support BOTH click-sequence AND Shift+drag (don't remove old methods)
 
 **NEVER use long-press for common actions:**
 - Long-press = high friction, slow workflow
@@ -153,4 +152,3 @@ src/
 - Base functionality MUST work on all devices
 - Enhanced features when capabilities available
 - NEVER break base experience when adding enhancements
-- All old interaction methods MUST still work (backward compatibility)

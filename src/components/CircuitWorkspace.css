@@ -52,6 +52,17 @@
   box-shadow: 1px 1px 0 #4A4A4A;
 }
 
+.toolbar button.active {
+  background: #F97316;
+  color: white;
+  border-color: #DC2626;
+  font-weight: bold;
+}
+
+.toolbar button.active:hover {
+  background: #DC2626;
+}
+
 .toolbar button:disabled {
   opacity: 0.4;
   cursor: not-allowed;

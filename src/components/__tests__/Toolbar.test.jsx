@@ -1,8 +1,8 @@
 /**
  * Toolbar.test.jsx - React component tests for Toolbar
  *
- * Tests the toolbar component for simulation control and
- * adding circuit components.
+ * Tests the mode-based toolbar component for simulation control
+ * and component placement mode selection.
  */
 
 import { describe, it, expect, vi } from 'vitest'
@@ -13,13 +13,14 @@ describe('Toolbar', () => {
   describe('Simulation Control Button', () => {
     it('should render start button when not running', () => {
       const onToggleSimulation = vi.fn()
-      const onAddComponent = vi.fn()
+      const onModeChange = vi.fn()
 
       render(
         <Toolbar
           isRunning={false}
           onToggleSimulation={onToggleSimulation}
-          onAddComponent={onAddComponent}
+          onModeChange={onModeChange}
+          activeMode={null}
         />
       )
 
@@ -28,13 +29,14 @@ describe('Toolbar', () => {
 
     it('should render stop button when running', () => {
       const onToggleSimulation = vi.fn()
-      const onAddComponent = vi.fn()
+      const onModeChange = vi.fn()
 
       render(
         <Toolbar
           isRunning={true}
           onToggleSimulation={onToggleSimulation}
-          onAddComponent={onAddComponent}
+          onModeChange={onModeChange}
+          activeMode={null}
         />
       )
 
@@ -43,13 +45,14 @@ describe('Toolbar', () => {
 
     it('should call onToggleSimulation when start button clicked', () => {
       const onToggleSimulation = vi.fn()
-      const onAddComponent = vi.fn()
+      const onModeChange = vi.fn()
 
       render(
         <Toolbar
           isRunning={false}
           onToggleSimulation={onToggleSimulation}
-          onAddComponent={onAddComponent}
+          onModeChange={onModeChange}
+          activeMode={null}
         />
       )
 
@@ -60,13 +63,14 @@ describe('Toolbar', () => {
 
     it('should call onToggleSimulation when stop button clicked', () => {
       const onToggleSimulation = vi.fn()
-      const onAddComponent = vi.fn()
+      const onModeChange = vi.fn()
 
       render(
         <Toolbar
           isRunning={true}
           onToggleSimulation={onToggleSimulation}
-          onAddComponent={onAddComponent}
+          onModeChange={onModeChange}
+          activeMode={null}
         />
       )
 
@@ -77,364 +81,371 @@ describe('Toolbar', () => {
 
     it('should have "running" class when simulation is running', () => {
       const onToggleSimulation = vi.fn()
-      const onAddComponent = vi.fn()
+      const onModeChange = vi.fn()
 
       render(
         <Toolbar
           isRunning={true}
           onToggleSimulation={onToggleSimulation}
-          onAddComponent={onAddComponent}
+          onModeChange={onModeChange}
+          activeMode={null}
         />
       )
 
       const button = screen.getByRole('button', { name: /Stop/i })
-      expect(button.className).toContain('running')
+      expect(button).toHaveClass('running')
     })
 
-    it('should have "stopped" class when simulation is stopped', () => {
+    it('should have "stopped" class when simulation is not running', () => {
       const onToggleSimulation = vi.fn()
-      const onAddComponent = vi.fn()
+      const onModeChange = vi.fn()
 
       render(
         <Toolbar
           isRunning={false}
           onToggleSimulation={onToggleSimulation}
-          onAddComponent={onAddComponent}
+          onModeChange={onModeChange}
+          activeMode={null}
         />
       )
 
       const button = screen.getByRole('button', { name: /Start/i })
-      expect(button.className).toContain('stopped')
+      expect(button).toHaveClass('stopped')
     })
   })
 
-  describe('Component Buttons - Enabled State', () => {
-    it('should enable all component buttons when not running', () => {
-      const onToggleSimulation = vi.fn()
-      const onAddComponent = vi.fn()
-
+  describe('Component Mode Buttons', () => {
+    it('should render battery mode button', () => {
       render(
         <Toolbar
           isRunning={false}
-          onToggleSimulation={onToggleSimulation}
-          onAddComponent={onAddComponent}
+          onToggleSimulation={vi.fn()}
+          onModeChange={vi.fn()}
+          activeMode={null}
         />
       )
 
-      expect(screen.getByRole('button', { name: /Potato/i })).not.toBeDisabled()
-      expect(screen.getByRole('button', { name: /LED/i })).not.toBeDisabled()
-      expect(screen.getByRole('button', { name: /Resistor/i })).not.toBeDisabled()
-      expect(screen.getByRole('button', { name: /Capacitor/i })).not.toBeDisabled()
-      expect(screen.getByRole('button', { name: /Light Bulb/i })).not.toBeDisabled()
+      expect(screen.getByRole('button', { name: /Battery/i })).toBeInTheDocument()
     })
 
-    it('should disable all component buttons when running', () => {
-      const onToggleSimulation = vi.fn()
-      const onAddComponent = vi.fn()
+    it('should render LED mode button', () => {
+      render(
+        <Toolbar
+          isRunning={false}
+          onToggleSimulation={vi.fn()}
+          onModeChange={vi.fn()}
+          activeMode={null}
+        />
+      )
 
+      expect(screen.getByRole('button', { name: /LED/i })).toBeInTheDocument()
+    })
+
+    it('should render resistor mode button', () => {
+      render(
+        <Toolbar
+          isRunning={false}
+          onToggleSimulation={vi.fn()}
+          onModeChange={vi.fn()}
+          activeMode={null}
+        />
+      )
+
+      expect(screen.getByRole('button', { name: /Resistor/i })).toBeInTheDocument()
+    })
+
+    it('should render capacitor mode button', () => {
+      render(
+        <Toolbar
+          isRunning={false}
+          onToggleSimulation={vi.fn()}
+          onModeChange={vi.fn()}
+          activeMode={null}
+        />
+      )
+
+      expect(screen.getByRole('button', { name: /Capacitor/i })).toBeInTheDocument()
+    })
+
+    it('should render bulb mode button', () => {
+      render(
+        <Toolbar
+          isRunning={false}
+          onToggleSimulation={vi.fn()}
+          onModeChange={vi.fn()}
+          activeMode={null}
+        />
+      )
+
+      expect(screen.getByRole('button', { name: /Bulb/i })).toBeInTheDocument()
+    })
+
+    it('should render wire mode button', () => {
+      render(
+        <Toolbar
+          isRunning={false}
+          onToggleSimulation={vi.fn()}
+          onModeChange={vi.fn()}
+          activeMode={null}
+        />
+      )
+
+      expect(screen.getByRole('button', { name: /Wire/i })).toBeInTheDocument()
+    })
+
+    it('should disable component buttons when simulation is running', () => {
       render(
         <Toolbar
           isRunning={true}
-          onToggleSimulation={onToggleSimulation}
-          onAddComponent={onAddComponent}
+          onToggleSimulation={vi.fn()}
+          onModeChange={vi.fn()}
+          activeMode={null}
         />
       )
 
-      expect(screen.getByRole('button', { name: /Potato/i })).toBeDisabled()
+      expect(screen.getByRole('button', { name: /Battery/i })).toBeDisabled()
       expect(screen.getByRole('button', { name: /LED/i })).toBeDisabled()
       expect(screen.getByRole('button', { name: /Resistor/i })).toBeDisabled()
       expect(screen.getByRole('button', { name: /Capacitor/i })).toBeDisabled()
-      expect(screen.getByRole('button', { name: /Light Bulb/i })).toBeDisabled()
+      expect(screen.getByRole('button', { name: /Bulb/i })).toBeDisabled()
+      expect(screen.getByRole('button', { name: /Wire/i })).toBeDisabled()
     })
-  })
 
-  describe('Add Battery', () => {
-    it('should call onAddComponent with battery data when clicked', () => {
-      const onToggleSimulation = vi.fn()
-      const onAddComponent = vi.fn()
-
+    it('should enable component buttons when simulation is not running', () => {
       render(
         <Toolbar
           isRunning={false}
-          onToggleSimulation={onToggleSimulation}
-          onAddComponent={onAddComponent}
+          onToggleSimulation={vi.fn()}
+          onModeChange={vi.fn()}
+          activeMode={null}
         />
       )
 
-      fireEvent.click(screen.getByRole('button', { name: /Potato/i }))
-
-      expect(onAddComponent).toHaveBeenCalledTimes(1)
-      const component = onAddComponent.mock.calls[0][0]
-      expect(component.type).toBe('battery')
-      expect(component.voltage).toBe(0.9)
-      expect(component.charge).toBe(1.0)
-      expect(component.id).toBeDefined()
-      expect(component.x).toBeGreaterThanOrEqual(100)
-      expect(component.y).toBeGreaterThanOrEqual(100)
-    })
-
-    it('should generate unique ID for battery', () => {
-      const onToggleSimulation = vi.fn()
-      const onAddComponent = vi.fn()
-
-      render(
-        <Toolbar
-          isRunning={false}
-          onToggleSimulation={onToggleSimulation}
-          onAddComponent={onAddComponent}
-        />
-      )
-
-      fireEvent.click(screen.getByRole('button', { name: /Potato/i }))
-      const id1 = onAddComponent.mock.calls[0][0].id
-
-      fireEvent.click(screen.getByRole('button', { name: /Potato/i }))
-      const id2 = onAddComponent.mock.calls[1][0].id
-
-      expect(id1).not.toBe(id2)
+      expect(screen.getByRole('button', { name: /Battery/i })).not.toBeDisabled()
+      expect(screen.getByRole('button', { name: /LED/i })).not.toBeDisabled()
+      expect(screen.getByRole('button', { name: /Resistor/i })).not.toBeDisabled()
+      expect(screen.getByRole('button', { name: /Capacitor/i })).not.toBeDisabled()
+      expect(screen.getByRole('button', { name: /Bulb/i })).not.toBeDisabled()
+      expect(screen.getByRole('button', { name: /Wire/i })).not.toBeDisabled()
     })
   })
 
-  describe('Add LED', () => {
-    it('should call onAddComponent with LED data when clicked', () => {
-      const onToggleSimulation = vi.fn()
-      const onAddComponent = vi.fn()
+  describe('Mode Selection', () => {
+    it('should call onModeChange with "battery" when battery button clicked (inactive)', () => {
+      const onModeChange = vi.fn()
 
       render(
         <Toolbar
           isRunning={false}
-          onToggleSimulation={onToggleSimulation}
-          onAddComponent={onAddComponent}
+          onToggleSimulation={vi.fn()}
+          onModeChange={onModeChange}
+          activeMode={null}
+        />
+      )
+
+      fireEvent.click(screen.getByRole('button', { name: /Battery/i }))
+
+      expect(onModeChange).toHaveBeenCalledWith('battery')
+    })
+
+    it('should call onModeChange with null when battery button clicked (active)', () => {
+      const onModeChange = vi.fn()
+
+      render(
+        <Toolbar
+          isRunning={false}
+          onToggleSimulation={vi.fn()}
+          onModeChange={onModeChange}
+          activeMode="battery"
+        />
+      )
+
+      fireEvent.click(screen.getByRole('button', { name: /Battery/i }))
+
+      expect(onModeChange).toHaveBeenCalledWith(null)
+    })
+
+    it('should call onModeChange with "led" when LED button clicked', () => {
+      const onModeChange = vi.fn()
+
+      render(
+        <Toolbar
+          isRunning={false}
+          onToggleSimulation={vi.fn()}
+          onModeChange={onModeChange}
+          activeMode={null}
         />
       )
 
       fireEvent.click(screen.getByRole('button', { name: /LED/i }))
 
-      expect(onAddComponent).toHaveBeenCalledTimes(1)
-      const component = onAddComponent.mock.calls[0][0]
-      expect(component.type).toBe('led')
-      expect(component.brightness).toBe(0)
-      expect(component.id).toBeDefined()
-      expect(component.x).toBeGreaterThanOrEqual(250)
-      expect(component.y).toBeGreaterThanOrEqual(100)
+      expect(onModeChange).toHaveBeenCalledWith('led')
     })
-  })
 
-  describe('Add Resistor', () => {
-    it('should call onAddComponent with resistor data when clicked', () => {
-      const onToggleSimulation = vi.fn()
-      const onAddComponent = vi.fn()
+    it('should call onModeChange with "resistor" when resistor button clicked', () => {
+      const onModeChange = vi.fn()
 
       render(
         <Toolbar
           isRunning={false}
-          onToggleSimulation={onToggleSimulation}
-          onAddComponent={onAddComponent}
+          onToggleSimulation={vi.fn()}
+          onModeChange={onModeChange}
+          activeMode={null}
         />
       )
 
       fireEvent.click(screen.getByRole('button', { name: /Resistor/i }))
 
-      expect(onAddComponent).toHaveBeenCalledTimes(1)
-      const component = onAddComponent.mock.calls[0][0]
-      expect(component.type).toBe('resistor')
-      expect(component.resistance).toBe(100)
-      expect(component.current).toBe(0)
-      expect(component.id).toBeDefined()
-      expect(component.x).toBeGreaterThanOrEqual(400)
-      expect(component.y).toBeGreaterThanOrEqual(100)
+      expect(onModeChange).toHaveBeenCalledWith('resistor')
     })
 
-    it('should show 100Ω in button label', () => {
-      const onToggleSimulation = vi.fn()
-      const onAddComponent = vi.fn()
+    it('should call onModeChange with "capacitor" when capacitor button clicked', () => {
+      const onModeChange = vi.fn()
 
       render(
         <Toolbar
           isRunning={false}
-          onToggleSimulation={onToggleSimulation}
-          onAddComponent={onAddComponent}
-        />
-      )
-
-      expect(screen.getByRole('button', { name: /100Ω/i })).toBeInTheDocument()
-    })
-  })
-
-  describe('Add Capacitor', () => {
-    it('should call onAddComponent with capacitor data when clicked', () => {
-      const onToggleSimulation = vi.fn()
-      const onAddComponent = vi.fn()
-
-      render(
-        <Toolbar
-          isRunning={false}
-          onToggleSimulation={onToggleSimulation}
-          onAddComponent={onAddComponent}
+          onToggleSimulation={vi.fn()}
+          onModeChange={onModeChange}
+          activeMode={null}
         />
       )
 
       fireEvent.click(screen.getByRole('button', { name: /Capacitor/i }))
 
-      expect(onAddComponent).toHaveBeenCalledTimes(1)
-      const component = onAddComponent.mock.calls[0][0]
-      expect(component.type).toBe('capacitor')
-      expect(component.capacitance).toBe(0.1)
-      expect(component.voltage).toBe(0)
-      expect(component.maxVoltage).toBe(5.0)
-      expect(component.id).toBeDefined()
-      expect(component.x).toBeGreaterThanOrEqual(550)
-      expect(component.y).toBeGreaterThanOrEqual(100)
+      expect(onModeChange).toHaveBeenCalledWith('capacitor')
     })
 
-    it('should show 100mF in button label', () => {
-      const onToggleSimulation = vi.fn()
-      const onAddComponent = vi.fn()
+    it('should call onModeChange with "lightbulb" when bulb button clicked', () => {
+      const onModeChange = vi.fn()
 
       render(
         <Toolbar
           isRunning={false}
-          onToggleSimulation={onToggleSimulation}
-          onAddComponent={onAddComponent}
+          onToggleSimulation={vi.fn()}
+          onModeChange={onModeChange}
+          activeMode={null}
         />
       )
 
-      expect(screen.getByRole('button', { name: /100mF/i })).toBeInTheDocument()
+      fireEvent.click(screen.getByRole('button', { name: /Bulb/i }))
+
+      expect(onModeChange).toHaveBeenCalledWith('lightbulb')
+    })
+
+    it('should call onModeChange with "wire" when wire button clicked', () => {
+      const onModeChange = vi.fn()
+
+      render(
+        <Toolbar
+          isRunning={false}
+          onToggleSimulation={vi.fn()}
+          onModeChange={onModeChange}
+          activeMode={null}
+        />
+      )
+
+      fireEvent.click(screen.getByRole('button', { name: /Wire/i }))
+
+      expect(onModeChange).toHaveBeenCalledWith('wire')
     })
   })
 
-  describe('Add Light Bulb', () => {
-    it('should call onAddComponent with light bulb data when clicked', () => {
-      const onToggleSimulation = vi.fn()
-      const onAddComponent = vi.fn()
-
+  describe('Active Mode Highlighting', () => {
+    it('should add "active" class to battery button when battery mode is active', () => {
       render(
         <Toolbar
           isRunning={false}
-          onToggleSimulation={onToggleSimulation}
-          onAddComponent={onAddComponent}
+          onToggleSimulation={vi.fn()}
+          onModeChange={vi.fn()}
+          activeMode="battery"
         />
       )
 
-      fireEvent.click(screen.getByRole('button', { name: /Light Bulb/i }))
-
-      expect(onAddComponent).toHaveBeenCalledTimes(1)
-      const component = onAddComponent.mock.calls[0][0]
-      expect(component.type).toBe('lightbulb')
-      expect(component.brightness).toBe(0)
-      expect(component.resistance).toBe(0.36)
-      expect(component.current).toBe(0)
-      expect(component.power).toBe(0)
-      expect(component.id).toBeDefined()
-      expect(component.x).toBeGreaterThanOrEqual(700)
-      expect(component.y).toBeGreaterThanOrEqual(100)
+      expect(screen.getByRole('button', { name: /Battery/i })).toHaveClass('active')
     })
-  })
 
-  describe('Component Position Randomization', () => {
-    it('should randomize battery position within range', () => {
-      const onToggleSimulation = vi.fn()
-      const onAddComponent = vi.fn()
-
+    it('should add "active" class to LED button when LED mode is active', () => {
       render(
         <Toolbar
           isRunning={false}
-          onToggleSimulation={onToggleSimulation}
-          onAddComponent={onAddComponent}
+          onToggleSimulation={vi.fn()}
+          onModeChange={vi.fn()}
+          activeMode="led"
         />
       )
 
-      fireEvent.click(screen.getByRole('button', { name: /Potato/i }))
-
-      const component = onAddComponent.mock.calls[0][0]
-      // x: 100 + Math.random() * 100 = [100, 200)
-      expect(component.x).toBeGreaterThanOrEqual(100)
-      expect(component.x).toBeLessThan(200)
-      // y: 100 + Math.random() * 100 = [100, 200)
-      expect(component.y).toBeGreaterThanOrEqual(100)
-      expect(component.y).toBeLessThan(200)
+      expect(screen.getByRole('button', { name: /LED/i })).toHaveClass('active')
     })
 
-    it('should place different component types at different x offsets', () => {
-      const onToggleSimulation = vi.fn()
-      const onAddComponent = vi.fn()
-
+    it('should add "active" class to resistor button when resistor mode is active', () => {
       render(
         <Toolbar
           isRunning={false}
-          onToggleSimulation={onToggleSimulation}
-          onAddComponent={onAddComponent}
+          onToggleSimulation={vi.fn()}
+          onModeChange={vi.fn()}
+          activeMode="resistor"
         />
       )
 
-      fireEvent.click(screen.getByRole('button', { name: /Potato/i }))
-      const battery = onAddComponent.mock.calls[0][0]
-
-      fireEvent.click(screen.getByRole('button', { name: /LED/i }))
-      const led = onAddComponent.mock.calls[1][0]
-
-      fireEvent.click(screen.getByRole('button', { name: /Resistor/i }))
-      const resistor = onAddComponent.mock.calls[2][0]
-
-      // Battery starts at x=100, LED at x=250, Resistor at x=400
-      expect(battery.x).toBeLessThan(200)
-      expect(led.x).toBeGreaterThanOrEqual(250)
-      expect(led.x).toBeLessThan(350)
-      expect(resistor.x).toBeGreaterThanOrEqual(400)
-    })
-  })
-
-  describe('Component Rendering', () => {
-    it('should render the toolbar div', () => {
-      const onToggleSimulation = vi.fn()
-      const onAddComponent = vi.fn()
-
-      const { container } = render(
-        <Toolbar
-          isRunning={false}
-          onToggleSimulation={onToggleSimulation}
-          onAddComponent={onAddComponent}
-        />
-      )
-
-      expect(container.querySelector('.toolbar')).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: /Resistor/i })).toHaveClass('active')
     })
 
-    it('should render 6 buttons (1 control + 5 components)', () => {
-      const onToggleSimulation = vi.fn()
-      const onAddComponent = vi.fn()
-
+    it('should add "active" class to capacitor button when capacitor mode is active', () => {
       render(
         <Toolbar
           isRunning={false}
-          onToggleSimulation={onToggleSimulation}
-          onAddComponent={onAddComponent}
+          onToggleSimulation={vi.fn()}
+          onModeChange={vi.fn()}
+          activeMode="capacitor"
         />
       )
 
-      const buttons = screen.getAllByRole('button')
-      expect(buttons).toHaveLength(6)
+      expect(screen.getByRole('button', { name: /Capacitor/i })).toHaveClass('active')
     })
-  })
 
-  describe('Button Labels', () => {
-    it('should show emoji labels for all components', () => {
-      const onToggleSimulation = vi.fn()
-      const onAddComponent = vi.fn()
-
+    it('should add "active" class to bulb button when lightbulb mode is active', () => {
       render(
         <Toolbar
           isRunning={false}
-          onToggleSimulation={onToggleSimulation}
-          onAddComponent={onAddComponent}
+          onToggleSimulation={vi.fn()}
+          onModeChange={vi.fn()}
+          activeMode="lightbulb"
         />
       )
 
-      expect(screen.getByRole('button', { name: /🥔/i })).toBeInTheDocument()
-      expect(screen.getByRole('button', { name: /💡 LED/i })).toBeInTheDocument()
-      expect(screen.getByRole('button', { name: /⚡ Resistor/i })).toBeInTheDocument()
-      expect(screen.getByRole('button', { name: /⚡ Capacitor/i })).toBeInTheDocument()
-      expect(screen.getByRole('button', { name: /💡 Light Bulb/i })).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: /Bulb/i })).toHaveClass('active')
+    })
+
+    it('should add "active" class to wire button when wire mode is active', () => {
+      render(
+        <Toolbar
+          isRunning={false}
+          onToggleSimulation={vi.fn()}
+          onModeChange={vi.fn()}
+          activeMode="wire"
+        />
+      )
+
+      expect(screen.getByRole('button', { name: /Wire/i })).toHaveClass('active')
+    })
+
+    it('should not add "active" class to any button when no mode is active', () => {
+      render(
+        <Toolbar
+          isRunning={false}
+          onToggleSimulation={vi.fn()}
+          onModeChange={vi.fn()}
+          activeMode={null}
+        />
+      )
+
+      expect(screen.getByRole('button', { name: /Battery/i })).not.toHaveClass('active')
+      expect(screen.getByRole('button', { name: /LED/i })).not.toHaveClass('active')
+      expect(screen.getByRole('button', { name: /Resistor/i })).not.toHaveClass('active')
+      expect(screen.getByRole('button', { name: /Capacitor/i })).not.toHaveClass('active')
+      expect(screen.getByRole('button', { name: /Bulb/i })).not.toHaveClass('active')
+      expect(screen.getByRole('button', { name: /Wire/i })).not.toHaveClass('active')
     })
   })
 })

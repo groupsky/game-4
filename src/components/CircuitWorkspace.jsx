@@ -33,7 +33,6 @@ export default function CircuitWorkspace() {
   const [wires, setWires] = useState([])
   const [dragging, setDragging] = useState(null)
   const [offset, setOffset] = useState({ x: 0, y: 0 })
-  const [connecting, setConnecting] = useState(null)
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 })
   const [selectedComponent, setSelectedComponent] = useState(null)
   const [selectedComponents, setSelectedComponents] = useState([])
@@ -157,21 +156,6 @@ export default function CircuitWorkspace() {
       drawWire(ctx, wire, components)
     })
 
-    // Draw wire being created (legacy Shift+drag mode)
-    if (connecting) {
-      const comp = components.find(c => c.id === connecting)
-      if (comp) {
-        ctx.strokeStyle = '#1E3A8A'
-        ctx.lineWidth = 3
-        ctx.setLineDash([5, 5])
-        ctx.beginPath()
-        ctx.moveTo(comp.x, comp.y)
-        ctx.lineTo(mousePos.x, mousePos.y)
-        ctx.stroke()
-        ctx.setLineDash([])
-      }
-    }
-
     // Draw wire chain preview (click-sequence mode)
     if (wireChain.length > 0) {
       ctx.strokeStyle = '#F97316'
@@ -239,7 +223,7 @@ export default function CircuitWorkspace() {
         ctx.restore()
       }
     })
-  }, [components, wires, connecting, mousePos, selectedComponent, selectedComponents, selectionBox, wireChain])
+  }, [components, wires, mousePos, selectedComponent, selectedComponents, selectionBox, wireChain])
 
   // Run simulation every 100ms (with 10ms physics step for finer granularity)
   // ONLY when simulation is running
@@ -399,15 +383,6 @@ export default function CircuitWorkspace() {
       return
     }
 
-    // LEGACY SHIFT+DRAG WIRING (keep for desktop compatibility)
-    if (e.shiftKey && capabilities.supportsShiftDrag()) {
-      const hit = getComponentAt(x, y)
-      if (hit) {
-        setConnecting(hit.component.id)
-      }
-      return
-    }
-
     // SELECTION MODE (default when no active mode)
     const hit = getComponentAt(x, y)
 
@@ -558,25 +533,6 @@ export default function CircuitWorkspace() {
   }
 
   const handleMouseUp = (e) => {
-    if (connecting) {
-      // Finish wire connection
-      const canvas = canvasRef.current
-      const rect = canvas.getBoundingClientRect()
-      const x = e.clientX - rect.left
-      const y = e.clientY - rect.top
-
-      const hit = getComponentAt(x, y)
-      if (hit && hit.component.id !== connecting) {
-        // Create wire
-        setWires([...wires, {
-          id: Date.now(),
-          from: connecting,
-          to: hit.component.id
-        }])
-      }
-      setConnecting(null)
-    }
-
     if (selectionBox && selectionBox.width > 5 && selectionBox.height > 5) {
       // Find all components within selection box
       const selected = []
@@ -640,7 +596,8 @@ export default function CircuitWorkspace() {
         <Toolbar
           isRunning={isRunning}
           onToggleSimulation={() => simulationState.toggle()}
-          onAddComponent={(component) => setComponents([...components, component])}
+          onModeChange={setActiveMode}
+          activeMode={activeMode}
         />
       </div>
 
@@ -658,7 +615,6 @@ export default function CircuitWorkspace() {
         isRunning={isRunning}
         components={components}
         wires={wires}
-        connecting={connecting}
         selectedComponents={selectedComponents}
         selectedComponent={selectedComponent}
       />

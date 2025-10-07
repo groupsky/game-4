@@ -1,68 +1,11 @@
 /**
- * Toolbar - Component toolbar for adding circuit elements
+ * Toolbar - Mode-based component toolbar
  *
- * Provides buttons for starting/stopping simulation and adding components
- * to the circuit workspace.
+ * Provides buttons for starting/stopping simulation and selecting
+ * component placement modes with visual feedback.
  */
 
-export function Toolbar({ isRunning, onToggleSimulation, onAddComponent }) {
-  const addBattery = () => {
-    onAddComponent({
-      id: Date.now(),
-      type: 'battery',
-      x: 100 + Math.random() * 100,
-      y: 100 + Math.random() * 100,
-      charge: 1.0,
-      voltage: 0.9  // Single potato battery
-    })
-  }
-
-  const addLED = () => {
-    onAddComponent({
-      id: Date.now(),
-      type: 'led',
-      x: 250 + Math.random() * 100,
-      y: 100 + Math.random() * 100,
-      brightness: 0
-    })
-  }
-
-  const addResistor = () => {
-    onAddComponent({
-      id: Date.now(),
-      type: 'resistor',
-      x: 400 + Math.random() * 100,
-      y: 100 + Math.random() * 100,
-      resistance: 100,
-      current: 0
-    })
-  }
-
-  const addCapacitor = () => {
-    onAddComponent({
-      id: Date.now(),
-      type: 'capacitor',
-      x: 550 + Math.random() * 100,
-      y: 100 + Math.random() * 100,
-      capacitance: 0.1,  // 100mF capacitor
-      voltage: 0,
-      maxVoltage: 5.0
-    })
-  }
-
-  const addLightBulb = () => {
-    onAddComponent({
-      id: Date.now(),
-      type: 'lightbulb',
-      x: 700 + Math.random() * 100,
-      y: 100 + Math.random() * 100,
-      brightness: 0,
-      resistance: 0.36,  // Tuned to drain 3 batteries in ~40 seconds
-      current: 0,
-      power: 0
-    })
-  }
-
+export function Toolbar({ isRunning, onToggleSimulation, onModeChange, activeMode }) {
   return (
     <div className="toolbar">
       <button
@@ -73,33 +16,45 @@ export function Toolbar({ isRunning, onToggleSimulation, onAddComponent }) {
       </button>
       <button
         disabled={isRunning}
-        onClick={addBattery}
+        className={activeMode === 'battery' ? 'active' : ''}
+        onClick={() => onModeChange(activeMode === 'battery' ? null : 'battery')}
       >
-        Add 🥔 Potato
+        🥔 Battery
       </button>
       <button
         disabled={isRunning}
-        onClick={addLED}
+        className={activeMode === 'led' ? 'active' : ''}
+        onClick={() => onModeChange(activeMode === 'led' ? null : 'led')}
       >
-        Add 💡 LED
+        💡 LED
       </button>
       <button
         disabled={isRunning}
-        onClick={addResistor}
+        className={activeMode === 'resistor' ? 'active' : ''}
+        onClick={() => onModeChange(activeMode === 'resistor' ? null : 'resistor')}
       >
-        Add ⚡ Resistor (100Ω)
+        ⚡ Resistor
       </button>
       <button
         disabled={isRunning}
-        onClick={addCapacitor}
+        className={activeMode === 'capacitor' ? 'active' : ''}
+        onClick={() => onModeChange(activeMode === 'capacitor' ? null : 'capacitor')}
       >
-        Add ⚡ Capacitor (100mF)
+        🔋 Capacitor
       </button>
       <button
         disabled={isRunning}
-        onClick={addLightBulb}
+        className={activeMode === 'lightbulb' ? 'active' : ''}
+        onClick={() => onModeChange(activeMode === 'lightbulb' ? null : 'lightbulb')}
       >
-        Add 💡 Light Bulb
+        💡 Bulb
+      </button>
+      <button
+        disabled={isRunning}
+        className={activeMode === 'wire' ? 'active' : ''}
+        onClick={() => onModeChange(activeMode === 'wire' ? null : 'wire')}
+      >
+        🔌 Wire
       </button>
     </div>
   )

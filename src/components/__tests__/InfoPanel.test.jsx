@@ -17,7 +17,6 @@ describe('InfoPanel', () => {
           isRunning={true}
           components={[]}
           wires={[]}
-          connecting={false}
           selectedComponents={[]}
           selectedComponent={null}
         />
@@ -32,7 +31,6 @@ describe('InfoPanel', () => {
           isRunning={true}
           components={[]}
           wires={[]}
-          connecting={false}
           selectedComponents={[]}
           selectedComponent={null}
         />
@@ -48,7 +46,6 @@ describe('InfoPanel', () => {
           isRunning={false}
           components={[]}
           wires={[]}
-          connecting={false}
           selectedComponents={[]}
           selectedComponent={null}
         />
@@ -63,14 +60,13 @@ describe('InfoPanel', () => {
           isRunning={false}
           components={[]}
           wires={[]}
-          connecting={false}
           selectedComponents={[]}
           selectedComponent={null}
         />
       )
 
-      expect(screen.getByText(/Drag to move/i)).toBeInTheDocument()
-      expect(screen.getByText(/Shift\+Click to wire/i)).toBeInTheDocument()
+      expect(screen.getByText(/Click mode button/i)).toBeInTheDocument()
+      expect(screen.getByText(/Wire mode: Click components in sequence/i)).toBeInTheDocument()
     })
   })
 
@@ -81,7 +77,6 @@ describe('InfoPanel', () => {
           isRunning={false}
           components={[]}
           wires={[]}
-          connecting={false}
           selectedComponents={[]}
           selectedComponent={null}
         />
@@ -103,7 +98,6 @@ describe('InfoPanel', () => {
           isRunning={false}
           components={components}
           wires={[]}
-          connecting={false}
           selectedComponents={[]}
           selectedComponent={null}
         />
@@ -123,7 +117,6 @@ describe('InfoPanel', () => {
           isRunning={false}
           components={[]}
           wires={wires}
-          connecting={false}
           selectedComponents={[]}
           selectedComponent={null}
         />
@@ -144,61 +137,12 @@ describe('InfoPanel', () => {
           isRunning={false}
           components={components}
           wires={wires}
-          connecting={false}
           selectedComponents={[]}
           selectedComponent={null}
         />
       )
 
       expect(screen.getByText(/Components: 2.*Wires: 1/i)).toBeInTheDocument()
-    })
-  })
-
-  describe('Connecting State', () => {
-    it('should show connecting message when connecting is true', () => {
-      render(
-        <InfoPanel
-          isRunning={false}
-          components={[]}
-          wires={[]}
-          connecting={true}
-          selectedComponents={[]}
-          selectedComponent={null}
-        />
-      )
-
-      expect(screen.getByText(/Connecting\.\.\./i)).toBeInTheDocument()
-      expect(screen.getByText(/Click another component to finish wire/i)).toBeInTheDocument()
-    })
-
-    it('should not show connecting message when connecting is false', () => {
-      render(
-        <InfoPanel
-          isRunning={false}
-          components={[]}
-          wires={[]}
-          connecting={false}
-          selectedComponents={[]}
-          selectedComponent={null}
-        />
-      )
-
-      expect(screen.queryByText(/Connecting\.\.\./i)).not.toBeInTheDocument()
-    })
-
-    it('should not show connecting message when simulation is running', () => {
-      render(
-        <InfoPanel
-          isRunning={true}
-          components={[]}
-          wires={[]}
-          connecting={true}
-          selectedComponents={[]}
-          selectedComponent={null}
-        />
-      )
-
-      expect(screen.queryByText(/Connecting\.\.\./i)).not.toBeInTheDocument()
     })
   })
 
@@ -209,7 +153,6 @@ describe('InfoPanel', () => {
           isRunning={false}
           components={[]}
           wires={[]}
-          connecting={false}
           selectedComponents={[1, 2, 3]}
           selectedComponent={null}
         />
@@ -224,7 +167,6 @@ describe('InfoPanel', () => {
           isRunning={false}
           components={[]}
           wires={[]}
-          connecting={false}
           selectedComponents={[1, 2]}
           selectedComponent={null}
         />
@@ -239,7 +181,6 @@ describe('InfoPanel', () => {
           isRunning={true}
           components={[]}
           wires={[]}
-          connecting={false}
           selectedComponents={[1, 2]}
           selectedComponent={null}
         />
@@ -261,7 +202,6 @@ describe('InfoPanel', () => {
           isRunning={false}
           components={components}
           wires={[]}
-          connecting={false}
           selectedComponents={[]}
           selectedComponent={1}
         />
@@ -278,7 +218,6 @@ describe('InfoPanel', () => {
           isRunning={false}
           components={components}
           wires={[]}
-          connecting={false}
           selectedComponents={[]}
           selectedComponent={0}
         />
@@ -298,7 +237,6 @@ describe('InfoPanel', () => {
           isRunning={false}
           components={components}
           wires={[]}
-          connecting={false}
           selectedComponents={[0, 1]}
           selectedComponent={0}
         />
@@ -317,7 +255,6 @@ describe('InfoPanel', () => {
           isRunning={true}
           components={components}
           wires={[]}
-          connecting={false}
           selectedComponents={[]}
           selectedComponent={0}
         />
@@ -334,7 +271,6 @@ describe('InfoPanel', () => {
           isRunning={false}
           components={components}
           wires={[]}
-          connecting={false}
           selectedComponents={[]}
           selectedComponent={0}
         />
@@ -354,7 +290,6 @@ describe('InfoPanel', () => {
           isRunning={true}
           components={components}
           wires={[]}
-          connecting={true}
           selectedComponents={[0]}
           selectedComponent={0}
         />
@@ -377,7 +312,6 @@ describe('InfoPanel', () => {
           isRunning={false}
           components={components}
           wires={[{ from: 1, to: 2 }]}
-          connecting={false}
           selectedComponents={[]}
           selectedComponent={1}
         />
@@ -397,7 +331,6 @@ describe('InfoPanel', () => {
           isRunning={false}
           components={[]}
           wires={[]}
-          connecting={false}
           selectedComponents={[]}
           selectedComponent={null}
         />
@@ -412,7 +345,6 @@ describe('InfoPanel', () => {
           isRunning={false}
           components={[]}
           wires={[]}
-          connecting={false}
           selectedComponents={[]}
           selectedComponent={null}
         />
