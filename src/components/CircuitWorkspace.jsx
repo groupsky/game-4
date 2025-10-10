@@ -300,8 +300,9 @@ export default function CircuitWorkspace() {
       // Delete key
       if (e.key === 'Delete' || e.key === 'Backspace') {
         if (selectedComponents.length > 0) {
-          // Delete multiple components
-          selectedComponents.forEach(index => {
+          // Delete multiple components - sort indices in descending order to avoid index shifting
+          const sortedIndices = [...selectedComponents].sort((a, b) => b - a)
+          sortedIndices.forEach(index => {
             deleteComponent(index, components, setComponents, wires, setWires, undoStack, UndoActions, setToast)
           })
           setSelectedComponents([])

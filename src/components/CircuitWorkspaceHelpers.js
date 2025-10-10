@@ -89,12 +89,26 @@ export function createWiresFromChain(chain, wires, setWires, undoStack, UndoActi
 
   const newWires = []
   for (let i = 0; i < chain.length - 1; i++) {
-    newWires.push({
-      id: Date.now() + i,
-      from: chain[i],
-      to: chain[i + 1]
-    })
+    const from = chain[i]
+    const to = chain[i + 1]
+
+    // Check if wire already exists (bidirectional check)
+    const wireExists = wires.some(w =>
+      (w.from === from && w.to === to) || (w.from === to && w.to === from)
+    )
+
+    // Only add wire if it doesn't already exist
+    if (!wireExists) {
+      newWires.push({
+        id: Date.now() + i,
+        from,
+        to
+      })
+    }
   }
+
+  // If no new wires to add, don't do anything
+  if (newWires.length === 0) return
 
   // Record undo
   const actionInfo = UndoActions.ADD_WIRES(newWires.length)
