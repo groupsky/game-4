@@ -173,7 +173,9 @@ export function simulateCircuit(circuit, context) {
 
       // All batteries in a series chain get the same current
       // Each parallel chain discharges independently based on its own current
-      const drainRate = chainCurrent * 0.001
+      // Scale drain by deltaTime to make it framerate-independent
+      // Factor of 0.005 gives reasonable lifetimes: LEDs ~10,000s, bulbs ~27s
+      const drainRate = chainCurrent * deltaTime * 0.005
       chain.forEach(battery => {
         battery.charge = Math.max(0, battery.charge - drainRate)
       })
@@ -280,8 +282,9 @@ export function simulateLightBulb(circuit, context) {
 
       // All batteries in a series chain carry the same current
       // Each battery in the chain drains based on the chain's current
-      // Factor of 0.001 converts from current to charge drain rate per timestep
-      const drainRate = chainCurrent * 0.001
+      // Scale drain by deltaTime to make it framerate-independent
+      // Factor of 0.005 gives reasonable lifetimes: LEDs ~10,000s, bulbs ~27s
+      const drainRate = chainCurrent * deltaTime * 0.005
 
       chain.forEach(battery => {
         battery.charge = Math.max(0, battery.charge - drainRate)
@@ -290,7 +293,7 @@ export function simulateLightBulb(circuit, context) {
   } else if (batteries.length > 0) {
     // Fallback for circuits without topology analysis
     // Assume all batteries in series (old behavior for compatibility)
-    const drainRate = current * 0.001 / totalSources
+    const drainRate = current * deltaTime * 0.005 / totalSources
 
     batteries.forEach(battery => {
       battery.charge = Math.max(0, battery.charge - drainRate)
