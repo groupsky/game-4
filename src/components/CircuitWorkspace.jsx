@@ -125,6 +125,10 @@ export default function CircuitWorkspace() {
       setComponents([])
       setWires([])
 
+      // Clear undo stack when changing challenges
+      undoStack.clear()
+      setToast(null)
+
       // Then update challenge ID and load saved circuit
       setCurrentChallengeId(activeChallenge.id)
 

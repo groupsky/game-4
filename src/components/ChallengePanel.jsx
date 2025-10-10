@@ -20,6 +20,7 @@ export function ChallengePanel({ challengeSystem, circuit, isRunning, onChalleng
   const [showFailureModal, setShowFailureModal] = useState(false)
   const [failureReason, setFailureReason] = useState('')
   const [failureHint, setFailureHint] = useState('')
+  const [isExpanded, setIsExpanded] = useState(false)
   const previousCompletedRef = useRef(new Set())
   const previousFailedRef = useRef(false)
 
@@ -185,6 +186,12 @@ export function ChallengePanel({ challengeSystem, circuit, isRunning, onChalleng
 
   const handleRetryChallenge = () => {
     setShowCompletionModal(false)
+    // Remove from previousCompletedRef so completion can be detected again
+    if (activeChallenge) {
+      previousCompletedRef.current.delete(activeChallenge.id)
+    }
+    // Clear validation result
+    setValidationResult(null)
     // Stop the simulation to allow circuit modifications
     if (onStopSimulation) {
       onStopSimulation()
@@ -229,6 +236,14 @@ export function ChallengePanel({ challengeSystem, circuit, isRunning, onChalleng
     )
   }
 
+  // Helper to get star rating for a completed challenge
+  const getChallengeStars = (challenge) => {
+    if (!challenge.completed) return null
+    // For now, show 3 stars for completed challenges
+    // TODO: Store actual star rating in progress data
+    return 3
+  }
+
   return (
     <>
       <WinEffect
@@ -252,7 +267,15 @@ export function ChallengePanel({ challengeSystem, circuit, isRunning, onChalleng
         onRetry={handleRetryAfterFailure}
         onClose={handleCloseFailureModal}
       />
-      <div className="challenge-panel">
+      {/* Mobile toggle button */}
+      <button
+        className="challenge-toggle-btn"
+        onClick={() => setIsExpanded(!isExpanded)}
+        title="Toggle Challenge Panel"
+      >
+        🎯
+      </button>
+      <div className={`challenge-panel ${isExpanded ? 'expanded' : ''}`}>
         <div className="challenge-header">
           <h2>🎯 Current Challenge</h2>
         <button
@@ -321,7 +344,11 @@ export function ChallengePanel({ challengeSystem, circuit, isRunning, onChalleng
                 <span className="challenge-number">{index + 1}.</span>
                 <span className="challenge-title">{challenge.title}</span>
                 <span className="challenge-status">
-                  {challenge.completed ? '✅' : challenge.unlocked ? '🔓' : '🔒'}
+                  {challenge.completed ? (
+                    <span className="star-display">
+                      {'⭐'.repeat(getChallengeStars(challenge) || 0)}
+                    </span>
+                  ) : challenge.unlocked ? '🔓' : '🔒'}
                 </span>
               </div>
             ))}
@@ -340,7 +367,11 @@ export function ChallengePanel({ challengeSystem, circuit, isRunning, onChalleng
                 <span className="challenge-number">{index + 11}.</span>
                 <span className="challenge-title">{challenge.title}</span>
                 <span className="challenge-status">
-                  {challenge.completed ? '✅' : challenge.unlocked ? '🔓' : '🔒'}
+                  {challenge.completed ? (
+                    <span className="star-display">
+                      {'⭐'.repeat(getChallengeStars(challenge) || 0)}
+                    </span>
+                  ) : challenge.unlocked ? '🔓' : '🔒'}
                 </span>
               </div>
             ))}
@@ -359,7 +390,11 @@ export function ChallengePanel({ challengeSystem, circuit, isRunning, onChalleng
                 <span className="challenge-number">{index + 21}.</span>
                 <span className="challenge-title">{challenge.title}</span>
                 <span className="challenge-status">
-                  {challenge.completed ? '✅' : challenge.unlocked ? '🔓' : '🔒'}
+                  {challenge.completed ? (
+                    <span className="star-display">
+                      {'⭐'.repeat(getChallengeStars(challenge) || 0)}
+                    </span>
+                  ) : challenge.unlocked ? '🔓' : '🔒'}
                 </span>
               </div>
             ))}
