@@ -50,12 +50,13 @@ describe('Battery Discharge - Parallel Chain Configuration', () => {
     // All batteries in chain 2 (b3, b4) should drain at same rate
     expect(b3.charge).toBeCloseTo(b4.charge, 3)
 
-    // Each parallel chain carries current/3 (3 chains total)
-    // So all batteries should drain at roughly the same rate
-    // (regardless of how many batteries are in their chain)
-    expect(b0.charge).toBeCloseTo(b3.charge, 2)
-    expect(b0.charge).toBeCloseTo(b5.charge, 2)
-    expect(b3.charge).toBeCloseTo(b5.charge, 2)
+    // Parallel chains with different voltages carry different currents
+    // Higher voltage chains (more batteries) supply MORE current, so drain FASTER
+    // Chain 1 (3 batteries, 2.7V) drains fastest
+    // Chain 2 (2 batteries, 1.8V) drains medium
+    // Chain 3 (1 battery, 0.9V) drains slowest
+    expect(b0.charge).toBeLessThan(b3.charge) // Chain 1 < Chain 2
+    expect(b3.charge).toBeLessThan(b5.charge) // Chain 2 < Chain 3
 
     // Bulb should be lit
     expect(bulb1.brightness).toBeGreaterThan(0.2)

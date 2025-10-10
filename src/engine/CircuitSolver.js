@@ -172,7 +172,8 @@ export function simulateCircuit(circuit, context) {
       const chainCurrent = totalCurrent * chainCurrentFraction
 
       // All batteries in a series chain get the same current
-      const drainRate = chainCurrent * 0.001 / (capacitors.length + seriesChains.length)
+      // Each parallel chain discharges independently based on its own current
+      const drainRate = chainCurrent * 0.001
       chain.forEach(battery => {
         battery.charge = Math.max(0, battery.charge - drainRate)
       })
@@ -266,11 +267,21 @@ export function simulateLightBulb(circuit, context) {
     // Each parallel chain carries its share of the total current
     const currentPerChain = current / parallelCount
 
-    seriesChains.forEach(chain => {
+    seriesChains.forEach((chain, index) => {
+      // Calculate voltage of each chain to determine current distribution
+      const chainVoltage = chain.reduce((sum, bat) => sum + (bat.charge > 0 ? bat.voltage : 0), 0)
+      const totalChainVoltage = seriesChains.reduce((sum, ch) =>
+        sum + ch.reduce((s, b) => s + (b.charge > 0 ? b.voltage : 0), 0), 0
+      )
+
+      // Current from this chain is proportional to its voltage
+      const chainCurrentFraction = totalChainVoltage > 0 ? chainVoltage / totalChainVoltage : 1 / seriesChains.length
+      const chainCurrent = current * chainCurrentFraction
+
       // All batteries in a series chain carry the same current
       // Each battery in the chain drains based on the chain's current
       // Factor of 0.001 converts from current to charge drain rate per timestep
-      const drainRate = currentPerChain * 0.001
+      const drainRate = chainCurrent * 0.001
 
       chain.forEach(battery => {
         battery.charge = Math.max(0, battery.charge - drainRate)
