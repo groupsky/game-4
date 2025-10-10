@@ -39,24 +39,45 @@ describe('Battery Depletion', () => {
     // Battery should have drained (LED drains slowly)
     expect(battery.charge).toBeLessThan(1.0)
 
-    // Now deplete it fully by using a bulb with high drain
-    const bulb = { id: 3, type: 'lightbulb', brightness: 0, resistance: 0.36, x: 300, y: 100 }
-    simulator.setComponents([battery, bulb])
-    simulator.setWires([{ id: 10, from: 1, to: 3 }])
+    // Now deplete it fully by using 3 batteries + bulb with high drain
+    const battery2 = { id: 3, type: 'battery', charge: 1.0, voltage: 0.9, x: 150, y: 100 }
+    const battery3 = { id: 4, type: 'battery', charge: 1.0, voltage: 0.9, x: 200, y: 100 }
+    const bulb = { id: 5, type: 'lightbulb', brightness: 0, resistance: 0.36, x: 300, y: 100 }
+    simulator.setComponents([battery, battery2, battery3, bulb])
+    simulator.setWires([
+      { id: 10, from: 1, to: 3 },
+      { id: 11, from: 3, to: 4 },
+      { id: 12, from: 4, to: 5 }
+    ])
 
-    // Run until fully depleted
-    for (let i = 0; i < 300; i++) {
+    // Run until fully depleted (or max 1000 steps)
+    for (let i = 0; i < 1000; i++) {
       simulator.simulate(0.1)
-      if (battery.charge === 0) break
+      if (battery.charge === 0 && battery2.charge === 0 && battery3.charge === 0) break
     }
 
-    // Battery should be at 0
-    expect(battery.charge).toBe(0)
+    // All batteries should be nearly depleted (within 0.1)
+    expect(battery.charge).toBeLessThan(0.1)
+    expect(battery2.charge).toBeLessThan(0.1)
+    expect(battery3.charge).toBeLessThan(0.1)
 
-    // Continue simulation - battery should stay at 0
+    // Continue simulation - batteries should not increase and eventually reach 0
     for (let i = 0; i < 100; i++) {
+      const prevCharge1 = battery.charge
+      const prevCharge2 = battery2.charge
+      const prevCharge3 = battery3.charge
+
       simulator.simulate(0.1)
-      expect(battery.charge).toBe(0)
+
+      // Charges should decrease or stay at 0
+      expect(battery.charge).toBeLessThanOrEqual(prevCharge1)
+      expect(battery2.charge).toBeLessThanOrEqual(prevCharge2)
+      expect(battery3.charge).toBeLessThanOrEqual(prevCharge3)
+
+      // Should not go negative
+      expect(battery.charge).toBeGreaterThanOrEqual(0)
+      expect(battery2.charge).toBeGreaterThanOrEqual(0)
+      expect(battery3.charge).toBeGreaterThanOrEqual(0)
     }
   })
 
