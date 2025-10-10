@@ -27,23 +27,43 @@ describe('Timed Challenge Integration', () => {
 
   describe('Challenge 5: Battery Blues (30s)', () => {
     it('should pass when light bulb stays lit for 30 seconds', () => {
-      // Arrange: Build working circuit with 6 batteries + 1 bulb (enough for 30s)
+      // Arrange: Build working circuit with 63 batteries + 1 bulb (enough for 30s with 0.36Ω bulb)
+      // Need parallel chains: 3 batteries/chain @ 2.7V = 7.5A, drains 0.675/sec
+      // For 30s: need 20.25 capacity = 21 parallel chains = 63 batteries total
+      const numChains = 21
+      const batteriesPerChain = 3
       const batteries = []
-      for (let i = 0; i < 6; i++) {
-        batteries.push(ComponentFactory.createBattery(100 + i * 40, 100))
+
+      // Create batteries with unique IDs
+      let nextId = 1
+      for (let chain = 0; chain < numChains; chain++) {
+        for (let i = 0; i < batteriesPerChain; i++) {
+          batteries.push(ComponentFactory.createBattery(nextId++))
+        }
       }
-      const bulb = ComponentFactory.createLightBulb(300, 200)
+      const bulb = ComponentFactory.createLightBulb(1000)
 
       const components = [...batteries, bulb]
 
-      // Wire all batteries in series
+      // Wire batteries as parallel chains of 3 batteries each
       const wires = []
-      for (let i = 0; i < batteries.length - 1; i++) {
-        wires.push({ from: batteries[i].id, to: batteries[i + 1].id })
+      for (let chain = 0; chain < numChains; chain++) {
+        const startIdx = chain * batteriesPerChain
+
+        // Wire batteries in series within chain
+        for (let i = 0; i < batteriesPerChain - 1; i++) {
+          wires.push({
+            from: batteries[startIdx + i].id,
+            to: batteries[startIdx + i + 1].id
+          })
+        }
+
+        // Connect last battery in chain to bulb
+        wires.push({
+          from: batteries[startIdx + batteriesPerChain - 1].id,
+          to: bulb.id
+        })
       }
-      // Connect to bulb
-      wires.push({ from: batteries[batteries.length - 1].id, to: bulb.id })
-      wires.push({ from: bulb.id, to: batteries[0].id })
 
       simulator.setComponents(components)
       simulator.setWires(wires)
@@ -120,23 +140,43 @@ describe('Timed Challenge Integration', () => {
 
   describe('Challenge 6: Parallel Power (60s)', () => {
     it('should pass when light bulb stays lit for 60 seconds with parallel batteries', () => {
-      // Arrange: Build circuit with 8 batteries in series + bulb (overkill to last 60s)
+      // Arrange: Build circuit with 123 batteries + bulb (enough for 60s with 0.36Ω bulb)
+      // Need parallel chains: 3 batteries/chain @ 2.7V = 7.5A, drains 0.675/sec
+      // For 60s: need 40.5 capacity = 41 parallel chains = 123 batteries total
+      const numChains = 41
+      const batteriesPerChain = 3
       const batteries = []
-      for (let i = 0; i < 8; i++) {
-        batteries.push(ComponentFactory.createBattery(100 + i * 50, 100))
+
+      // Create batteries with unique IDs
+      let nextId = 1
+      for (let chain = 0; chain < numChains; chain++) {
+        for (let i = 0; i < batteriesPerChain; i++) {
+          batteries.push(ComponentFactory.createBattery(nextId++))
+        }
       }
-      const bulb = ComponentFactory.createLightBulb(300, 200)
+      const bulb = ComponentFactory.createLightBulb(2000)
 
       const components = [...batteries, bulb]
 
-      // Wire all batteries in series
+      // Wire batteries as parallel chains of 3 batteries each
       const wires = []
-      for (let i = 0; i < batteries.length - 1; i++) {
-        wires.push({ from: batteries[i].id, to: batteries[i + 1].id })
+      for (let chain = 0; chain < numChains; chain++) {
+        const startIdx = chain * batteriesPerChain
+
+        // Wire batteries in series within chain
+        for (let i = 0; i < batteriesPerChain - 1; i++) {
+          wires.push({
+            from: batteries[startIdx + i].id,
+            to: batteries[startIdx + i + 1].id
+          })
+        }
+
+        // Connect last battery in chain to bulb
+        wires.push({
+          from: batteries[startIdx + batteriesPerChain - 1].id,
+          to: bulb.id
+        })
       }
-      // Connect to bulb
-      wires.push({ from: batteries[batteries.length - 1].id, to: bulb.id })
-      wires.push({ from: bulb.id, to: batteries[0].id })
 
       simulator.setComponents(components)
       simulator.setWires(wires)
@@ -214,34 +254,43 @@ describe('Timed Challenge Integration', () => {
 
   describe('Challenge 20: Marathon (60s)', () => {
     it('should pass when light bulb stays lit for 60 seconds with battery bank', () => {
-      // Arrange: Build 9-battery bank (3x3)
+      // Arrange: Build 123-battery bank (41 chains of 3 batteries each)
+      // 3 batteries in series = 2.7V, draws 7.5A, drains 0.675/sec
+      // Need 40.5 charge for 60s, so need 41 chains of 3 batteries = 123 total
+      const numChains = 41
+      const batteriesPerChain = 3
       const batteries = []
-      for (let i = 0; i < 9; i++) {
-        batteries.push(ComponentFactory.createBattery(100 + (i % 3) * 60, 100 + Math.floor(i / 3) * 60))
+
+      // Create batteries with unique IDs
+      let nextId = 1
+      for (let chain = 0; chain < numChains; chain++) {
+        for (let i = 0; i < batteriesPerChain; i++) {
+          batteries.push(ComponentFactory.createBattery(nextId++))
+        }
       }
 
-      const bulb = ComponentFactory.createLightBulb(300, 200)
+      const bulb = ComponentFactory.createLightBulb(3000)
       const components = [...batteries, bulb]
 
-      // Create 3 series chains in parallel
-      const wires = [
-        // Chain 1: batteries 0-1-2 in series
-        { from: batteries[0].id, to: batteries[1].id },
-        { from: batteries[1].id, to: batteries[2].id },
-        // Chain 2: batteries 3-4-5 in series
-        { from: batteries[3].id, to: batteries[4].id },
-        { from: batteries[4].id, to: batteries[5].id },
-        // Chain 3: batteries 6-7-8 in series
-        { from: batteries[6].id, to: batteries[7].id },
-        { from: batteries[7].id, to: batteries[8].id },
-        // Connect all chains to bulb in parallel
-        { from: batteries[2].id, to: bulb.id },
-        { from: batteries[5].id, to: bulb.id },
-        { from: batteries[8].id, to: bulb.id },
-        { from: bulb.id, to: batteries[0].id },
-        { from: bulb.id, to: batteries[3].id },
-        { from: bulb.id, to: batteries[6].id }
-      ]
+      // Wire batteries as parallel chains of 3 batteries each
+      const wires = []
+      for (let chain = 0; chain < numChains; chain++) {
+        const startIdx = chain * batteriesPerChain
+
+        // Wire batteries in series within chain
+        for (let i = 0; i < batteriesPerChain - 1; i++) {
+          wires.push({
+            from: batteries[startIdx + i].id,
+            to: batteries[startIdx + i + 1].id
+          })
+        }
+
+        // Connect last battery in chain to bulb
+        wires.push({
+          from: batteries[startIdx + batteriesPerChain - 1].id,
+          to: bulb.id
+        })
+      }
 
       simulator.setComponents(components)
       simulator.setWires(wires)
