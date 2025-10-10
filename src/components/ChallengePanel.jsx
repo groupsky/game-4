@@ -208,6 +208,10 @@ export function ChallengePanel({ challengeSystem, circuit, isRunning, onChalleng
     // Reset the time tracker
     challengeSystem.getTimeTracker().reset()
     challengeSystem.getTimeTracker().failed = false
+    // Stop the simulation to allow circuit modifications
+    if (onStopSimulation) {
+      onStopSimulation()
+    }
     // Notify parent to reload circuit
     if (onChallengeChange) {
       onChallengeChange()
