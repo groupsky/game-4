@@ -206,12 +206,10 @@ export function simulateLightBulb(circuit, context) {
 
   // Use battery topology analysis for accurate series/parallel handling
   let totalVoltage = 0
-  let parallelCount = 1
 
   if (batteryTopology) {
     // Use analyzed topology
     totalVoltage = batteryTopology.voltage
-    parallelCount = batteryTopology.parallelCount || 1
   } else {
     // Fallback: treat all batteries as series (old behavior)
     batteries.forEach(battery => {
@@ -266,10 +264,7 @@ export function simulateLightBulb(circuit, context) {
     // Use topology analysis to drain batteries correctly per chain
     const { seriesChains } = batteryTopology
 
-    // Each parallel chain carries its share of the total current
-    const currentPerChain = current / parallelCount
-
-    seriesChains.forEach((chain, index) => {
+    seriesChains.forEach((chain) => {
       // Calculate voltage of each chain to determine current distribution
       const chainVoltage = chain.reduce((sum, bat) => sum + (bat.charge > 0 ? bat.voltage : 0), 0)
       const totalChainVoltage = seriesChains.reduce((sum, ch) =>
